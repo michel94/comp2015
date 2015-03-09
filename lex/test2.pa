@@ -1,0 +1,5 @@
+var i;
+i := 4;
+if i = 4 aNd i < 5 or i moD 2 then
+	i := i + 1
+
