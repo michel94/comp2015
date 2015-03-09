@@ -6,8 +6,9 @@ whitespace		[\n\t ]
 {num}										{printf("INTLIT(%s)\n", yytext); }
 
 '([^'\n]|'')+'							{printf("STRING(%s)\n", yytext); }
-'([^'\n]|'')+							{printf("Undeterminated String at \n", yytext); }
-"{"([^a]|a)*"}"							{printf("Comment %s\n", yytext); /*comments will be ignored later, just for testing*/ }
+'([^'\n]|'')+							{printf("Unterminated string at \n", yytext); }
+"{"[^}]*"}"							{printf("Comment %s\n", yytext); /*comments will be ignored later, just for testing*/ }
+"{"[^}]*							{printf("Unterminated comment at \n", yytext); }
 
 ":=" 										{printf("ASSIGN\n"); }
 [bB][eE][gG][iI][nN] 						{printf("BEGIN\n"); }
@@ -39,6 +40,8 @@ whitespace		[\n\t ]
 {letter}[{num}{letter}]*						{printf("ID(%s)\n", yytext);}
 {whitespace}								{;}
 .											{printf("\nBUG\n"); }
+
+
 
 %%
 int main(){
