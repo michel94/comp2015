@@ -7,7 +7,7 @@ whitespace		[\n\t ]
 
 '([^'\n]|'')+'							{printf("STRING(%s)\n", yytext); }
 '([^'\n]|'')+							{printf("Undeterminated String at \n", yytext); }
-
+"{"([^a]|a)*"}"							{printf("Comment %s\n", yytext); /*comments will be ignored later, just for testing*/ }
 
 ":=" 										{printf("ASSIGN\n"); }
 [bB][eE][gG][iI][nN] 						{printf("BEGIN\n"); }
