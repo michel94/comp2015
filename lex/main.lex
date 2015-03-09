@@ -1,9 +1,6 @@
 num				[0-9]+
 letter			[a-zA-Z]+
 whitespace		[\n\t ]
-char			[^\n']
-lixo			('')*
-stringterm		'
 %%
 {num}"."{num}|{num}.{num}e{num}|{num}e{num}	{printf("REALLIT(%s)\n", yytext); } 
 {num}										{printf("INTLIT(%s)\n", yytext); }
