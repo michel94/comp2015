@@ -5,10 +5,10 @@ whitespace		[\n\t ]
 {num}"."{num}|{num}.{num}e{num}|{num}e{num}	{printf("REALLIT(%s)\n", yytext); } 
 {num}										{printf("INTLIT(%s)\n", yytext); }
 
-'([^'\n]|'')+'							{printf("STRING(%s)\n", yytext); }
-'([^'\n]|'')+							{printf("Unterminated string at \n", yytext); }
-"{"[^}]*"}"							{printf("Comment %s\n", yytext); /*comments will be ignored later, just for testing*/ }
-"{"[^}]*							{printf("Unterminated comment at \n", yytext); }
+'([^'\n]|'')+'							{yytext[strlen(yytext)-1]=0; printf("STRING(%s)\n", yytext+1); }
+'([^'\n]|'')+							{printf("Unterminated string at %d\n", 33); }
+"{"[^}]*"}"							{; /*comments are ignored*/ }
+"{"[^}]*							{printf("Unterminated comment at %d\n", 33); }
 
 ":=" 										{printf("ASSIGN\n"); }
 [bB][eE][gG][iI][nN] 						{printf("BEGIN\n"); }
