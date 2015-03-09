@@ -1,2 +1,2 @@
-lex $1
-gcc -o $2 lex.yy.c
+lex main.lex
+gcc -o analyser lex.yy.c
