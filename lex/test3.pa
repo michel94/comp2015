@@ -1,0 +1,5 @@
+while a <> b do  WriteLn('Waiting');
+ 
+if a > b then WriteLn('Condition met')   {no semicolon allowed!}
+           else WriteLn('Condition not met');
+
