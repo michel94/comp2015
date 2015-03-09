@@ -1,0 +1,15 @@
+'sdf sdf '''''sdf'
+'def def'
+'asdsad'''
+'asdasd '' sad
+'
+2.3
+2.3e4
+2e4
+' asd as '' asdasd ''''' asd '
+program echo(output);
+var x: integer;
+begin
+	val(paramstr(1.2), x);
+	writeln(x)
+end.
