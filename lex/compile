@@ -1,2 +1,2 @@
-lex main.lex
+lex main.l
 gcc -o analyser lex.yy.c
