@@ -1,2 +1,4 @@
 lex main.l
 gcc -o analyser lex.yy.c
+rm mpascanner.zip; cp main.l mpascanner.l; zip mpascanner.zip mpascanner.l; rm mpascanner.l
+
