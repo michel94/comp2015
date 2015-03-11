@@ -37,7 +37,8 @@ whitespace					[\n\t ]
 [vV][aA][rR]								{printf("VAR\n");}
 [wW][hH][iI][lL][eE]						{printf("WHILE\n");}
 [wW][rR][iI][tT][eE][lL][nN]				{printf("WRITELN\n");}
-[aA][nN][dD]|[oO][rR]						{printf("OP1\n");}
+[aA][nN][dD]								{printf("OP1(AND)\n", yytext);}
+[oO][rR]									{printf("OP1(OR)\n", yytext);}
 "<"|">"|"="|"<>"|"<="|">="					{printf("OP2(%s)\n", yytext);}
 "+"|"-"				 						{printf("OP3(%s)\n", yytext);}
 "*"|"/"										{printf("OP4(%s)\n", yytext);}
