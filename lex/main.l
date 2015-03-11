@@ -4,11 +4,11 @@ whitespace					[\n\t ]
 
 %%
 
-{num}"."{num}|{num}.{num}e{num}|{num}e{num} {printf("REALLIT(%s)\n", yytext); } 
+{num}"."{num}|{num}.{num}e[+-]?{num}|{num}e[-+]?{num} {printf("REALLIT(%s)\n", yytext); } 
 {num}										{printf("INTLIT(%s)\n", yytext); }
 
 '([^'\n]|'')+'								{yytext[strlen(yytext)-1]=0; printf("STRING(%s)\n", yytext+1); }
-'([^'\n]|'')+								{printf("Line 33, col 33: unterminated string\n", 33); }
+'([^'\n]|'')+								{printf("Line 33, col 33: unterminated string\n"); }
 (\{|"(*")[^"}""\*\)"]*(\}|"*)")				{; /*comments are ignored*/ }
 (\{|"(*")[^"}""\*\)"]*						{printf("Line 33, col 33: unterminated comment %s\n", yytext); }
 
