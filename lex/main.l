@@ -4,7 +4,7 @@ whitespace					[\n\t ]
 
 %%
 
-{num}"."{num}|{num}.{num}e[+-]?{num}|{num}e[-+]?{num} {printf("REALLIT(%s)\n", yytext); } 
+({num}"."{num})|({num}e[+-]?{num}) 			{printf("REALLIT(%s)\n", yytext); } 
 {num}										{printf("INTLIT(%s)\n", yytext); }
 
 '([^'\n]|'')+'								{yytext[strlen(yytext)-1]=0; printf("STRING(%s)\n", yytext+1); }
@@ -33,19 +33,20 @@ whitespace					[\n\t ]
 ";"				 							{printf("SEMIC\n");}
 [tT][hH][eE][nN]							{printf("THEN\n");}
 [uU][nN][tT][iI][lL]						{printf("UNTIL\n");}
-[vV][aA][lL]								{printf("VAL\n");}
+[vV][aA][lL]								{printf("VAL\n");}	
 [vV][aA][rR]								{printf("VAR\n");}
 [wW][hH][iI][lL][eE]						{printf("WHILE\n");}
 [wW][rR][iI][tT][eE][lL][nN]				{printf("WRITELN\n");}
-[aA][nN][dD]								{printf("OP1(AND)\n", yytext);}
-[oO][rR]									{printf("OP1(OR)\n", yytext);}
+[aA][nN][dD]								{printf("OP1(%s)\n", yytext);}
+[oO][rR]									{printf("OP1(%s)\n", yytext);}
 "<"|">"|"="|"<>"|"<="|">="					{printf("OP2(%s)\n", yytext);}
 "+"|"-"				 						{printf("OP3(%s)\n", yytext);}
 "*"|"/"										{printf("OP4(%s)\n", yytext);}
-[mM][oO][dD]								{printf("OP4(MOD)\n", yytext);}
-[dD][iI][vV]								{printf("OP4(DIV)\n", yytext);}
+[mM][oO][dD]								{printf("OP4(%s)\n", yytext);}
+[dD][iI][vV]								{printf("OP4(%s)\n", yytext);}
+	
+[a-zA-Z][0-9a-zA-Z]*						{printf("ID(%s)\n", yytext);}
 
-{letter}[{num}{letter}]*					{printf("ID(%s)\n", yytext);}
 {whitespace}								{;}
 .											{printf("Line 33, col 33: illegal character ('%s')\n", yytext); /* Some illegal characters are parsed twice*/ }
 
