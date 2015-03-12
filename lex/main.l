@@ -1,4 +1,5 @@
 %option caseless
+%option yylineno
 
 num									[0-9]+
 letter								[a-zA-Z]+
@@ -6,13 +7,13 @@ whitespace							[\n\t ]
 
 %%
 
-({num}"."{num})|({num}e[+-]?{num}) 			{printf("REALLIT(%s)\n", yytext); } 
+({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) 			{printf("REALLIT(%s)\n", yytext); } 
 {num}										{printf("INTLIT(%s)\n", yytext); }
 
 '([^'\n]|'')+'								{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1); }
-'([^'\n]|'')+								{printf("Line 33, col 33: unterminated string\n"); }
+'([^'\n]|'')+								{printf("Line %d, col 33: unterminated string\n", yylineno); }
 (\{|"(*")[^("}"|"*)")]*(\}|"*)")			{; /*comments are ignored*/ }
-(\{|"(*")[^("}"|"*)")]						{printf("Line 33, col 33: unterminated comment %s\n", yytext); }
+(\{|"(*")[^("}"|"*)")]						{printf("Line %d, col 33: unterminated comment %s\n", yylineno, yytext); }
 
 ":="										{printf("ASSIGN\n");}
 begin										{printf("BEGIN\n");}
