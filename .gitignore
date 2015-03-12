@@ -22,6 +22,8 @@
 *.dylib
 
 # Executables
+analyser
+*.zip
 *.exe
 *.out
 *.app
@@ -31,3 +33,4 @@
 
 # Unix backup files
 *~
+

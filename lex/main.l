@@ -2,7 +2,6 @@
 %option yylineno
 
 num									[0-9]+
-letter								[a-zA-Z]+
 whitespace							[\n\t ]
 
 %%
@@ -40,13 +39,12 @@ val											{printf("VAL\n");}
 var											{printf("VAR\n");}
 while										{printf("WHILE\n");}
 writeln										{printf("WRITELN\n");}
-and											{printf("OP1(%s)\n", yytext);}
-or											{printf("OP1(%s)\n", yytext);}
+and|or										{printf("OP1(%s)\n", yytext);}
 "<"|">"|"="|"<>"|"<="|">="					{printf("OP2(%s)\n", yytext);}
 "+"|"-"				 						{printf("OP3(%s)\n", yytext);}
-"*"|"/"										{printf("OP4(%s)\n", yytext);}
-mod											{printf("OP4(%s)\n", yytext);}
-div											{printf("OP4(%s)\n", yytext);}
+"*"|"/"|mod|div								{printf("OP4(%s)\n", yytext);}
+
+abs|arctan|char|chr|cos|dispose|eof|eoln|exp|for|get|input|ln|maxint|new|odd|ord|output|pack|page|pred|put|read|readln|reset|rewrite|round|sin|sqr|sqrt|succ|text|to|trunc|unpack|write 						{printf("RESERVED(%s)\n", yytext);}
 	
 [a-zA-Z][0-9a-zA-Z]*						{printf("ID(%s)\n", yytext);}
 
