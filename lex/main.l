@@ -1,6 +1,8 @@
 %option caseless
 %option yylineno
 
+%X COMMENT
+
 num									[0-9]+
 whitespace							[\n\t ]
 
@@ -11,8 +13,10 @@ whitespace							[\n\t ]
 
 '([^'\n]|'')+'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1);}
 '([^'\n]|'')+												{printf("Line %d, col 33: unterminated string\n", yylineno);}
-(\{|"(*")[^("}"|"*)")]*(\}|"*)")							{; /*comments are ignored*/ }
-(\{|"(*")[^("}"|"*)")]										{printf("Line %d, col 33: unterminated comment %s\n", yylineno, yytext);}
+
+"{"|"(*"													{BEGIN COMMENT; }
+<COMMENT>"}"|"*)"											{BEGIN 0; }
+<COMMENT>.|\n												{; }
 
 ":="														{printf("ASSIGN\n");}
 begin														{printf("BEGIN\n");}
