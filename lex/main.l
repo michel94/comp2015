@@ -61,7 +61,7 @@ abs|arctan|array|case|char|chr|const|cos|dispose|div|downto|eof|eoln|exp|file|fo
 
 {whitespace}												{;}
 \n															{col=1;}
-.															{printf("Line 33, col 33: illegal character ('%s')\n", yytext); /* Some illegal characters are parsed twice*/ }
+.															{printf("Line %d, col %d: illegal character ('%s')\n", yylineno, col, yytext); /* Some illegal characters are parsed twice*/ }
 
 
 %%
