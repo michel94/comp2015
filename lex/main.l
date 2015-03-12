@@ -44,11 +44,11 @@ and|or														{printf("OP1(%s)\n", yytext);}
 "+"|"-"				 										{printf("OP3(%s)\n", yytext);}
 "*"|"/"|mod|div												{printf("OP4(%s)\n", yytext);}
 
-abs|arctan|char|chr|cos|dispose|eof|eoln|exp|for|get|input|ln|maxint|new|odd|ord|output|pack|page|pred|put|read|readln|reset|rewrite|round|sin|sqr|sqrt|succ|text|to|trunc|unpack|write 										{printf("RESERVED(%s)\n", yytext);}
+abs|arctan|array|case|char|chr|const|cos|dispose|div|downto|eof|eoln|exp|file|for|function|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|output|pack|packed|page|pred|procedure|put|record|read|readln|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|type|to|trunc|unpack|until|var|with|write 																							{printf("RESERVED(%s)\n", yytext);}
 	
 [a-zA-Z][0-9a-zA-Z]*										{printf("ID(%s)\n", yytext);}
 
-{whitespace}								{;}
+{whitespace}												{;}
 .															{printf("Line 33, col 33: illegal character ('%s')\n", yytext); /* Some illegal characters are parsed twice*/ }
 
 
