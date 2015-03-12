@@ -4,7 +4,12 @@
 %X COMMENT
 
 num									[0-9]+
-whitespace							[\n\t ]
+whitespace							[\t ]
+
+%{
+	int col=0;
+	#define YY_USER_ACTION col+=yyleng;
+%}
 
 %%
 
@@ -12,11 +17,13 @@ whitespace							[\n\t ]
 {num}														{printf("INTLIT(%s)\n", yytext);}
 
 '([^'\n]|'')+'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1);}
-'([^'\n]|'')+												{printf("Line %d, col 33: unterminated string\n", yylineno);}
+'([^'\n]|'')+												{printf("Line %d, col %d: unterminated string\n", yylineno, col);}
 
 "{"|"(*"													{BEGIN COMMENT; }
 <COMMENT>"}"|"*)"											{BEGIN 0; }
-<COMMENT>.|\n												{; }
+<COMMENT>.													{; }
+<COMMENT>\n 												{col = 1; }
+<COMMENT><<eof>>	 										{printf("Line %d, col %d: unterminated comment\n", yylineno, col); return 0; }
 
 ":="														{printf("ASSIGN\n");}
 begin														{printf("BEGIN\n");}
@@ -53,6 +60,7 @@ abs|arctan|array|case|char|chr|const|cos|dispose|div|downto|eof|eoln|exp|file|fo
 [a-zA-Z][0-9a-zA-Z]*										{printf("ID(%s)\n", yytext);}
 
 {whitespace}												{;}
+\n															{col=1;}
 .															{printf("Line 33, col 33: illegal character ('%s')\n", yytext); /* Some illegal characters are parsed twice*/ }
 
 
