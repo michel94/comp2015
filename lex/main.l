@@ -7,7 +7,7 @@ num									[0-9]+
 whitespace							[\t ]
 
 %{
-	int col=0;
+	int col=0, stcol, stline;
 	#define YY_USER_ACTION col+=yyleng;
 %}
 
@@ -17,13 +17,13 @@ whitespace							[\t ]
 {num}														{printf("INTLIT(%s)\n", yytext);}
 
 '([^'\n]|'')+'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1);}
-'([^'\n]|'')+												{printf("Line %d, col %d: unterminated string\n", yylineno, col);}
+'([^'\n]|'')+												{printf("Line %d, col %d: unterminated string\n", yylineno, col - yyleng);}
 
-"{"|"(*"													{BEGIN COMMENT; }
+"{"|"(*"													{BEGIN COMMENT; stcol = col- yyleng; stline = yylineno; }
 <COMMENT>"}"|"*)"											{BEGIN 0; }
 <COMMENT>.													{; }
 <COMMENT>\n 												{col = 1; }
-<COMMENT><<eof>>	 										{printf("Line %d, col %d: unterminated comment\n", yylineno, col); return 0; }
+<COMMENT><<eof>>	 										{printf("Line %d, col %d: unterminated comment\n", stline, stcol); return 0; }
 
 ":="														{printf("ASSIGN\n");}
 begin														{printf("BEGIN\n");}
