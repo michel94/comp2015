@@ -7,7 +7,7 @@ num									[0-9]+
 whitespace							[\t ]
 
 %{
-	int col=0, stcol, stline;
+	int col=1, stcol, stline;
 	#define YY_USER_ACTION col+=yyleng;
 %}
 
@@ -16,10 +16,10 @@ whitespace							[\t ]
 ({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {printf("REALLIT(%s)\n", yytext);}
 {num}														{printf("INTLIT(%s)\n", yytext);}
 
-'([^'\n]|'')+'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1);}
-'([^'\n]|'')+												{printf("Line %d, col %d: unterminated string\n", yylineno, col - yyleng);}
+'([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1);}
+'([^'\n]|'')*												{printf("Line %d, col %d: unterminated string\n", yylineno, col - (int)yyleng);}
 
-"{"|"(*"													{BEGIN COMMENT; stcol = col- yyleng; stline = yylineno; }
+"{"|"(*"													{BEGIN COMMENT; stcol = col-yyleng; stline = yylineno; }
 <COMMENT>"}"|"*)"											{BEGIN 0; }
 <COMMENT>.													{; }
 <COMMENT>\n 												{col = 1; }
@@ -61,8 +61,7 @@ abs|arctan|array|case|char|chr|const|cos|dispose|div|downto|eof|eoln|exp|file|fo
 
 {whitespace}												{;}
 \n															{col=1;}
-.															{printf("Line %d, col %d: illegal character ('%s')\n", yylineno, col, yytext); /* Some illegal characters are parsed twice*/ }
-
+.															{printf("Line %d, col %d: illegal character ('%s')\n", yylineno, col - (int)yyleng, yytext); /* Some illegal characters are parsed twice*/ }
 
 %%
 int main(){
