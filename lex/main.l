@@ -7,16 +7,20 @@ num									[0-9]+
 whitespace							[\t ]
 
 %{
-	int col=1, stcol, stline;
+	#include "../yacc/y.tab.h"
 	#define YY_USER_ACTION col+=yyleng;
+	
+	extern int yylval;
+	extern int yylfloat;
+	int col=1, stcol, stline;
 %}
 
 %%
 
-({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {printf("REALLIT(%s)\n", yytext); yylval = atoi(yytext); return NUMBER; }
-{num}														{printf("INTLIT(%s)\n", yytext); yylval = atof(yytext); return NUMBER; }
+({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {printf("REALLIT(%s)\n", yytext); yylval = yytext; return NUMBER; }
+{num}														{printf("INTLIT(%s)\n", yytext); yylval = yytext; return NUMBER; }
 
-'([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1); strcpy(yylstr, yytext); return STRING; }
+'([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1); yylval = yytext; return STRING; }
 '([^'\n]|'')*												{printf("Line %d, col %d: unterminated string\n", yylineno, col - (int)yyleng);}
 
 "{"|"(*"													{BEGIN COMMENT; stcol = col-yyleng; stline = yylineno; }
@@ -26,7 +30,7 @@ whitespace							[\t ]
 <COMMENT><<eof>>	 										{printf("Line %d, col %d: unterminated comment\n", stline, stcol); return 0; }
 
 ":="														{return ASSIGN; }
-begin														{return BEGIN; }
+begin														{return BEG; }
 do															{return DO; }
 else														{return ELSE; }
 end															{return END; }
@@ -56,7 +60,7 @@ div															{return DIV; }
 
 abs|arctan|array|case|char|chr|const|cos|dispose|div|downto|eof|eoln|exp|file|for|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|output|pack|packed|page|pred|procedure|put|record|read|readln|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|type|to|trunc|unpack|with|write 	{printf("RESERVED(%s)\n", yytext);}
 
-[a-zA-Z][0-9a-zA-Z]*										{printf("ID(%s)\n", yytext); strcpy(yylstr, yytext); return ID;}
+[a-zA-Z][0-9a-zA-Z]*										{yylval = yytext; return ID;}
 
 {whitespace}												{;}
 \n															{col=1;}
