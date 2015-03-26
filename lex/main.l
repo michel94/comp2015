@@ -13,10 +13,10 @@ whitespace							[\t ]
 
 %%
 
-({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {printf("REALLIT(%s)\n", yytext);}
-{num}														{printf("INTLIT(%s)\n", yytext);}
+({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {printf("REALLIT(%s)\n", yytext); yylval = atoi(yytext); return NUMBER; }
+{num}														{printf("INTLIT(%s)\n", yytext); yylval = atof(yytext); return NUMBER; }
 
-'([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1);}
+'([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; printf("STRING('%s')\n", yytext+1); strcpy(yylstr, yytext); return STRING; }
 '([^'\n]|'')*												{printf("Line %d, col %d: unterminated string\n", yylineno, col - (int)yyleng);}
 
 "{"|"(*"													{BEGIN COMMENT; stcol = col-yyleng; stline = yylineno; }
@@ -25,39 +25,38 @@ whitespace							[\t ]
 <COMMENT>\n 												{col = 1; }
 <COMMENT><<eof>>	 										{printf("Line %d, col %d: unterminated comment\n", stline, stcol); return 0; }
 
-":="														{printf("ASSIGN\n");}
-begin														{printf("BEGIN\n");}
-":"															{printf("COLON\n");}
-","				 											{printf("COMMA\n");}
-do															{printf("DO\n"); }
-"."															{printf("DOT\n");}
-else														{printf("ELSE\n");}
-end															{printf("END\n");}
-forward														{printf("FORWARD\n");}
-function													{printf("FUNCTION\n");}
-if															{printf("IF\n");}
-"("				 											{printf("LBRAC\n");}
-not															{printf("NOT\n");}
-output														{printf("OUTPUT\n");}
-paramstr													{printf("PARAMSTR\n");}
-program														{printf("PROGRAM\n");}
-")"				 											{printf("RBRAC\n");}
-repeat														{printf("REPEAT\n");}
-";"				 											{printf("SEMIC\n");}
-then														{printf("THEN\n");}
-until														{printf("UNTIL\n");}
-val															{printf("VAL\n");}	
-var															{printf("VAR\n");}
-while														{printf("WHILE\n");}
-writeln														{printf("WRITELN\n");}
-and|or														{printf("OP1(%s)\n", yytext);}
-"<"|">"|"="|"<>"|"<="|">="									{printf("OP2(%s)\n", yytext);}
-"+"|"-"				 										{printf("OP3(%s)\n", yytext);}
-"*"|"/"|mod|div												{printf("OP4(%s)\n", yytext);}
+":="														{return ASSIGN; }
+begin														{return BEGIN; }
+do															{return DO; }
+else														{return ELSE; }
+end															{return END; }
+forward														{return FORWARD; }
+function													{return FUNCTION; }
+if															{return IF; }
+not															{return NOT; }
+output														{return OUTPUT; }
+paramstr													{return PARAMSTR; }
+program														{return PROGRAM; }
+repeat														{return REPEAT; }
+then														{return THEN; }
+until														{return UNTIL; }
+val															{return VAL; }	
+var															{return VAR; }
+while														{return WHILE; }
+writeln														{return WRITELN; }
+
+and															{return AND; }
+or															{return OR; }
+"<>"														{return NEQ; }
+"<="														{return LE; }
+">="														{return GE; }
+"<"|">"|"="|"+"|"-"|"*"|"/"|":"|","|"."|"("|")"|";"			{return yytext[0]; }
+mod															{return MOD; }
+div															{return DIV; }
 
 abs|arctan|array|case|char|chr|const|cos|dispose|div|downto|eof|eoln|exp|file|for|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|output|pack|packed|page|pred|procedure|put|record|read|readln|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|type|to|trunc|unpack|with|write 	{printf("RESERVED(%s)\n", yytext);}
 
-[a-zA-Z][0-9a-zA-Z]*										{printf("ID(%s)\n", yytext);}
+[a-zA-Z][0-9a-zA-Z]*										{printf("ID(%s)\n", yytext); strcpy(yylstr, yytext); return ID;}
 
 {whitespace}												{;}
 \n															{col=1;}
