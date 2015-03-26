@@ -64,10 +64,6 @@ abs|arctan|array|case|char|chr|const|cos|dispose|div|downto|eof|eoln|exp|file|fo
 .															{printf("Line %d, col %d: illegal character ('%s')\n", yylineno, col - (int)yyleng, yytext); /* Some illegal characters are parsed twice*/ }
 
 %%
-int main(){
-	yylex();
-	return 0;
-}
 
 int yywrap(){
 	return 1;
