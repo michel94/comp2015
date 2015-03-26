@@ -27,23 +27,17 @@ whitespace							[\t ]
 
 ":="														{return ASSIGN; }
 begin														{return BEGIN; }
-":"															{return COLON; }
-","				 											{return COMMA; }
 do															{return DO; }
-"."															{return DOT; }
 else														{return ELSE; }
 end															{return END; }
 forward														{return FORWARD; }
 function													{return FUNCTION; }
 if															{return IF; }
-"("				 											{return LBRAC; }
 not															{return NOT; }
 output														{return OUTPUT; }
 paramstr													{return PARAMSTR; }
 program														{return PROGRAM; }
-")"				 											{return RBRAC; }
 repeat														{return REPEAT; }
-";"				 											{return SEMIC; }
 then														{return THEN; }
 until														{return UNTIL; }
 val															{return VAL; }	
@@ -56,7 +50,7 @@ or															{return OR; }
 "<>"														{return NEQ; }
 "<="														{return LE; }
 ">="														{return GE; }
-"<"|">"|"="|"+"|"-"|"*"|"/"									{return yytext[0]; }
+"<"|">"|"="|"+"|"-"|"*"|"/"|":"|","|"."|"("|")"|";"			{return yytext[0]; }
 mod															{return MOD; }
 div															{return DIV; }
 
