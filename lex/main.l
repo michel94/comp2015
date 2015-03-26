@@ -48,8 +48,8 @@ writeln														{return WRITELN; }
 and															{return AND; }
 or															{return OR; }
 "<>"														{return NEQ; }
-"<="														{return LE; }
-">="														{return GE; }
+"<="														{return LEQ; }
+">="														{return GEQ; }
 "<"|">"|"="|"+"|"-"|"*"|"/"|":"|","|"."|"("|")"|";"			{return yytext[0]; }
 mod															{return MOD; }
 div															{return DIV; }
