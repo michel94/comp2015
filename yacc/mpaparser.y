@@ -35,7 +35,8 @@
 prog: progHeading ';' progBlock '.';
 progHeading: PROGRAM ID '(' OUTPUT ')';
 progBlock: varPart funcPart statPart;
-varPart: VAR varDeclaration;
+varPart: | VAR varDeclaration ';' varDeclarationSemicList;
+varDeclarationSemicList: | varDeclarationSemicList varDeclaration ';';
 varDeclaration: idList ':' ID;
 
 idList: ID commaIdList;
