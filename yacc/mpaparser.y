@@ -63,8 +63,8 @@ Stat: compStat;
 Stat: IF Expr THEN Stat elseStatOr;
 Stat: WHILE Expr DO Stat;
 Stat: REPEAT statList UNTIL Expr;
-Stat: VAL '(' PARAMSTR ')' Expr ')' ',' ID ')';
-Stat: | ID '=' Expr;
+Stat: VAL '(' PARAMSTR '(' Expr ')' ',' ID ')';
+Stat: | ID ASSIGN Expr;
 Stat: WRITELN writelnPList | WRITELN;
 
 writelnPList: '(' exprOrString commaExprOrStringList ')';
