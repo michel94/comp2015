@@ -17,8 +17,8 @@ whitespace							[\t ]
 
 %%
 
-({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {return NUMBER; }
-{num}														{return NUMBER; }
+({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {return REALLIT; }
+{num}														{return INTLIT; }
 
 '([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; return STRING; }
 '([^'\n]|'')*												{printf("Line %d, col %d: unterminated string\n", yylineno, col - (int)yyleng);}

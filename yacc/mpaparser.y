@@ -1,7 +1,8 @@
 
 %token ID
 %token STRING
-%token NUMBER
+%token REALLIT
+%token INTLIT
 
 %token ASSIGN
 %token BEG
@@ -73,7 +74,7 @@ commaExprOrStringList: | commaExprOrStringList ',' exprOrString;
 Expr: Expr exprOp Expr;
 Expr: exprOp3Not Expr;
 Expr: '(' Expr ')';
-Expr: NUMBER;
+Expr: INTLIT | REALLIT;
 Expr: ID paramList | ID;
 
 paramList: '(' Expr commaExprList ')';
