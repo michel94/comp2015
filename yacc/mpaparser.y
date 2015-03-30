@@ -39,10 +39,10 @@ varPart: VAR varDeclaration;
 varDeclaration: idList ':' ID;
 
 idList: ID commaIdList;
-commaIdList: commaIdList ',' ID | ;
+commaIdList: | commaIdList ',' ID;
 
 funcPart: funcDeclarationList;
-funcDeclarationList: funcDeclarationList funcDeclaration ';' | ;
+funcDeclarationList: | funcDeclarationList funcDeclaration ';';
 funcDeclaration: funcHeading ';' FORWARD;
 funcDeclaration: funcIdent ';' funcBlock;
 funcDeclaration: funcHeading ';' funcBlock;
@@ -50,24 +50,24 @@ funcHeading: FUNCTION ID formalParamListOr ':' ID;
 funcIdent: FUNCTION ID;
 
 formalParamList: '(' formalParams semicFormalParamsList ')';
-semicFormalParamsList: semicFormalParamsList ';' formalParams | ;
+semicFormalParamsList: | semicFormalParamsList ';' formalParams;
 formalParams: varOr idList ':' ID;
 funcBlock: varPart statPart;
 
 statPart: compStat;
 compStat: BEG statList END;
 statList: Stat semicStatList;
-semicStatList: semicStatList ';' Stat | ;
+semicStatList: | semicStatList ';' Stat;
 Stat: compStat;
 Stat: IF Expr THEN Stat elseStatOr;
 Stat: WHILE Expr DO Stat;
 Stat: REPEAT statList UNTIL Expr;
 Stat: VAL '(' PARAMSTR ')' Expr ')' ',' ID ')';
-Stat: ID '=' Expr | ;
+Stat: | ID '=' Expr;
 Stat: WRITELN writelnPList | WRITELN;
 
 writelnPList: '(' exprOrString commaExprOrStringList ')';
-commaExprOrStringList: commaExprOrStringList ',' exprOrString | ;
+commaExprOrStringList: | commaExprOrStringList ',' exprOrString;
 
 Expr: Expr exprOp Expr;
 Expr: exprOp3Not Expr;
@@ -76,13 +76,13 @@ Expr: NUMBER;
 Expr: ID paramList | ID;
 
 paramList: '(' Expr commaExprList ')';
-commaExprList: commaExprList ',' Expr | ;
+commaExprList: | commaExprList ',' Expr;
 
 exprOp: OP1 | OP2 | OP3 | OP4;
 exprOp3Not: OP3 | NOT;
-varOr: VAR | ;
-elseStatOr: ELSE Stat | ;
-formalParamListOr: formalParamListOr | ;
+varOr: | VAR;
+elseStatOr: | ELSE Stat;
+formalParamListOr: | formalParamList;
 exprOrString: Expr | STRING ;
 OP1: AND | OR; 
 OP2: '<' | '>' | '=' | NEQ | LEQ | GEQ;
