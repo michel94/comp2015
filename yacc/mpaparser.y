@@ -1,97 +1,73 @@
-
-%token ID
-%token STRING
-%token REALLIT
-%token INTLIT
-
-%token ASSIGN
-%token BEG
-%token DO
-%token ELSE
-%token END
-%token FORWARD
-%token FUNCTION
-%token IF
-%token NOT
-%token OUTPUT
-%token PARAMSTR
-%token PROGRAM
-%token REPEAT
-%token THEN
-%token UNTIL
-%token VAL
-%token VAR
-%token WHILE
-%token WRITELN
-%token AND
-%token OR
-%token NEQ
-%token LEQ
-%token GEQ
-%token MOD
-%token DIV
+%token NOT AND OR MOD DIV
+%token ASSIGN NEQ LEQ GEQ
+%token IF THEN ELSE BEG END
+%token DO REPEAT UNTIL WHILE
+%token VAR VAL ID STRING REALLIT INTLIT
+%token FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN
 
 %%
 
-prog: progHeading ';' progBlock '.';
-progHeading: PROGRAM ID '(' OUTPUT ')';
-progBlock: varPart funcPart statPart;
-varPart: | VAR varDeclaration ';' varDeclarationSemicList;
-varDeclarationSemicList: | varDeclarationSemicList varDeclaration ';';
-varDeclaration: idList ':' ID;
+Prog: ProgHeading ';' ProgBlock '.';
+ProgHeading: PROGRAM ID '(' OUTPUT ')';
+ProgBlock: VarPart FuncPart StatPart;
+VarPart: VAR VarDeclaration ';' varDeclarationSemicList | %empty;
+varDeclarationSemicList: varDeclarationSemicList VarDeclaration ';' | %empty;
+VarDeclaration: IdList ':' ID;
+IdList: ID IdListList;
+IdListList: IdListList ',' ID | %empty;
 
-idList: ID commaIdList;
-commaIdList: | commaIdList ',' ID;
+FuncPart: FuncDeclarationList;
+FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' | %empty;
+FuncDeclaration: FuncHeading ';' FORWARD;
+FuncDeclaration: FuncIdent ';' FuncBlock;
+FuncDeclaration: FuncHeading ';' FuncBlock;
+FuncHeading: FUNCTION ID NullFormalParam ':' ID;
+FuncIdent: FUNCTION ID;
 
-funcPart: funcDeclarationList;
-funcDeclarationList: | funcDeclarationList funcDeclaration ';';
-funcDeclaration: funcHeading ';' FORWARD;
-funcDeclaration: funcIdent ';' funcBlock;
-funcDeclaration: funcHeading ';' funcBlock;
-funcHeading: FUNCTION ID formalParamListOr ':' ID;
-funcIdent: FUNCTION ID;
+FormalParamList: '(' FormalParams FormalParamsListList ')';
+FormalParams: NullVar IdList ':' ID;
+FuncBlock: VarPart StatPart;
+NullVar: VAR | %empty;
 
-formalParamList: '(' formalParams semicFormalParamsList ')';
-semicFormalParamsList: | semicFormalParamsList ';' formalParams;
-formalParams: varOr idList ':' ID;
-funcBlock: varPart statPart;
+FormalParamsListList: FormalParamsListList ';' FormalParams | %empty;
+NullFormalParam: FormalParamList | %empty;
 
-statPart: compStat;
-compStat: BEG statList END;
-statList: Stat semicStatList;
-semicStatList: | semicStatList ';' Stat;
-Stat: compStat;
-Stat: IF Expr THEN Stat elseStatOr;
-Stat: WHILE Expr DO Stat;
-Stat: REPEAT statList UNTIL Expr;
-Stat: VAL '(' PARAMSTR '(' Expr ')' ',' ID ')';
-Stat: | ID ASSIGN Expr;
-Stat: WRITELN writelnPList | WRITELN;
+StatPart: CompStat;
+CompStat: BEG StatList END;
+StatList: Stat StatListList;
+StatListList: StatListList ';' Stat | %empty;
+Stat: CompStat
+	| IF Expr THEN Stat
+	| IF Expr THEN Stat ELSE Stat
+	| WHILE Expr DO Stat
+	| REPEAT StatList UNTIL Expr
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')'
+	| WRITELN WriteList | WRITELN
+	| ID ASSIGN Expr
+	| %empty;
 
-writelnPList: '(' exprOrString commaExprOrStringList ')';
-commaExprOrStringList: | commaExprOrStringList ',' exprOrString;
+WriteList: '(' ExprString ExprStringList ')';
+ExprStringList: ExprStringList ',' ExprString | %empty;
+ExprString: Expr | STRING ;
 
-Expr: Expr exprOp Expr;
-Expr: exprOp3Not Expr;
-Expr: '(' Expr ')';
-Expr: INTLIT | REALLIT;
-Expr: ID paramList | ID;
+Expr: Expr AllOP Expr
+	| PreOP Expr
+	| '(' Expr ')'
+	| INTLIT | REALLIT
+	| ID ParamList | ID;
 
-paramList: '(' Expr commaExprList ')';
-commaExprList: | commaExprList ',' Expr;
+ParamList: '(' Expr ExprList ')';
+ExprList: ExprList ',' Expr | %empty;
 
-exprOp: OP1 | OP2 | OP3 | OP4;
-exprOp3Not: OP3 | NOT;
-varOr: | VAR;
-elseStatOr: | ELSE Stat;
-formalParamListOr: | formalParamList;
-exprOrString: Expr | STRING ;
+AllOP: OP1 | OP2 | OP3 | OP4;
+PreOP: OP3 | NOT;
 OP1: AND | OR; 
 OP2: '<' | '>' | '=' | NEQ | LEQ | GEQ;
 OP3: '+' | '-' ;
 OP4: '*' | '/' | MOD | DIV;
 
 %%
+
 #include <stdio.h>
 
 int main(){
@@ -99,6 +75,6 @@ int main(){
 }
 
 int yyerror(char *s){
-	printf("%s\n", s);
+	printf("Line %d, col %d: %s: %s\n", 1, 2, s, "");
 }
 
