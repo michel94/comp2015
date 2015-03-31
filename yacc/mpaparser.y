@@ -96,5 +96,9 @@ OP4: '*' | '/' | MOD | DIV;
 
 int main(){
 	yyparse();
-
 }
+
+int yyerror(char *s){
+	printf("%s\n", s);
+}
+

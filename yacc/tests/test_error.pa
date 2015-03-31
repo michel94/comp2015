@@ -1,0 +1,5 @@
+program gcd(output);
+var a, b: integer;
+begin
+	writeln(5
+end.
