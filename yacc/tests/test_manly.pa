@@ -1,0 +1,20 @@
+Program lesson4Program1;
+Var Sel: String;
+    N1,N2, Total : Real;
+    YN : Char;  {this is a character variable type, 
+                 which holds single characters ONLY}
+Begin
+ Total := 0;  {always initialise integer/real variables}
+ GotoXy(4,3);
+ Writeln('1.Addition');
+ GotoXy(4,4);
+ Writeln('2.Subtraction');
+ GotoXy(4,5);
+ Writeln('3.Exit');
+ GotoXy(6,8);
+ Sel := Readkey;
+ If Sel = '1' {action} then 
+  Begin  {more than one statement}
+   Writeln('Input No.1:'); 
+  End;  {Closing the if statement(begin)}
+End.
