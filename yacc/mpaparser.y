@@ -8,6 +8,12 @@
 %right THEN
 %right ELSE
 
+%right ASSIGN
+%left NEQ LEQ GEQ '<' '>' '='
+%left  OR '+' '-'
+%left '*' '/' MOD DIV AND
+%left NOT
+
 %%
 
 Prog: ProgHeading ';' ProgBlock '.';
@@ -34,7 +40,6 @@ NullVar: VAR | %empty;
 
 FormalParamsListLoop: FormalParamsListLoop ';' FormalParams | %empty;
 NullFormalParam: FormalParamList | %empty;
-
 StatPart: CompStat;
 CompStat: BEG StatList END;
 StatList: Stat StatListLoop;
@@ -53,21 +58,31 @@ WriteList: '(' ExprString ExprStringList ')';
 ExprStringList: ExprStringList ',' ExprString | %empty;
 ExprString: Expr | STRING ;
 
-Expr: Expr AllOP Expr
-	| PreOP Expr
+Expr: Expr AND Expr
+	| Expr OR Expr
+	| Expr '<' Expr
+	| Expr '>' Expr
+	| Expr '=' Expr
+	| Expr NEQ Expr
+	| Expr LEQ Expr
+	| Expr GEQ Expr
+	| Expr '+' Expr
+	| Expr '-' Expr
+	| Expr '*' Expr
+	| Expr '/' Expr
+	| Expr DIV Expr
+	| Expr MOD Expr
+	| '+' Expr
+	| '-' Expr
+	| NOT Expr
 	| '(' Expr ')'
 	| INTLIT | REALLIT
 	| ID ParamList | ID;
 
 ParamList: '(' Expr ExprList ')';
+
 ExprList: ExprList ',' Expr | %empty;
 
-AllOP: OP1 | OP2 | OP3 | OP4;
-PreOP: OP3 | NOT;
-OP1: AND | OR; 
-OP2: '<' | '>' | '=' | NEQ | LEQ | GEQ;
-OP3: '+' | '-' ;
-OP4: '*' | '/' | MOD | DIV;
 
 %%
 
