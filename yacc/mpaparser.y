@@ -14,6 +14,11 @@
 %left '*' '/' MOD DIV AND
 %left NOT
 
+%{
+	extern int yylineno, col, yyleng;
+	extern char* yytext;
+%}
+
 %%
 
 Prog: ProgHeading ';' ProgBlock '.';
@@ -93,6 +98,6 @@ int main(){
 }
 
 int yyerror(char *s){
-	printf("Line %d, col %d: %s: %s\n", 1, 2, s, "");
+	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
 }
 
