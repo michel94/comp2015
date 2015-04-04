@@ -5,6 +5,9 @@
 %token VAR VAL ID STRING REALLIT INTLIT
 %token FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN
 
+%right THEN
+%right ELSE
+
 %%
 
 Prog: ProgHeading ';' ProgBlock '.';
