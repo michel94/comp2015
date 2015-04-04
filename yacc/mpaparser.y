@@ -13,8 +13,8 @@ ProgBlock: VarPart FuncPart StatPart;
 VarPart: VAR VarDeclaration ';' varDeclarationSemicList | %empty;
 varDeclarationSemicList: varDeclarationSemicList VarDeclaration ';' | %empty;
 VarDeclaration: IdList ':' ID;
-IdList: ID IdListList;
-IdListList: IdListList ',' ID | %empty;
+IdList: ID IdListLoop;
+IdListLoop: IdListLoop ',' ID | %empty;
 
 FuncPart: FuncDeclarationList;
 FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' | %empty;
@@ -24,18 +24,18 @@ FuncDeclaration: FuncHeading ';' FuncBlock;
 FuncHeading: FUNCTION ID NullFormalParam ':' ID;
 FuncIdent: FUNCTION ID;
 
-FormalParamList: '(' FormalParams FormalParamsListList ')';
+FormalParamList: '(' FormalParams FormalParamsListLoop ')';
 FormalParams: NullVar IdList ':' ID;
 FuncBlock: VarPart StatPart;
 NullVar: VAR | %empty;
 
-FormalParamsListList: FormalParamsListList ';' FormalParams | %empty;
+FormalParamsListLoop: FormalParamsListLoop ';' FormalParams | %empty;
 NullFormalParam: FormalParamList | %empty;
 
 StatPart: CompStat;
 CompStat: BEG StatList END;
-StatList: Stat StatListList;
-StatListList: StatListList ';' Stat | %empty;
+StatList: Stat StatListLoop;
+StatListLoop: StatListLoop ';' Stat | %empty;
 Stat: CompStat
 	| IF Expr THEN Stat
 	| IF Expr THEN Stat ELSE Stat
