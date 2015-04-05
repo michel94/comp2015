@@ -88,13 +88,28 @@ ParamList: '(' Expr ExprList ')';
 
 ExprList: ExprList ',' Expr | %empty;
 
-
 %%
 
 #include <stdio.h>
 
-int main(){
-	yyparse();
+void print_ast(int syntax_error){
+	if(syntax_error)
+		return;
+
+	printf("TREE!\n");
+}
+
+int main(int argc, char **argv){
+	int tmp = yyparse();
+
+	// SIMPLER THIS WAY
+	// if(!tmp)
+
+	while(argc--)
+		if(!strcmp(*argv++, "-t"))
+			print_ast(tmp);
+
+	return 0;
 }
 
 int yyerror(char *s){
