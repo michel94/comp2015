@@ -17,6 +17,13 @@
 %{
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
+
+	typedef struct node {
+		int type;
+		int n_op;
+
+		struct node **op;
+	} Node;
 %}
 
 %%
@@ -91,6 +98,25 @@ ExprList: ExprList ',' Expr | %empty;
 %%
 
 #include <stdio.h>
+#include <stdarg.h>
+
+Node *production(int node_type, int node_operands, ...){
+	Node *p, **tmp;
+	va_list args;
+
+	p = (Node *) malloc(sizeof(Node));
+	tmp = p->op = (Node **) malloc(node_operands * sizeof(Node *));
+
+	p->type = node_type;
+	p->n_op = node_operands;
+
+	va_start(args, node_operands);
+	while(node_operands--)
+		*tmp++ = va_arg(args, Node *);
+
+	va_end(args);
+	return p;
+} 
 
 void print_ast(int syntax_error){
 	if(syntax_error)
