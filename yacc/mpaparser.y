@@ -1,9 +1,29 @@
+%{
+	typedef struct node {
+		int type;
+		int n_op;
+
+		struct node **op;
+	} Node;
+
+	extern int yylineno, col, yyleng;
+	extern char* yytext;
+%}
+
+%union{
+	int val;
+	char *str;
+	struct node *node;
+}
+
+%token <val> INTLIT
+%token <str> ID STRING REALLIT
+
 %token NOT AND OR MOD DIV
 %token ASSIGN NEQ LEQ GEQ
 %token IF THEN ELSE BEG END
 %token DO REPEAT UNTIL WHILE
-%token VAR VAL ID STRING REALLIT INTLIT
-%token FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN
+%token VAR VAL FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN
 
 %right THEN
 %right ELSE
@@ -13,18 +33,6 @@
 %left  OR '+' '-'
 %left '*' '/' MOD DIV AND
 %left NOT
-
-%{
-	extern int yylineno, col, yyleng;
-	extern char* yytext;
-
-	typedef struct node {
-		int type;
-		int n_op;
-
-		struct node **op;
-	} Node;
-%}
 
 %%
 

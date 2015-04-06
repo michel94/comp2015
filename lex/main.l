@@ -15,10 +15,10 @@ whitespace							[\t ]
 
 %%
 
-({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {return REALLIT; }
-{num}														{return INTLIT; }
+({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {yylval.str=(char *) strdup(yytext); return REALLIT; }
+{num}														{yylval.val=atoi(yytext); return INTLIT; }
 
-'([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; return STRING; }
+'([^'\n]|'')*'												{yytext[strlen(yytext)-1]=0; yylval.str=(char *) strdup(yytext); return STRING; }
 '([^'\n]|'')*												{printf("Line %d, col %d: unterminated string\n", yylineno, col - (int)yyleng);}
 
 "{"|"(*"													{BEGIN COMMENT; stcol = col-yyleng; stline = yylineno; }
@@ -58,7 +58,7 @@ div															{return DIV; }
 
 abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|file|for|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|output|pack|packed|page|pred|procedure|put|record|read|readln|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|type|to|trunc|unpack|with|write 	{printf("RESERVED(%s)\n", yytext);}
 
-[a-zA-Z][0-9a-zA-Z]*										{return ID; }
+[a-zA-Z][0-9a-zA-Z]*										{yylval.str=(char *) strdup(yytext); return ID; }
 
 {whitespace}												{;}
 \n															{col=1;}
