@@ -47,8 +47,8 @@ IdListLoop: IdListLoop ',' ID | %empty;
 
 FuncPart: FuncDeclarationList;
 FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' | %empty;
-FuncDeclaration: FuncHeading ';' FORWARD;
-	| FuncIdent ';' FuncBlock;
+FuncDeclaration: FuncHeading ';' FORWARD
+	| FuncIdent ';' FuncBlock
 	| FuncHeading ';' FuncBlock;
 FuncHeading: FUNCTION ID NullFormalParam ':' ID;
 FuncIdent: FUNCTION ID;
