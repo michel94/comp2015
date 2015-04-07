@@ -1,13 +1,107 @@
 %{
+
+	#include <stdio.h>
+	#include <stdarg.h>
+	#include <stdlib.h>
+	#include <string.h>
 	typedef struct node {
-		int type;
+		char* type;
+		char* value;
 		int n_op;
+		int to_use;
 
 		struct node **op;
 	} Node;
 
+	Node* merge_nodes[1000000];
+
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
+	int tree=0;
+
+	Node* new_node(){
+		return (Node *) malloc(sizeof(Node));
+	}
+
+	Node *make_node(char* node_type, int to_use, int node_operands, ...){
+		Node *p, **tmp;
+		va_list args;
+		int i;
+
+		p = new_node();
+		p->to_use = to_use;
+		//tmp = p->op = 
+		tmp = merge_nodes;
+
+		p->type = node_type;
+		p->n_op = node_operands;
+
+		int node_count=0;
+
+
+		va_start(args, node_operands);
+		while(node_operands--){
+			Node *t = va_arg(args, Node *);
+			if(!t->to_use){
+				if(strcmp(node_type, "Program") == 0){
+					printf("prog_arg: %s %d\n", t->type, t->n_op);
+				}
+				for(i=0; i<t->n_op; i++){
+					if(strcmp(node_type, "Program") == 0){
+						printf("prog_arg: %s\n", t->op[i]->type);
+					}
+					node_count++;
+					*tmp++ = t->op[i];
+					
+				}
+			}else{
+				node_count++;
+				*tmp++ = t;
+			}
+		}
+
+		va_end(args);
+
+		p->op = (Node **) malloc(node_count * sizeof(Node *));
+		memcpy(p->op, merge_nodes, node_count * sizeof(Node *));
+		p->n_op = node_count;
+
+		return p;
+	}
+
+	Node *terminal(char* node_type, char* value){
+		Node* p = new_node();
+		p->type = node_type;
+		p->value = value;
+		p->n_op = 0;
+		p->to_use = 1;
+
+		return p;
+	}
+
+	void printData(Node* p){
+		if(strcmp(p->type, "Id") == 0)
+			printf("Id(%s)\n", p->value);
+		else
+			printf("%s\n", p->type);
+	}
+
+	void printNode(Node* p, int d){
+		int i, o;
+		for(o=0; o<d; o++) putchar('\t');
+		printData(p);
+		for(i=0; i<p->n_op; i++){
+			printNode(p->op[i], d+1);
+		}
+	}
+
+	void print_ast(int syntax_error){
+		if(syntax_error)
+			return;
+		
+
+	}
+
 %}
 
 %union{
@@ -34,33 +128,44 @@
 %left '*' '/' MOD DIV AND
 %left NOT
 
+%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop ID_
+
+
 %%
 
-Prog: ProgHeading ';' ProgBlock '.';
-ProgHeading: PROGRAM ID '(' OUTPUT ')';
-ProgBlock: VarPart FuncPart StatPart;
-VarPart: VAR VarDeclaration ';' varDeclarationSemicList | %empty;
-varDeclarationSemicList: varDeclarationSemicList VarDeclaration ';' | %empty;
-VarDeclaration: IdList ':' ID;
-IdList: ID IdListLoop;
-IdListLoop: IdListLoop ',' ID | %empty;
+Prog: ProgHeading ';' ProgBlock '.' {$$ = make_node("Program", 1, 2, $1, $3); if(tree) printNode($$, 0); };
+ProgHeading: PROGRAM ID_ '(' OUTPUT ')' {$$ = make_node("ProgHeading", 0, 1, $2); };
+ProgBlock: VarPart FuncPart StatPart {$$ = make_node("ProgBlock", 0, 3, $1, $2, $3); };
+VarPart: VAR VarDeclaration ';' VarDeclarationList {$$ = make_node("VarPart", 1, 2, $2, $4);}
+	 	| %empty 										{$$ = make_node("VarPart", 0, 0);}
+;
+VarDeclarationList: VarDeclarationList VarDeclaration ';' {$$ = make_node("VarDeclarationList", 0, 2, $1, $2);} 
+		| %empty										{$$ = make_node("VarDeclarationList", 0, 0);}
+;
+VarDeclaration: IdList ':' ID_							{$$ = make_node("VarDecl", 1, 2, $1, $3); } ;
+IdList: ID_ IdListLoop									{$$ = make_node("IdList", 0, 2, $1, $2);};
+IdListLoop: IdListLoop ',' ID_ 							{$$ = make_node("IdListLoop", 0, 2, $1, $3);};
+		| %empty										{$$ = make_node("IdListLoop", 0, 0);};
 
-FuncPart: FuncDeclarationList;
+ID_ : ID 												{$$ = terminal("Id", $1); };
+
+FuncPart: FuncDeclarationList 							{$$ = make_node("FuncPart", 1, 0); };
 FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' | %empty;
 FuncDeclaration: FuncHeading ';' FORWARD
 	| FuncIdent ';' FuncBlock
 	| FuncHeading ';' FuncBlock;
-FuncHeading: FUNCTION ID NullFormalParam ':' ID;
-FuncIdent: FUNCTION ID;
+FuncHeading: FUNCTION ID_ NullFormalParam ':' ID_;
+FuncIdent: FUNCTION ID_;
 
 FormalParamList: '(' FormalParams FormalParamsListLoop ')';
-FormalParams: NullVar IdList ':' ID;
+FormalParams: NullVar IdList ':' ID_;
 FuncBlock: VarPart StatPart;
 NullVar: VAR | %empty;
 
 FormalParamsListLoop: FormalParamsListLoop ';' FormalParams | %empty;
 NullFormalParam: FormalParamList | %empty;
-StatPart: CompStat;
+
+StatPart: CompStat 										{$$ = make_node("StatPart", 1, 0); };
 CompStat: BEG StatList END;
 StatList: Stat StatListLoop;
 StatListLoop: StatListLoop ';' Stat | %empty;
@@ -69,9 +174,9 @@ Stat: CompStat
 	| IF Expr THEN Stat ELSE Stat
 	| WHILE Expr DO Stat
 	| REPEAT StatList UNTIL Expr
-	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')'
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID_ ')'
 	| WRITELN WriteList | WRITELN
-	| ID ASSIGN Expr
+	| ID_ ASSIGN Expr
 	| %empty;
 
 WriteList: '(' ExprString ExprStringList ')';
@@ -97,7 +202,7 @@ Expr: Expr AND Expr
 	| NOT Expr
 	| '(' Expr ')'
 	| INTLIT | REALLIT
-	| ID ParamList | ID;
+	| ID_ ParamList | ID_;
 
 ParamList: '(' Expr ExprList ')';
 
@@ -105,43 +210,18 @@ ExprList: ExprList ',' Expr | %empty;
 
 %%
 
-#include <stdio.h>
-#include <stdarg.h>
-
-Node *production(int node_type, int node_operands, ...){
-	Node *p, **tmp;
-	va_list args;
-
-	p = (Node *) malloc(sizeof(Node));
-	tmp = p->op = (Node **) malloc(node_operands * sizeof(Node *));
-
-	p->type = node_type;
-	p->n_op = node_operands;
-
-	va_start(args, node_operands);
-	while(node_operands--)
-		*tmp++ = va_arg(args, Node *);
-
-	va_end(args);
-	return p;
-} 
-
-void print_ast(int syntax_error){
-	if(syntax_error)
-		return;
-
-	printf("TREE!\n");
-}
-
 int main(int argc, char **argv){
-	int tmp = yyparse();
 
 	// SIMPLER THIS WAY
 	// if(!tmp)
 
 	while(argc--)
-		if(!strcmp(*argv++, "-t"))
-			print_ast(tmp);
+		if(!strcmp(*argv++, "-t")){
+			tree = 1;
+			//print_ast(tmp);
+		}
+
+	int tmp = yyparse();
 
 	return 0;
 }
