@@ -133,23 +133,23 @@
 
 %%
 
-Prog: ProgHeading ';' ProgBlock '.' {$$ = make_node("Program", 1, 2, $1, $3); if(tree) printNode($$, 0); };
-ProgHeading: PROGRAM ID_ '(' OUTPUT ')' {$$ = make_node("ProgHeading", 0, 1, $2); };
-ProgBlock: VarPart FuncPart StatPart {$$ = make_node("ProgBlock", 0, 3, $1, $2, $3); };
-VarPart: VAR VarDeclaration ';' VarDeclarationList {$$ = make_node("VarPart", 1, 2, $2, $4);}
-	 	| %empty 										{$$ = make_node("VarPart", 0, 0);}
+Prog: ProgHeading ';' ProgBlock '.' 									{$$ = make_node("Program", 1, 2, $1, $3); if(tree) printNode($$, 0); };
+ProgHeading: PROGRAM ID_ '(' OUTPUT ')' 								{$$ = make_node("ProgHeading", 0, 1, $2); };
+ProgBlock: VarPart FuncPart StatPart 									{$$ = make_node("ProgBlock", 0, 3, $1, $2, $3); };
+VarPart: VAR VarDeclaration ';' VarDeclarationList 						{$$ = make_node("VarPart", 1, 2, $2, $4);}
+	 	| %empty 														{$$ = make_node("VarPart", 0, 0);}
 ;
-VarDeclarationList: VarDeclarationList VarDeclaration ';' {$$ = make_node("VarDeclarationList", 0, 2, $1, $2);} 
-		| %empty										{$$ = make_node("VarDeclarationList", 0, 0);}
+VarDeclarationList: VarDeclarationList VarDeclaration ';' 				{$$ = make_node("VarDeclarationList", 0, 2, $1, $2);} 
+		| %empty														{$$ = make_node("VarDeclarationList", 0, 0);}
 ;
-VarDeclaration: IdList ':' ID_							{$$ = make_node("VarDecl", 1, 2, $1, $3); } ;
-IdList: ID_ IdListLoop									{$$ = make_node("IdList", 0, 2, $1, $2);};
-IdListLoop: IdListLoop ',' ID_ 							{$$ = make_node("IdListLoop", 0, 2, $1, $3);};
-		| %empty										{$$ = make_node("IdListLoop", 0, 0);};
+VarDeclaration: IdList ':' ID_											{$$ = make_node("VarDecl", 1, 2, $1, $3); } ;
+IdList: ID_ IdListLoop													{$$ = make_node("IdList", 0, 2, $1, $2);};
+IdListLoop: IdListLoop ',' ID_ 											{$$ = make_node("IdListLoop", 0, 2, $1, $3);};
+		| %empty														{$$ = make_node("IdListLoop", 0, 0);};
 
-ID_ : ID 												{$$ = terminal("Id", $1); };
+ID_ : ID 																{$$ = terminal("Id", $1); };
 
-FuncPart: FuncDeclarationList 							{$$ = make_node("FuncPart", 1, 0); };
+FuncPart: FuncDeclarationList 											{$$ = make_node("FuncPart", 1, 0); };
 FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' | %empty;
 FuncDeclaration: FuncHeading ';' FORWARD
 	| FuncIdent ';' FuncBlock
@@ -165,7 +165,7 @@ NullVar: VAR | %empty;
 FormalParamsListLoop: FormalParamsListLoop ';' FormalParams | %empty;
 NullFormalParam: FormalParamList | %empty;
 
-StatPart: CompStat 										{$$ = make_node("StatPart", 1, 0); };
+StatPart: CompStat 														{$$ = make_node("StatPart", 1, 0); };
 CompStat: BEG StatList END;
 StatList: Stat StatListLoop;
 StatListLoop: StatListLoop ';' Stat | %empty;
