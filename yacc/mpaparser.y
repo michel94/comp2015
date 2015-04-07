@@ -43,13 +43,9 @@
 		while(node_operands--){
 			Node *t = va_arg(args, Node *);
 			if(!t->to_use){
-				if(strcmp(node_type, "Program") == 0){
-					printf("prog_arg: %s %d\n", t->type, t->n_op);
-				}
+				
 				for(i=0; i<t->n_op; i++){
-					if(strcmp(node_type, "Program") == 0){
-						printf("prog_arg: %s\n", t->op[i]->type);
-					}
+					
 					node_count++;
 					*tmp++ = t->op[i];
 					
@@ -128,7 +124,7 @@
 %left '*' '/' MOD DIV AND
 %left NOT
 
-%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop ID_
+%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop ID_ FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar
 
 
 %%
@@ -149,24 +145,34 @@ IdListLoop: IdListLoop ',' ID_ 											{$$ = make_node("IdListLoop", 0, 2, $1
 
 ID_ : ID 																{$$ = terminal("Id", $1); };
 
-FuncPart: FuncDeclarationList 											{$$ = make_node("FuncPart", 1, 0); };
-FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' | %empty;
-FuncDeclaration: FuncHeading ';' FORWARD
-	| FuncIdent ';' FuncBlock
-	| FuncHeading ';' FuncBlock;
-FuncHeading: FUNCTION ID_ NullFormalParam ':' ID_;
-FuncIdent: FUNCTION ID_;
+FuncPart: FuncDeclarationList 											{$$ = make_node("FuncPart", 1, 1, $1); };
+FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' 			{$$ = make_node("FuncDeclarationList", 0, 2, $1, $2); }
+| %empty																{$$ = make_node("FuncDeclarationList", 0, 0); }
+;
+FuncDeclaration: FuncHeading ';' FORWARD								{$$ = make_node("FuncDecl", 1, 1, $1); }
+	| FuncIdent ';' FuncBlock 											{$$ = make_node("FuncDef", 1, 2, $1, $3); }
+	| FuncHeading ';' FuncBlock											{$$ = make_node("FuncDef2", 1, 2, $1, $3); }
+;
+FuncHeading: FUNCTION ID_ NullFormalParam ':' ID_						{$$ = make_node("FuncHeading", 0, 3, $2, $3, $5); };
+FuncIdent: FUNCTION ID_													{$$ = make_node("FuncIdent", 0, 1, $2); };
+FuncBlock: VarPart StatPart												{$$ = make_node("FuncBlock", 0, 2, $1, $2); };
 
-FormalParamList: '(' FormalParams FormalParamsListLoop ')';
-FormalParams: NullVar IdList ':' ID_;
-FuncBlock: VarPart StatPart;
-NullVar: VAR | %empty;
+NullFormalParam: FormalParamList 										{$$ = make_node("FuncParams", 1, 1, $1); }
+					| %empty 											{$$ = make_node("FuncParams", 0, 0); };
+FormalParamList: '(' FormalParams FormalParamsListLoop ')' 				{$$ = make_node("FormalParamList", 0, 2, $2, $3); };
+FormalParams: NullVar IdList ':' ID_ 									{$$ = make_node("FormalParams", 0, 3, $1, $2, $4); };
+FormalParamsListLoop: FormalParamsListLoop ';' FormalParams 			{$$ = make_node("FormalParamsListLoop", 0, 2, $1, $3); }
+					| %empty 											{$$ = make_node("FormalParamsListLoop", 0, 0); }
+;
 
-FormalParamsListLoop: FormalParamsListLoop ';' FormalParams | %empty;
-NullFormalParam: FormalParamList | %empty;
+NullVar: VAR 															{$$ = make_node("NullVar", 0, 0); }
+		| %empty 														{$$ = make_node("NullVar", 0, 0); }
+;
+
+
 
 StatPart: CompStat 														{$$ = make_node("StatPart", 1, 0); };
-CompStat: BEG StatList END;
+CompStat: BEG StatList END;	 											
 StatList: Stat StatListLoop;
 StatListLoop: StatListLoop ';' Stat | %empty;
 Stat: CompStat
@@ -212,13 +218,9 @@ ExprList: ExprList ',' Expr | %empty;
 
 int main(int argc, char **argv){
 
-	// SIMPLER THIS WAY
-	// if(!tmp)
-
 	while(argc--)
 		if(!strcmp(*argv++, "-t")){
 			tree = 1;
-			//print_ast(tmp);
 		}
 
 	int tmp = yyparse();
