@@ -163,7 +163,7 @@ FormalParamsListLoop: FormalParamsListLoop ';' FormalParams 			{$$ = make_node("
 ;
 
 NullVar: VAR 															{$$ = make_node("NullVar", 0, 0); }
-	| %empty 															{$$ = make_node("NullVar", 0, 0); }
+	| %empty 															{$$ = NULL; }
 ;
 
 StatPart: CompStat 														{$$ = make_node("StatPart"		, 0, 1, $1); };
