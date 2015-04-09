@@ -1,7 +1,9 @@
 PROGRAM test(OUTPUT);
 var i: integer;
 BEGIN
-	i := 2--2;
+	i := -3*7;
+	i := -3+7;
+	i := 3--7;
 	i := -3 MOD 7;
 	if 3 < i < 7 then
 		writeln(i)

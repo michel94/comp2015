@@ -117,7 +117,7 @@
 %right ELSE
 
 %right ASSIGN
-%left NEQ LEQ GEQ '<' '>' '='
+%nonassoc NEQ LEQ GEQ '<' '>' '='
 %left  OR '+' '-'
 %left '*' '/' MOD DIV AND
 %left NOT
