@@ -7,7 +7,7 @@ num									[0-9]+
 whitespace							[\t ]
 
 %{
-	#include "../yacc/y.tab.h"
+	#include "y.tab.h"
 	#define YY_USER_ACTION col+=yyleng;
 	
 	int col=1, stcol, stline;
