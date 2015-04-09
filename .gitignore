@@ -38,5 +38,5 @@ analyser
 mpaparser
 y.tab.c
 y.tab.h
-
+y.output
 

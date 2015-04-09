@@ -121,7 +121,7 @@
 %right ASSIGN
 
 %type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar 
-CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList SimpleExpr Term Factor TermNNull
+CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList SimpleExpr Term Factor TermNNull AddOp
 
 %%
 
@@ -200,18 +200,19 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt"	, 1, 2, $1, $3); 
 	| SimpleExpr 														{$$ = $1; }
 ;
 
-SimpleExpr: SimpleExpr '+' Term											{$$ = make_node("Add"	, 1, 2, $1, $3); }
-	| SimpleExpr '-' Term												{$$ = make_node("Sub"	, 1, 2, $1, $3); }
+SimpleExpr: AddOp														{$$ = $1;}
 	| TermNNull OR Term 												{$$ = make_node("Or"	, 1, 2, $1, $3); }
 	| Term 																{$$ = $1;}
 	| %empty 															{$$ = NULL; }
 ;
 
-TermNNull: SimpleExpr '+' Term											{$$ = make_node("Add"	, 1, 2, $1, $3); }
-	| SimpleExpr '-' Term												{$$ = make_node("Sub"	, 1, 2, $1, $3); }
+TermNNull: AddOp														{$$ = $1;}
 	| TermNNull OR Term 												{$$ = make_node("Or"	, 1, 2, $1, $3); }
 	| Term 																{$$ = $1;}
 ;
+
+AddOp: SimpleExpr '+' Term												{$$ = make_node( $1 != NULL ? "Add" : "Plus", 1, 2, $1, $3); }
+	| SimpleExpr '-' Term												{$$ = make_node( $1 != NULL ? "Sub" : "Minus", 1, 2, $1, $3); }
 
 Term: Factor															{$$ = $1; }
 	| Factor '*' Term 													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
