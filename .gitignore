@@ -34,3 +34,9 @@ analyser
 # Unix backup files
 *~
 
+# Yacc files
+mpaparser
+y.tab.c
+y.tab.h
+
+
