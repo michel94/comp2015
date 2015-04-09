@@ -122,7 +122,7 @@
 %left '*' '/' MOD DIV AND
 %left NOT
 
-%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList
+%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList Expr2
 
 %%
 
@@ -192,23 +192,26 @@ ExprString: Expr 														{$$ = make_node("ExprString", 0, 1, $1); }
 	| STRING 															{Value v; v.s = $1; $$ = terminal("String", v); }
 ;
 
-Expr: Expr AND Expr 													{$$ = make_node("And"	, 1, 2, $1, $3); }
-	| Expr OR Expr 														{$$ = make_node("Or"	, 1, 2, $1, $3); }
-	| Expr '<' Expr 													{$$ = make_node("Lt"	, 1, 2, $1, $3); }
-	| Expr '>' Expr 													{$$ = make_node("Gt"	, 1, 2, $1, $3); }
-	| Expr '=' Expr 													{$$ = make_node("Eq"	, 1, 2, $1, $3); }
-	| Expr NEQ Expr 													{$$ = make_node("Neq"	, 1, 2, $1, $3); }
-	| Expr LEQ Expr 													{$$ = make_node("Leq"	, 1, 2, $1, $3); }
-	| Expr GEQ Expr 													{$$ = make_node("Geq"	, 1, 2, $1, $3); }
-	| Expr '+' Expr 													{$$ = make_node("Add"	, 1, 2, $1, $3); }
-	| Expr '-' Expr 													{$$ = make_node("Sub"	, 1, 2, $1, $3); }
-	| Expr '*' Expr 													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
-	| Expr '/' Expr 													{$$ = make_node("Div"	, 1, 2, $1, $3); }
-	| Expr DIV Expr 													{$$ = make_node("RealDiv",1, 2, $1, $3); }
-	| Expr MOD Expr 													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
-	| '+' Expr 															{$$ = make_node("Plus"	, 1, 1, $2); }
-	| '-' Expr 															{$$ = make_node("Minus"	, 1, 1, $2); }
-	| NOT Expr 															{$$ = make_node("Not"	, 1, 1, $2); }
+Expr: '+' Expr2 															{$$ = make_node("Plus"	, 1, 1, $2); }
+	| '-' Expr2 															{$$ = make_node("Minus"	, 1, 1, $2); }
+	| Expr2 																{$$ = $1; }
+;
+
+Expr2: Expr2 AND Expr2 													{$$ = make_node("And"	, 1, 2, $1, $3); }
+	| Expr2 OR Expr2 													{$$ = make_node("Or"	, 1, 2, $1, $3); }
+	| Expr2 '<' Expr2 													{$$ = make_node("Lt"	, 1, 2, $1, $3); }
+	| Expr2 '>' Expr2 													{$$ = make_node("Gt"	, 1, 2, $1, $3); }
+	| Expr2 '=' Expr2 													{$$ = make_node("Eq"	, 1, 2, $1, $3); }
+	| Expr2 NEQ Expr2 													{$$ = make_node("Neq"	, 1, 2, $1, $3); }
+	| Expr2 LEQ Expr2 													{$$ = make_node("Leq"	, 1, 2, $1, $3); }
+	| Expr2 GEQ Expr2 													{$$ = make_node("Geq"	, 1, 2, $1, $3); }
+	| Expr2 '+' Expr2 													{$$ = make_node("Add"	, 1, 2, $1, $3); }
+	| Expr2 '-' Expr2 													{$$ = make_node("Sub"	, 1, 2, $1, $3); }
+	| Expr2 '*' Expr2 													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
+	| Expr2 '/' Expr2 													{$$ = make_node("Div"	, 1, 2, $1, $3); }
+	| Expr2 DIV Expr2 													{$$ = make_node("RealDiv",1, 2, $1, $3); }
+	| Expr2 MOD Expr2 													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
+	| NOT Expr2 														{$$ = make_node("Not"	, 1, 1, $2); }
 	| IdProd ParamList 													{$$ = make_node("Call"	, 1, 2, $1, $2); }
 	| '(' Expr ')' 														{$$ = $2; }
 	| INTLIT 															{Value v; v.t = $1; $$ = terminal("IntLit", v); }
