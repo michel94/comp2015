@@ -1,4 +1,4 @@
-lex mpascanner.l
+lex mpaparser.l
 yacc -d mpaparser.y $1
 gcc -o mpaparser y.tab.c lex.yy.c -ly
-rm mpascanner.zip; zip mpaparser.zip mpascanner.l mpaparser.y;
+rm mpaparser.zip; zip mpaparser.zip mpaparser.l mpaparser.y;

@@ -10,6 +10,7 @@
 		char *s;
 	} Value;
 
+
 	typedef struct node {
 		Value value;
 		int to_use;
@@ -19,7 +20,8 @@
 		struct node **op;
 	} Node;
 
-	Node *merge_nodes[256];
+	Node *merge_nodes[2048];
+	Node* tree;
 
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
@@ -111,22 +113,19 @@
 %token ASSIGN NEQ LEQ GEQ
 %token IF THEN ELSE BEG END
 %token DO REPEAT UNTIL WHILE
-%token VAR VAL FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN
+%token VAR VAL FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN RESERVED
 
 %right THEN
 %right ELSE
 
 %right ASSIGN
-%nonassoc NEQ LEQ GEQ '<' '>' '='
-%left  OR '+' '-'
-%left '*' '/' MOD DIV AND
-%left NOT
 
-%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList Expr2
+%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar 
+CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList SimpleExpr TermList Term Factor
 
 %%
 
-Prog: ProgHeading ';' ProgBlock '.' 									{$$ = make_node("Program"	 , 1, 2, $1, $3); if(print_tree) print_node($$, 0); };
+Prog: ProgHeading ';' ProgBlock '.' 									{$$ = tree = make_node("Program"	 , 1, 2, $1, $3); if(print_tree) print_node($$, 0); };
 ProgHeading: PROGRAM IdProd '(' OUTPUT ')' 								{$$ = make_node("ProgHeading", 0, 1, $2); };
 ProgBlock: VarPart FuncPart StatPart 									{$$ = make_node("ProgBlock"	 , 0, 3, $1, $2, $3); };
 VarPart: VAR VarDeclaration ';' VarDeclarationList 						{$$ = make_node("VarPart"	 , 1, 2, $2, $4);}
@@ -192,31 +191,40 @@ ExprString: Expr 														{$$ = make_node("ExprString", 0, 1, $1); }
 	| STRING 															{Value v; v.s = $1; $$ = terminal("String", v); }
 ;
 
-Expr: '+' Expr2 															{$$ = make_node("Plus"	, 1, 1, $2); }
-	| '-' Expr2 															{$$ = make_node("Minus"	, 1, 1, $2); }
-	| Expr2 																{$$ = $1; }
+Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt"	, 1, 2, $1, $3); }
+	| SimpleExpr '>' SimpleExpr 										{$$ = make_node("Gt"	, 1, 2, $1, $3); }
+	| SimpleExpr '=' SimpleExpr 										{$$ = make_node("Eq"	, 1, 2, $1, $3); }
+	| SimpleExpr NEQ SimpleExpr 										{$$ = make_node("Neq"	, 1, 2, $1, $3); }
+	| SimpleExpr LEQ SimpleExpr 										{$$ = make_node("Leq"	, 1, 2, $1, $3); }
+	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq"	, 1, 2, $1, $3); }
+	| SimpleExpr 														{$$ = $1; }
 ;
 
-Expr2: Expr2 AND Expr2 													{$$ = make_node("And"	, 1, 2, $1, $3); }
-	| Expr2 OR Expr2 													{$$ = make_node("Or"	, 1, 2, $1, $3); }
-	| Expr2 '<' Expr2 													{$$ = make_node("Lt"	, 1, 2, $1, $3); }
-	| Expr2 '>' Expr2 													{$$ = make_node("Gt"	, 1, 2, $1, $3); }
-	| Expr2 '=' Expr2 													{$$ = make_node("Eq"	, 1, 2, $1, $3); }
-	| Expr2 NEQ Expr2 													{$$ = make_node("Neq"	, 1, 2, $1, $3); }
-	| Expr2 LEQ Expr2 													{$$ = make_node("Leq"	, 1, 2, $1, $3); }
-	| Expr2 GEQ Expr2 													{$$ = make_node("Geq"	, 1, 2, $1, $3); }
-	| Expr2 '+' Expr2 													{$$ = make_node("Add"	, 1, 2, $1, $3); }
-	| Expr2 '-' Expr2 													{$$ = make_node("Sub"	, 1, 2, $1, $3); }
-	| Expr2 '*' Expr2 													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
-	| Expr2 '/' Expr2 													{$$ = make_node("Div"	, 1, 2, $1, $3); }
-	| Expr2 DIV Expr2 													{$$ = make_node("RealDiv",1, 2, $1, $3); }
-	| Expr2 MOD Expr2 													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
-	| NOT Expr2 														{$$ = make_node("Not"	, 1, 1, $2); }
-	| IdProd ParamList 													{$$ = make_node("Call"	, 1, 2, $1, $2); }
-	| '(' Expr ')' 														{$$ = $2; }
+SimpleExpr: Term TermList 												{$$ = make_node("Plus"	, 1, 2, $1, $2); }
+	| '+' Term TermList 												{$$ = make_node("Plus"	, 1, 2, $2, $3); }
+	| '-' Term TermList 												{$$ = make_node("Minus"	, 1, 2, $2, $3); }
+;
+
+TermList: '+' Term TermList												{$$ = make_node("Add"	, 1, 2, $2, $3); }
+	| '-' Term TermList													{$$ = make_node("Sub"	, 1, 2, $2, $3); }
+	| OR Term TermList 													{$$ = make_node("Or"	, 1, 2, $2, $3); }
+	| %empty 															{$$ = NULL;}
+;
+
+Term: Factor															{$$ = $1; }
+	| Factor '*' Term 													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
+	| Factor '/' Term 													{$$ = make_node("Div"	, 1, 2, $1, $3); }
+	| Factor DIV Term 													{$$ = make_node("RealDiv",1, 2, $1, $3); }
+	| Factor MOD Term 													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
+	| Factor AND Term 													{$$ = make_node("And"	, 1, 2, $1, $3); }
+;
+
+Factor:	'(' Expr ')' 													{$$ = $2; }
 	| INTLIT 															{Value v; v.t = $1; $$ = terminal("IntLit", v); }
 	| REALLIT 															{Value v; v.s = $1; $$ = terminal("RealLit", v); }
 	| ID 																{Value v; v.s = $1; $$ = terminal("Id", v); };
+	| NOT Factor 														{$$ = make_node("Not"	, 1, 1, $2); }
+	| IdProd ParamList 													{$$ = make_node("Call"	, 1, 2, $1, $2); }
 ;
 
 ParamList: '(' Expr ExprList ')'										{$$ = make_node("ParamList", 0, 2, $2, $3); };
@@ -238,4 +246,5 @@ int main(int argc, char **argv){
 
 int yyerror(char *s){
 	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
+	//print_node(tree, 0);
 }

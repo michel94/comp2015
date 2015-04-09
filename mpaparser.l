@@ -56,7 +56,7 @@ or															{return OR; }
 mod															{return MOD; }
 div															{return DIV; }
 
-abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|file|for|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|output|pack|packed|page|pred|procedure|put|record|read|readln|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|type|to|trunc|unpack|with|write 	{printf("RESERVED(%s)\n", yytext);}
+abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|file|for|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|output|pack|packed|page|pred|procedure|put|record|read|readln|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|type|to|trunc|unpack|with|write 	{return RESERVED;}
 
 [a-zA-Z][0-9a-zA-Z]*										{yylval.str=(char *) strdup(yytext); return ID; }
 

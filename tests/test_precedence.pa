@@ -3,8 +3,10 @@ var i: integer;
 BEGIN
 	i := -3*7;
 	i := -3+7;
-	i := 3--7;
+	o := 4*d*1-2+3-(e<4);
+	{i := 3- -7;}
 	i := -3 MOD 7;
+	i := a < c;
 	if 3 < i < 7 then
 		writeln(i)
 END.
