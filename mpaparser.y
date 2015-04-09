@@ -121,7 +121,7 @@
 %right ASSIGN
 
 %type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar 
-CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList SimpleExpr TermList Term Factor
+CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList SimpleExpr Term Factor TermNNull
 
 %%
 
@@ -200,15 +200,17 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt"	, 1, 2, $1, $3); 
 	| SimpleExpr 														{$$ = $1; }
 ;
 
-SimpleExpr: Term TermList 												{$$ = make_node("Plus"	, 1, 2, $1, $2); }
-	| '+' Term TermList 												{$$ = make_node("Plus"	, 1, 2, $2, $3); }
-	| '-' Term TermList 												{$$ = make_node("Minus"	, 1, 2, $2, $3); }
+SimpleExpr: SimpleExpr '+' Term											{$$ = make_node("Add"	, 1, 2, $1, $3); }
+	| SimpleExpr '-' Term												{$$ = make_node("Sub"	, 1, 2, $1, $3); }
+	| TermNNull OR Term 												{$$ = make_node("Or"	, 1, 2, $1, $3); }
+	| Term 																{$$ = $1;}
+	| %empty 															{$$ = NULL; }
 ;
 
-TermList: '+' Term TermList												{$$ = make_node("Add"	, 1, 2, $2, $3); }
-	| '-' Term TermList													{$$ = make_node("Sub"	, 1, 2, $2, $3); }
-	| OR Term TermList 													{$$ = make_node("Or"	, 1, 2, $2, $3); }
-	| %empty 															{$$ = NULL;}
+TermNNull: SimpleExpr '+' Term											{$$ = make_node("Add"	, 1, 2, $1, $3); }
+	| SimpleExpr '-' Term												{$$ = make_node("Sub"	, 1, 2, $1, $3); }
+	| TermNNull OR Term 												{$$ = make_node("Or"	, 1, 2, $1, $3); }
+	| Term 																{$$ = $1;}
 ;
 
 Term: Factor															{$$ = $1; }
