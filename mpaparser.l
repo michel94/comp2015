@@ -25,7 +25,7 @@ whitespace							[\t ]
 <COMMENT>"}"|"*)"											{BEGIN 0; }
 <COMMENT>.													{; }
 <COMMENT>\n 												{col = 1; }
-<COMMENT><<eof>>	 										{printf("Line %d, col %d: unterminated comment\n", stline, stcol); return 0; }
+<COMMENT><<eof>>	 										{col+=1; printf("Line %d, col %d: unterminated comment\n", stline, stcol); return 0; }
 
 ":="														{return ASSIGN; }
 begin														{return BEG; }
@@ -62,6 +62,7 @@ abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|file|for|ge
 
 {whitespace}												{;}
 \n															{col=1;}
+<<eof>>														{col+=1; return 0;}
 .															{printf("Line %d, col %d: illegal character ('%s')\n", yylineno, col - (int)yyleng, yytext); /* Some illegal characters are parsed twice*/ }
 
 %%
