@@ -20,12 +20,10 @@
 		struct node **op;
 	} Node;
 
-	Node *merge_nodes[2048];
-	Node* tree;
+	Node *tree, *merge_nodes[2048];
 
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
-	int print_tree = 0;
 
 	Node *new_node(){
 		return (Node *) malloc(sizeof(Node));
@@ -48,12 +46,12 @@
 			if(t == NULL)
 				continue;
 			else if(!t->to_use)
-				for(nodes+=t->n_op-1, i = 0; i < t->n_op; i++)
+				for(nodes+=t->n_op, i = 0; i < t->n_op; i++)
 					*tmp++ = t->op[i];
-			else 
+			else{
 				*tmp++ = t;
-
-			nodes++;
+				nodes++;
+			}
 		}
 
 		prod->op = (Node **) malloc(nodes * sizeof(Node *));
@@ -87,7 +85,7 @@
 			printf("%s\n", p->type);
 	}
 
-	void print_node(Node* p, int d){
+	void print_tree(Node* p, int d){
 		int i, o;
 		
 		for(o = 0; o < d; o++) 
@@ -96,7 +94,7 @@
 		print_data(p);
 
 		for(i = 0; i < p->n_op; i++)
-			print_node(p->op[i], d+1);
+			print_tree(p->op[i], d+1);
 	}
 %}
 
@@ -117,7 +115,6 @@
 
 %right THEN
 %right ELSE
-
 %right ASSIGN
 
 %type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar 
@@ -125,10 +122,10 @@ CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString Par
 
 %%
 
-Prog: ProgHeading ';' ProgBlock '.' 									{$$ = tree = make_node("Program"	 , 1, 2, $1, $3); if(print_tree) print_node($$, 0); };
-ProgHeading: PROGRAM IdProd '(' OUTPUT ')' 								{$$ = make_node("ProgHeading", 0, 1, $2); };
-ProgBlock: VarPart FuncPart StatPart 									{$$ = make_node("ProgBlock"	 , 0, 3, $1, $2, $3); };
-VarPart: VAR VarDeclaration ';' VarDeclarationList 						{$$ = make_node("VarPart"	 , 1, 2, $2, $4);}
+Prog: ProgHeading ';' ProgBlock '.' 									{$$ = tree = make_node("Program" , 1, 2, $1, $3); };
+ProgHeading: PROGRAM IdProd '(' OUTPUT ')' 								{$$ = make_node("ProgHeading"	 , 0, 1, $2); };
+ProgBlock: VarPart FuncPart StatPart 									{$$ = make_node("ProgBlock"	 	 , 0, 3, $1, $2, $3); };
+VarPart: VAR VarDeclaration ';' VarDeclarationList 						{$$ = make_node("VarPart"	 	 , 1, 2, $2, $4);}
 	| %empty 															{$$ = NULL; }
 ;
 VarDeclarationList: VarDeclarationList VarDeclaration ';' 				{$$ = make_node("VarDeclarationList", 0, 2, $1, $2);} 
@@ -239,15 +236,16 @@ ExprList: ExprList ',' Expr 											{$$ = make_node("ExprList" , 0, 2, $1, $3
 
 int main(int argc, char **argv){
 
+	if(yyparse())
+		return 0;
+
 	while(argc--)
 		if(!strcmp(*argv++, "-t"))
-			print_tree = 1;
+			print_tree(tree, 0);
 
-	yyparse();
 	return 0;
 }
 
 int yyerror(char *s){
 	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
-	//print_node(tree, 0);
 }
