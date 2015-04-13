@@ -76,7 +76,7 @@
 		if(strcmp(p->type, "Id") == 0)
 			printf("Id(%s)\n", p->value.s);
 		else if(strcmp(p->type, "String") == 0)
-			printf("String('%s')", p->value.s);
+			printf("String('%s')\n", p->value.s);
 		else if(strcmp(p->type, "IntLit") == 0)
 			printf("IntLit(%d)\n", p->value.t);
 		else if(strcmp(p->type, "RealLit") == 0)
