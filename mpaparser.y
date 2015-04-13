@@ -200,7 +200,6 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt"	, 1, 2, $1, $3); 
 SimpleExpr: AddOp														{$$ = $1;}
 	| TermNNull OR Term 												{$$ = make_node("Or"	, 1, 2, $1, $3); }
 	| Term 																{$$ = $1;}
-	| %empty 															{$$ = NULL; }
 ;
 
 TermNNull: AddOp														{$$ = $1;}
