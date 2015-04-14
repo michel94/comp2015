@@ -65,11 +65,10 @@
 		memcpy(prod->op, merge_nodes, nodes * sizeof(Node *));
 		prod->n_op = nodes;
 
-		va_end(args);
-
 		if(is_superfluous(prod))
 			prod->to_use = 0;
 
+		va_end(args);
 		return prod;
 	}
 
