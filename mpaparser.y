@@ -31,7 +31,7 @@
 
 	int is_superfluous(Node *t){
 		if(!strcmp(t->type, "StatList"))
-			return t->n_op <= 2;
+			return t->n_op < 2;
 
 		return 0;
 	}
