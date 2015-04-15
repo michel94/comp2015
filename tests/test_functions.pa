@@ -5,6 +5,11 @@ function a;
 begin
 	writeln(jhsdkjsd)
 end
+function asd(e, r, t: it): o;
+begin
+	a := 5 * 3;
+	asd := a;
+end
 
 begin
 	val(paramstr(1), a);

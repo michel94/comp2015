@@ -3,6 +3,8 @@ var i: integer;
 BEGIN
 	i := +3*7;
 	i := +3+7;
+	if a > 3 then
+		c := 4;
 	o := 9*d*1-2+3-(e<4);
 	i := -3 MOD 7;
 	i := a < c;

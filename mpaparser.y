@@ -217,8 +217,11 @@ TermNNull: AddOp														{$$ = $1;}
 	| Term 																{$$ = $1;}
 ;
 
-AddOp: SimpleExpr '+' Term												{$$ = make_node( $1 != NULL ? "Add" : "Plus", 1, 2, $1, $3); }
-	| SimpleExpr '-' Term												{$$ = make_node( $1 != NULL ? "Sub" : "Minus", 1, 2, $1, $3); }
+AddOp: SimpleExpr '+' Term												{$$ = make_node( "Add", 1, 2, $1, $3); }
+	| SimpleExpr '-' Term												{$$ = make_node( "Sub", 1, 2, $1, $3); }
+	| '+' Term															{$$ = make_node( "Plus", 1, 1, $2); }
+	| '-' Term															{$$ = make_node( "Minus", 1, 1, $2); }
+
 
 Term: Factor															{$$ = $1; }
 	| Factor '*' Term 													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
