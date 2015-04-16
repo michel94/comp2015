@@ -104,6 +104,8 @@
 	}
 
 	Node* gen_statlist(Node* p){
+		if(p != NULL && p->to_use == 1)
+			return p;
 		return (p==NULL || p->n_op == 0) ? make_node("StatList", 1, 0) : p;
 	}
 
@@ -127,8 +129,9 @@
 %right ELSE
 %right ASSIGN
 
-%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamList FormalParams FormalParamsListLoop NullVar 
-CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList SimpleExpr Term Factor AddOp
+%type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration 
+FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamsList FormalParams 
+CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString ParamList ExprList SimpleExpr Term Factor AddOp Params VarParams FuncParams
 
 %%
 
@@ -153,26 +156,29 @@ FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' 			{$$ = make_node(
 	| %empty															{$$ = NULL; }
 ;
 FuncDeclaration: FuncHeading ';' FORWARD								{$$ = make_node("FuncDecl", 	1, 1, $1); }
-	| FuncIdent ';' FuncBlock 											{$$ = make_node("FuncDef", 		1, 2, $1, $3); }
-	| FuncHeading ';' FuncBlock											{$$ = make_node("FuncDef2", 	1, 2, $1, $3); }
+	| FuncIdent ';' FuncBlock 											{$$ = make_node("FuncDef2", 		1, 2, $1, $3); }
+	| FuncHeading ';' FuncBlock											{$$ = make_node("FuncDef", 	1, 2, $1, $3); }
 ;
+
 FuncHeading: FUNCTION IdProd NullFormalParam ':' IdProd					{$$ = make_node("FuncHeading",	0, 3, $2, $3, $5); };
 FuncIdent: FUNCTION IdProd												{$$ = make_node("FuncIdent", 	0, 1, $2); };
 FuncBlock: VarPart StatPart												{$$ = make_node("FuncBlock", 	0, 2, $1, $2); };
 
-NullFormalParam: FormalParamList 										{$$ = make_node("FuncParams", 			1, 1, $1); }
+NullFormalParam: FuncParams 											{$$ = make_node("FuncParams", 			1, 1, $1); }
 	| %empty															{$$ = make_node("FuncParams", 			1, 0); }
 ;
 
-FormalParamList: '(' FormalParams FormalParamsListLoop ')' 				{$$ = make_node("FormalParamList", 		0, 2, $2, $3); };
-FormalParams: NullVar IdList ':' IdProd 								{$$ = make_node("FormalParams", 		0, 3, $1, $2, $4); };
-FormalParamsListLoop: FormalParamsListLoop ';' FormalParams 			{$$ = make_node("FormalParamsListLoop", 0, 2, $1, $3); }
-	| %empty															{$$ = NULL; }
+FuncParams: '(' FormalParamsList ')' 									{$$ = make_node("FuncParams", 		0, 1, $2); };
+FormalParamsList: FormalParamsList ';' FormalParams 					{$$ = make_node("FormalParamsList", 0, 2, $1, $3); }
+	| FormalParams														{$$ = $1; }
 ;
 
-NullVar: VAR 															{$$ = make_node("NullVar", 0, 0); }
-	| %empty 															{$$ = NULL; }
+FormalParams : VarParams 												{$$ = $1; }
+			 | Params 													{$$ = $1; }
 ;
+
+VarParams: VAR IdList ':' IdProd 										{$$ = make_node("VarParams", 1, 2, $2, $4); }
+Params: IdList ':' IdProd 												{$$ = make_node("Params", 1, 2, $1, $3); }
 
 StatPart: CompStat 														{$$ = make_node("StatPart" , 0, 1, gen_statlist($1) ); };
 StatList: Stat StatListLoop												{$$ = make_node("StatList"		, 1, 2, $1, $2); if($$->n_op <= 1) $$->to_use=0; };
@@ -212,22 +218,22 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt"	, 1, 2, $1, $3); 
 ;
 
 SimpleExpr: AddOp														{$$ = $1;}
-	| SimpleExpr OR Term 												{$$ = make_node("Or"	, 1, 2, $1, $3); }
 	| Term 																{$$ = $1;}
 ;
 
-AddOp: SimpleExpr '+' Term												{$$ = make_node( "Add", 1, 2, $1, $3); }
-	| SimpleExpr '-' Term												{$$ = make_node( "Sub", 1, 2, $1, $3); }
-	| '+' Term															{$$ = make_node( "Plus", 1, 1, $2); }
-	| '-' Term															{$$ = make_node( "Minus", 1, 1, $2); }
+AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 1, 2, $1, $3); }
+	| SimpleExpr '-' Term												{$$ = make_node("Sub", 1, 2, $1, $3); }
+	| SimpleExpr OR Term 												{$$ = make_node("Or"  , 1, 2, $1, $3); }
+	| '+' Term															{$$ = make_node("Plus", 1, 1, $2); }
+	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); }
 ;
 
 Term: Factor															{$$ = $1; }
-	| Factor '*' Term 													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
-	| Factor '/' Term 													{$$ = make_node("Div"	, 1, 2, $1, $3); }
-	| Factor DIV Term 													{$$ = make_node("RealDiv",1, 2, $1, $3); }
-	| Factor MOD Term 													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
-	| Factor AND Term 													{$$ = make_node("And"	, 1, 2, $1, $3); }
+	| Term '*' Factor													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
+	| Term '/' Factor  													{$$ = make_node("RealDiv"	, 1, 2, $1, $3); }
+	| Term DIV Factor  													{$$ = make_node("Div",1, 2, $1, $3); }
+	| Term MOD Factor  													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
+	| Term AND Factor  													{$$ = make_node("And"	, 1, 2, $1, $3); }
 ;
 
 Factor:	'(' Expr ')' 													{$$ = $2; }
@@ -261,3 +267,6 @@ int main(int argc, char **argv){
 int yyerror(char *s){
 	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
 }
+
+
+

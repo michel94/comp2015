@@ -1,28 +1,15 @@
 program gcd(output);
 var a, b: integer;
 function abc(a: r): integer; FORWARD;
-function a;
+function a:a;
 begin
 	writeln(jhsdkjsd)
-end
-function asd(e, r, t: it): o;
+end;
+function asd(e, r, t: it; var a, d, e: ee; a, d, d: o): o;
 begin
-	a := 5 * 3;
-	asd := a;
-end
+	a := 1;
+end;
 
 begin
-	val(paramstr(1), a);
-	val(paramstr(2), b);
-	if a = 0 then
-		writeln(b)
-	else
-		begin
-			while b > 0 do
-				if a > b then
-					a := a - b
-				else
-					b := b - a;
-			writeln(a)
-		end
+
 end.
