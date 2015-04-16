@@ -52,7 +52,7 @@
 		memcpy(prod->op, merge_nodes, nodes * sizeof(Node *));
 		prod->n_op = nodes;
 		va_end(args);
-		
+
 		return prod;
 	}
 
@@ -147,7 +147,6 @@ FuncDeclaration: FuncHeading ';' FORWARD								{$$ = make_node("FuncDecl", 	1, 
 	| FuncIdent ';' FuncBlock 											{$$ = make_node("FuncDef2", 		1, 2, $1, $3); }
 	| FuncHeading ';' FuncBlock											{$$ = make_node("FuncDef", 	1, 2, $1, $3); }
 ;
-
 FuncHeading: FUNCTION IdProd NullFormalParam ':' IdProd					{$$ = make_node("FuncHeading",	0, 3, $2, $3, $5); };
 FuncIdent: FUNCTION IdProd												{$$ = make_node("FuncIdent", 	0, 1, $2); };
 FuncBlock: VarPart StatPart												{$$ = make_node("FuncBlock", 	0, 2, $1, $2); };
@@ -155,16 +154,13 @@ FuncBlock: VarPart StatPart												{$$ = make_node("FuncBlock", 	0, 2, $1, $
 NullFormalParam: FuncParams 											{$$ = make_node("FuncParams", 			1, 1, $1); }
 	| %empty															{$$ = make_node("FuncParams", 			1, 0); }
 ;
-
 FuncParams: '(' FormalParamsList ')' 									{$$ = make_node("FuncParams", 		0, 1, $2); };
 FormalParamsList: FormalParamsList ';' FormalParams 					{$$ = make_node("FormalParamsList", 0, 2, $1, $3); }
 	| FormalParams														{$$ = $1; }
 ;
-
 FormalParams : VarParams 												{$$ = $1; }
 			 | Params 													{$$ = $1; }
 ;
-
 VarParams: VAR IdList ':' IdProd 										{$$ = make_node("VarParams", 1, 2, $2, $4); }
 Params: IdList ':' IdProd 												{$$ = make_node("Params", 1, 2, $1, $3); }
 
@@ -173,7 +169,6 @@ StatList: Stat StatListLoop												{$$ = make_node("StatList"		, 1, 2, $1, $
 StatListLoop: StatListLoop ';' Stat 									{$$ = make_node("StatListLoop"	, 0, 2, $1, $3); };
 	| %empty															{$$ = NULL; }
 ;
-
 
 CompStat: BEG StatList END	 											{$$ = make_node("CompStat"	, 0, 1, $2); };
 Stat: CompStat															{$$ = make_node("CompStat"	, 0, 1, $1); }
@@ -204,18 +199,15 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt"	, 1, 2, $1, $3); 
 	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq"	, 1, 2, $1, $3); }
 	| SimpleExpr 														{$$ = $1; }
 ;
-
 SimpleExpr: AddOp														{$$ = $1;}
 	| Term 																{$$ = $1;}
 ;
-
 AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 1, 2, $1, $3); }
 	| SimpleExpr '-' Term												{$$ = make_node("Sub", 1, 2, $1, $3); }
 	| SimpleExpr OR Term 												{$$ = make_node("Or"  , 1, 2, $1, $3); }
 	| '+' Term															{$$ = make_node("Plus", 1, 1, $2); }
 	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); }
 ;
-
 Term: Factor															{$$ = $1; }
 	| Term '*' Factor													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
 	| Term '/' Factor  													{$$ = make_node("RealDiv"	, 1, 2, $1, $3); }
@@ -223,7 +215,6 @@ Term: Factor															{$$ = $1; }
 	| Term MOD Factor  													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
 	| Term AND Factor  													{$$ = make_node("And"	, 1, 2, $1, $3); }
 ;
-
 Factor:	'(' Expr ')' 													{$$ = $2; }
 	| INTLIT 															{$$ = terminal("IntLit", $1); }
 	| REALLIT 															{$$ = terminal("RealLit", $1); }
@@ -232,14 +223,12 @@ Factor:	'(' Expr ')' 													{$$ = $2; }
 	| IdProd ParamList 													{$$ = make_node("Call"	, 1, 2, $1, $2); }
 ;
 
-
 ParamList: '(' Expr ExprList ')'										{$$ = make_node("ParamList", 0, 2, $2, $3); };
 ExprList: ExprList ',' Expr 											{$$ = make_node("ExprList" , 0, 2, $1, $3); }
 	| %empty															{$$ = NULL; }
 ;
 
 %%
-
 int main(int argc, char **argv){
 
 	if(yyparse())
@@ -255,6 +244,4 @@ int main(int argc, char **argv){
 int yyerror(char *s){
 	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
 }
-
-
 
