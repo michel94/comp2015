@@ -1,7 +1,31 @@
 program gcd(output);
-var a, b: integer;
+var
+a, d, s: asd;
 begin
-	if then
-		a := 0;
-	
+	BEGIN
+		begin
+		end
+	END;
+	if a then
+		begin
+			begin
+				l := 1;
+				o := 3;
+				if a then
+					begin
+						op := 0;
+					end
+				else
+					begin
+					end
+			end
+		end;
+	begin
+	end;
+	a := 4;
+	begin
+		begin
+			f:=0;
+		end
+	end
 end.

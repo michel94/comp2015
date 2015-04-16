@@ -15,8 +15,8 @@ whitespace							[\t ]
 
 %%
 
-({num}"."{num})|({num}e[+-]?{num})|({num}.{num}e[+-]?{num}) {yylval.str=(char *) strdup(yytext); return REALLIT; }
-{num}														{yylval.val=atoi(yytext); return INTLIT; }
+({num}"."{num})|({num}e[+-]?{num})|({num}"."{num}e[+-]?{num}) {yylval.str=(char *) strdup(yytext); return REALLIT; }
+{num}														{yylval.str=(char *) strdup(yytext); return INTLIT; }
 
 '([^'\n]|'')+'												{yylval.str=(char *) strdup(yytext); return STRING; }
 '([^'\n]|'')+												{printf("Line %d, col %d: unterminated string\n", yylineno, col - (int)yyleng);}
