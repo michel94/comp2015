@@ -1,0 +1,8 @@
+program gcd(output);
+var
+a, d, s: asd;
+begin
+	asd := - a + d -e + 2 - e or (-2) or e - e -1 + 3 - 2;
+	if call(3,4) then
+		writeln;
+end.

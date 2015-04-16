@@ -1,0 +1,6 @@
+program gcd(output);
+var
+a, d, s: asd;
+begin
+	a := NOT(- (3.2e34+2)*(1)-a/4 MOD (30 DIV (3)-2) or a(2) < 4) > 3 * 3;
+end.
