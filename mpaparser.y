@@ -23,15 +23,6 @@
 		return (Node *) malloc(sizeof(Node));
 	}
 
-	int is_superfluous(Node *t){
-		//if(!strcmp(t->type, "StatList"))
-		//	return t->n_op <= 1;
-		//if(!strcmp(t->type, "FuncParams"))
-		//	return t->n_op < 2;
-
-		return 0;
-	}
-
 	Node *make_node(char *node_type, int to_use, int node_operands, ...){
 		Node *prod, **tmp;
 		int i, nodes = 0;
@@ -61,10 +52,7 @@
 		memcpy(prod->op, merge_nodes, nodes * sizeof(Node *));
 		prod->n_op = nodes;
 		va_end(args);
-
-		if(is_superfluous(prod))
-			prod->to_use = 0;
-
+		
 		return prod;
 	}
 
