@@ -1,0 +1,6 @@
+PROGRAM test(OUTPUT);
+var i: integer;
+BEGIN
+	BEGIN
+	END
+END.

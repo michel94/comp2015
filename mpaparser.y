@@ -6,10 +6,11 @@
 	#include <string.h>
 
 	typedef struct node {
-		char *value;
 		int to_use;
 		int n_op;
-		char* type;
+
+		char *value;
+		char *type;
 
 		struct node **op;
 	} Node;
@@ -123,17 +124,17 @@ CompStat StatList StatListLoop Stat Expr WriteList ExprStringList ExprString Par
 
 %%
 
-Prog: ProgHeading ';' ProgBlock '.' 									{$$ = tree = make_node("Program" , 1, 2, $1, $3); };
-ProgHeading: PROGRAM IdProd '(' OUTPUT ')' 								{$$ = make_node("ProgHeading"	 , 0, 1, $2); };
-ProgBlock: VarPart FuncPart StatPart 									{$$ = make_node("ProgBlock"	 	 , 0, 3, $1, $2, $3); };
-VarPart: VAR VarDeclaration ';' VarDeclarationList 						{$$ = make_node("VarPart"	 	 , 1, 2, $2, $4);}
-	| %empty 															{$$ = make_node("VarPart"	 	 , 1, 0); }
+Prog: ProgHeading ';' ProgBlock '.' 									{$$ = tree = make_node("Program", 1, 2, $1, $3); };
+ProgHeading: PROGRAM IdProd '(' OUTPUT ')' 								{$$ = make_node("ProgHeading", 	  0, 1, $2); };
+ProgBlock: VarPart FuncPart StatPart 									{$$ = make_node("ProgBlock", 	  0, 3, $1, $2, $3); };
+VarPart: VAR VarDeclaration ';' VarDeclarationList 						{$$ = make_node("VarPart", 		  1, 2, $2, $4);}
+	| %empty 															{$$ = make_node("VarPart", 		  1, 0); }
 ;
 VarDeclarationList: VarDeclarationList VarDeclaration ';' 				{$$ = make_node("VarDeclarationList", 0, 2, $1, $2);} 
 	| %empty															{$$ = NULL; }
 ;
-VarDeclaration: IdList ':' IdProd										{$$ = make_node("VarDecl"	, 1, 2, $1, $3); } ;
-IdList: IdProd IdListLoop												{$$ = make_node("IdList"	, 0, 2, $1, $2);};
+VarDeclaration: IdList ':' IdProd										{$$ = make_node("VarDecl", 	  1, 2, $1, $3); } ;
+IdList: IdProd IdListLoop												{$$ = make_node("IdList", 	  0, 2, $1, $2);};
 IdListLoop: IdListLoop ',' IdProd										{$$ = make_node("IdListLoop", 0, 2, $1, $3);};
 	| %empty															{$$ = NULL; }
 ;
@@ -143,16 +144,16 @@ FuncPart: FuncDeclarationList 											{$$ = make_node("FuncPart"			 , 1, 1, $
 FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' 			{$$ = make_node("FuncDeclarationList", 0, 2, $1, $2); }
 	| %empty															{$$ = NULL; }
 ;
-FuncDeclaration: FuncHeading ';' FORWARD								{$$ = make_node("FuncDecl", 	1, 1, $1); }
-	| FuncIdent ';' FuncBlock 											{$$ = make_node("FuncDef2", 		1, 2, $1, $3); }
+FuncDeclaration: FuncHeading ';' FORWARD								{$$ = make_node("FuncDecl", 1, 1, $1); }
+	| FuncIdent ';' FuncBlock 											{$$ = make_node("FuncDef2", 1, 2, $1, $3); }
 	| FuncHeading ';' FuncBlock											{$$ = make_node("FuncDef", 	1, 2, $1, $3); }
 ;
 FuncHeading: FUNCTION IdProd NullFormalParam ':' IdProd					{$$ = make_node("FuncHeading",	0, 3, $2, $3, $5); };
 FuncIdent: FUNCTION IdProd												{$$ = make_node("FuncIdent", 	0, 1, $2); };
 FuncBlock: VarPart StatPart												{$$ = make_node("FuncBlock", 	0, 2, $1, $2); };
 
-NullFormalParam: FuncParams 											{$$ = make_node("FuncParams", 			1, 1, $1); }
-	| %empty															{$$ = make_node("FuncParams", 			1, 0); }
+NullFormalParam: FuncParams 											{$$ = make_node("FuncParams", 1, 1, $1); }
+	| %empty															{$$ = make_node("FuncParams", 1, 0); }
 ;
 FuncParams: '(' FormalParamsList ')' 									{$$ = make_node("FuncParams", 		0, 1, $2); };
 FormalParamsList: FormalParamsList ';' FormalParams 					{$$ = make_node("FormalParamsList", 0, 2, $1, $3); }
@@ -161,29 +162,29 @@ FormalParamsList: FormalParamsList ';' FormalParams 					{$$ = make_node("Formal
 FormalParams : VarParams 												{$$ = $1; }
 			 | Params 													{$$ = $1; }
 ;
-VarParams: VAR IdList ':' IdProd 										{$$ = make_node("VarParams", 1, 2, $2, $4); }
-Params: IdList ':' IdProd 												{$$ = make_node("Params", 1, 2, $1, $3); }
+VarParams: VAR IdList ':' IdProd 										{$$ = make_node("VarParams", 1, 2, $2, $4); };
+Params: IdList ':' IdProd 												{$$ = make_node("Params", 	 1, 2, $1, $3); };
 
-StatPart: CompStat 														{$$ = make_node("StatPart" , 0, 1, gen_statlist($1) ); };
-StatList: Stat StatListLoop												{$$ = make_node("StatList"		, 1, 2, $1, $2); if($$->n_op <= 1) $$->to_use=0; };
-StatListLoop: StatListLoop ';' Stat 									{$$ = make_node("StatListLoop"	, 0, 2, $1, $3); };
+StatPart: CompStat 														{$$ = make_node("StatPart", 	0, 1, gen_statlist($1) ); };
+StatList: Stat StatListLoop												{$$ = make_node("StatList", 	1, 2, $1, $2); if($$->n_op <= 1) $$->to_use=0; };
+StatListLoop: StatListLoop ';' Stat 									{$$ = make_node("StatListLoop", 0, 2, $1, $3); };
 	| %empty															{$$ = NULL; }
 ;
 
-CompStat: BEG StatList END	 											{$$ = make_node("CompStat"	, 0, 1, $2); };
-Stat: CompStat															{$$ = make_node("CompStat"	, 0, 1, $1); }
-	| IF Expr THEN Stat 												{$$ = make_node("IfElse"	, 1, 3, $2, gen_statlist($4), gen_statlist(NULL)); }
-	| IF Expr THEN Stat ELSE Stat 										{$$ = make_node("IfElse"	, 1, 3, $2, gen_statlist($4), gen_statlist($6)); }
-	| WHILE Expr DO Stat 												{$$ = make_node("While"		, 1, 2, $2, gen_statlist($4)); }
-	| REPEAT StatList UNTIL Expr 										{$$ = make_node("Repeat"	, 1, 2, gen_statlist($2), $4); }
-	| VAL '(' PARAMSTR '(' Expr ')' ',' IdProd ')'						{$$ = make_node("ValParam"	, 1, 2, $5, $8); }
-	| WRITELN WriteList  												{$$ = make_node("WriteLn"	, 1, 1, $2); }
-	| WRITELN 															{$$ = make_node("WriteLn"	, 1, 0); }
-	| IdProd ASSIGN Expr 												{$$ = make_node("Assign"	, 1, 2, $1, $3); }
+CompStat: BEG StatList END	 											{$$ = make_node("CompStat", 0, 1, $2); };
+Stat: CompStat															{$$ = make_node("CompStat", 0, 1, $1); }
+	| IF Expr THEN Stat 												{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist(NULL)); }
+	| IF Expr THEN Stat ELSE Stat 										{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist($6)); }
+	| WHILE Expr DO Stat 												{$$ = make_node("While", 	1, 2, $2, gen_statlist($4)); }
+	| REPEAT StatList UNTIL Expr 										{$$ = make_node("Repeat", 	1, 2, gen_statlist($2), $4); }
+	| VAL '(' PARAMSTR '(' Expr ')' ',' IdProd ')'						{$$ = make_node("ValParam", 1, 2, $5, $8); }
+	| WRITELN WriteList  												{$$ = make_node("WriteLn",  1, 1, $2); }
+	| WRITELN 															{$$ = make_node("WriteLn",  1, 0); }
+	| IdProd ASSIGN Expr 												{$$ = make_node("Assign", 	1, 2, $1, $3); }
 	| %empty															{$$ = NULL; }
 ;
 
-WriteList: '(' ExprString ExprStringList ')' 							{$$ = make_node("WriteList"		, 0, 2, $2, $3); };
+WriteList: '(' ExprString ExprStringList ')' 							{$$ = make_node("WriteList", 	  0, 2, $2, $3); };
 ExprStringList: ExprStringList ',' ExprString 							{$$ = make_node("ExprStringList", 0, 2, $1, $3); }
 	| %empty															{$$ = NULL; }
 ;
@@ -191,40 +192,40 @@ ExprString: Expr 														{$$ = make_node("ExprString", 0, 1, $1); }
 	| STRING 															{$$ = terminal("String", $1); }
 ;
 
-Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt"	, 1, 2, $1, $3); }
-	| SimpleExpr '>' SimpleExpr 										{$$ = make_node("Gt"	, 1, 2, $1, $3); }
-	| SimpleExpr '=' SimpleExpr 										{$$ = make_node("Eq"	, 1, 2, $1, $3); }
-	| SimpleExpr NEQ SimpleExpr 										{$$ = make_node("Neq"	, 1, 2, $1, $3); }
-	| SimpleExpr LEQ SimpleExpr 										{$$ = make_node("Leq"	, 1, 2, $1, $3); }
-	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq"	, 1, 2, $1, $3); }
+Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); }
+	| SimpleExpr '>' SimpleExpr 										{$$ = make_node("Gt",  1, 2, $1, $3); }
+	| SimpleExpr '=' SimpleExpr 										{$$ = make_node("Eq",  1, 2, $1, $3); }
+	| SimpleExpr NEQ SimpleExpr 										{$$ = make_node("Neq", 1, 2, $1, $3); }
+	| SimpleExpr LEQ SimpleExpr 										{$$ = make_node("Leq", 1, 2, $1, $3); }
+	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq", 1, 2, $1, $3); }
 	| SimpleExpr 														{$$ = $1; }
 ;
 SimpleExpr: AddOp														{$$ = $1;}
 	| Term 																{$$ = $1;}
 ;
-AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 1, 2, $1, $3); }
-	| SimpleExpr '-' Term												{$$ = make_node("Sub", 1, 2, $1, $3); }
-	| SimpleExpr OR Term 												{$$ = make_node("Or"  , 1, 2, $1, $3); }
-	| '+' Term															{$$ = make_node("Plus", 1, 1, $2); }
+AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); }
+	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); }
+	| SimpleExpr OR Term 												{$$ = make_node("Or", 	 1, 2, $1, $3); }
+	| '+' Term															{$$ = make_node("Plus",  1, 1, $2); }
 	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); }
 ;
 Term: Factor															{$$ = $1; }
-	| Term '*' Factor													{$$ = make_node("Mul"	, 1, 2, $1, $3); }
-	| Term '/' Factor  													{$$ = make_node("RealDiv"	, 1, 2, $1, $3); }
-	| Term DIV Factor  													{$$ = make_node("Div",1, 2, $1, $3); }
-	| Term MOD Factor  													{$$ = make_node("Mod"	, 1, 2, $1, $3); }
-	| Term AND Factor  													{$$ = make_node("And"	, 1, 2, $1, $3); }
+	| Term '*' Factor													{$$ = make_node("Mul", 	   1, 2, $1, $3); }
+	| Term '/' Factor  													{$$ = make_node("RealDiv", 1, 2, $1, $3); }
+	| Term DIV Factor  													{$$ = make_node("Div", 	   1, 2, $1, $3); }
+	| Term MOD Factor  													{$$ = make_node("Mod", 	   1, 2, $1, $3); }
+	| Term AND Factor  													{$$ = make_node("And", 	   1, 2, $1, $3); }
 ;
 Factor:	'(' Expr ')' 													{$$ = $2; }
-	| INTLIT 															{$$ = terminal("IntLit", $1); }
+	| INTLIT 															{$$ = terminal("IntLit",  $1); }
 	| REALLIT 															{$$ = terminal("RealLit", $1); }
-	| ID 																{$$ = terminal("Id", $1); };
-	| NOT Factor 														{$$ = make_node("Not"	, 1, 1, $2); }
-	| IdProd ParamList 													{$$ = make_node("Call"	, 1, 2, $1, $2); }
+	| ID 																{$$ = terminal("Id", 	  $1); };
+	| NOT Factor 														{$$ = make_node("Not",  1, 1, $2); }
+	| IdProd ParamList 													{$$ = make_node("Call", 1, 2, $1, $2); }
 ;
 
 ParamList: '(' Expr ExprList ')'										{$$ = make_node("ParamList", 0, 2, $2, $3); };
-ExprList: ExprList ',' Expr 											{$$ = make_node("ExprList" , 0, 2, $1, $3); }
+ExprList: ExprList ',' Expr 											{$$ = make_node("ExprList",  0, 2, $1, $3); }
 	| %empty															{$$ = NULL; }
 ;
 
@@ -244,4 +245,3 @@ int main(int argc, char **argv){
 int yyerror(char *s){
 	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
 }
-
