@@ -12,8 +12,8 @@ typedef struct {
 } element_t;
 
 int64_t hash_fnv1a(char s[]){
-	const int64_t prime = 0xcbf29ce484222325;
-	int64_t hash = 0xcbf29ce484222325;
+	const uint64_t prime = 0xcbf29ce484222325;
+	uint64_t hash = 0xcbf29ce484222325;
 	int i;
 
 	for(i = 0; i < strlen(s); i++){
@@ -26,11 +26,10 @@ int64_t hash_fnv1a(char s[]){
 
 int store(element_t table[], int size, char *s, type_t type){
 	element_t *it, *el;
-	int ind = hash_fnv1a(s);
+	uint64_t ind = hash_fnv1a(s);
 	ind = ind % size;
 	el = &table[ind];
-
-
+	
 	for(it = el; it != el-1 % size; it+=(it-el+1) % size){
 		if(strlen(it->name) <= 0){
 			strcpy(it->name, s);

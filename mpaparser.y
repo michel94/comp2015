@@ -123,31 +123,24 @@
 		int stp_backup, i;
 		if(p == NULL)
 			return;
-		printf("%x\n", p);
-		printf(".. %d\n", p->n_op);
-		printf("%s %d %x\n", p->type, p->n_op, p->op);
-
+		
 		if(strcmp(p->type, "Program") == 0 || strcmp(p->type, "FuncDef") == 0 || strcmp(p->type, "FuncDef") == 0){
-			printf("program\n");
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			symbol_tables[st_pointer] = (element_t*) malloc(sizeof(element_t) * 256);
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
-			printf("program\n");
+			
 		}else if(strcmp(p->type, "VarParams") == 0){
-			printf("varParams\n");
 			for(i = 0; i < p->n_op; i++)
 				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->type) );
 		}else if(strcmp(p->type, "VarDecl") == 0){
-			printf("varDecl\n");
-			for(i = 0; i < p->n_op; i++)
+			for(i = 0; i < p->n_op-1; i++){
 				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->type) );
-			printf("varDecl2\n");
+			}
 		}else{
 			for(i = 0; i < p->n_op; i++){
-				printf("OK\n");
 				parse_tree(p->op[i]);
 			}
 		}
@@ -294,8 +287,15 @@ int main(int argc, char **argv){
 	while(argc--){
 		if(!strcmp(*argv, "-t"))
 			print_tree(tree, 0);
-		else if(!strcmp(*argv, "-s"))
+		else if(!strcmp(*argv, "-s")){
 			parse_tree(tree);
+			int i, j;
+			for(i=0; i<st_size; i++){
+				for(j=0; j<256; j++)
+					if(strlen(symbol_tables[i][j].name) > 0)
+						printf("%s\n", symbol_tables[i][j].name);
+			}
+		}
 		*argv++;
 	}
 	return 0;
