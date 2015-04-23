@@ -65,6 +65,7 @@
 		Node* p 	= new_node();
 		p->type 	= node_type;
 		p->value 	= s;
+		p->value = (char *) strdup(s);
 		p->to_use 	= 1;
 		p->n_op 	= 0;
 		p->op = NULL;
