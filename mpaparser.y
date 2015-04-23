@@ -4,11 +4,12 @@
 	#include <stdarg.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include "hashtable.h"
 
 	typedef struct node {
 		int to_use;
 		int n_op;
-
+		
 		char *value;
 		char *type;
 
@@ -19,6 +20,9 @@
 
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
+
+	element_t* symbol_tables[256];
+	int st_pointer, st_size=0;
 
 	Node *new_node(){
 		return (Node *) malloc(sizeof(Node));
@@ -63,6 +67,7 @@
 		p->value 	= s;
 		p->to_use 	= 1;
 		p->n_op 	= 0;
+		p->op = NULL;
 
 		return p;
 	}
@@ -96,6 +101,56 @@
 		if(p != NULL && p->to_use == 1)
 			return p;
 		return (p==NULL || p->n_op == 0) ? make_node("StatList", 1, 0) : p;
+	}
+
+	void parse_instruction(){
+
+
+	}
+
+	int vartype(char* s){
+		if(strcmp(s, "String") == 0)
+			return STRING_T;
+		else if(strcmp(s, "IntLit") == 0)
+			return INTEGER_T;
+		else if(strcmp(s, "RealLit") == 0)
+			return REAL_T;
+
+	}
+
+	void parse_tree(Node* p){
+		int stp_backup, i;
+		if(p == NULL)
+			return;
+		printf("%x\n", p);
+		printf(".. %d\n", p->n_op);
+		printf("%s %d %x\n", p->type, p->n_op, p->op);
+
+		if(strcmp(p->type, "Program") == 0 || strcmp(p->type, "FuncDef") == 0 || strcmp(p->type, "FuncDef") == 0){
+			printf("program\n");
+			stp_backup = st_pointer;
+			st_pointer = st_size++;
+			symbol_tables[st_pointer] = (element_t*) malloc(sizeof(element_t) * 256);
+			for(i = 0; i < p->n_op; i++)
+				parse_tree(p->op[i]);
+			st_pointer = stp_backup;
+			printf("program\n");
+		}else if(strcmp(p->type, "VarParams") == 0){
+			printf("varParams\n");
+			for(i = 0; i < p->n_op; i++)
+				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->type) );
+		}else if(strcmp(p->type, "VarDecl") == 0){
+			printf("varDecl\n");
+			for(i = 0; i < p->n_op; i++)
+				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->type) );
+			printf("varDecl2\n");
+		}else{
+			for(i = 0; i < p->n_op; i++){
+				printf("OK\n");
+				parse_tree(p->op[i]);
+			}
+		}
+
 	}
 
 %}
@@ -235,10 +290,13 @@ int main(int argc, char **argv){
 	if(yyparse())
 		return 0;
 
-	while(argc--)
-		if(!strcmp(*argv++, "-t"))
+	while(argc--){
+		if(!strcmp(*argv, "-t"))
 			print_tree(tree, 0);
-
+		else if(!strcmp(*argv, "-s"))
+			parse_tree(tree);
+		*argv++;
+	}
 	return 0;
 }
 

@@ -1,4 +1,4 @@
 lex mpaparser.l
 yacc -d mpaparser.y $1
-gcc -o mpaparser y.tab.c lex.yy.c -ly
+gcc -o mpaparser y.tab.c lex.yy.c -ly -g
 rm mpaparser.zip; zip mpaparser.zip mpaparser.l mpaparser.y;
