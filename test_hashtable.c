@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "hash.h"
+#include "hashtable.h"
 
 #define DEBUG_FILL 0
 #define DEBUG_DISTRIBUTION 1
