@@ -64,11 +64,10 @@
 	Node *terminal(char* node_type, char *s){
 		Node* p 	= new_node();
 		p->type 	= node_type;
-		p->value 	= s;
-		p->value = (char *) strdup(s);
+		p->value 	= (char *) strdup(s);
 		p->to_use 	= 1;
 		p->n_op 	= 0;
-		p->op = NULL;
+		p->op 		= NULL;
 
 		return p;
 	}
@@ -116,15 +115,15 @@
 			return INTEGER_T;
 		else if(strcmp(s, "RealLit") == 0)
 			return REAL_T;
-
 	}
 
 	void parse_tree(Node* p){
 		int stp_backup, i;
+		
 		if(p == NULL)
 			return;
 		
-		if(strcmp(p->type, "Program") == 0 || strcmp(p->type, "FuncDef") == 0 || strcmp(p->type, "FuncDef") == 0){
+		if(strcmp(p->type, "Program") == 0 || strcmp(p->type, "FuncDef") == 0 || strcmp(p->type, "FuncDef2") == 0){
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			symbol_tables[st_pointer] = (element_t*) malloc(sizeof(element_t) * 256);
