@@ -33,7 +33,7 @@ int store(element_t table[], int size, char *s, type_t type){
 	if(ENABLE_HASH_REGRESSIONS && size < 26*26*26)
 		return ind+1;
 
-	for(it = el; it != el-1; ++it){
+	for(it = el; it != el-1 % size; it=(it-el+1) % size){
 		if(strlen(it->name) <= 0){
 			strcpy(it->name, s);
 			it->type = type;
@@ -52,7 +52,7 @@ element_t *fetch(element_t table[], int size, char *s){
 	uint64_t ind = hash_fnv1a(s) % size;
 	element_t *it, *el = &table[ind];
 
-	for(it = el; it != el-1 % size; it+=(it-el+1) % size)
+	for(it = el; it != el-1 % size; it=(it-el+1) % size)
 		if(strcmp(it->name, s) == 0)
 			return it;
 
