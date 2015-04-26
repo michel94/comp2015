@@ -109,12 +109,23 @@
 	}
 
 	int vartype(char* s){
-		if(strcmp(s, "String") == 0)
+		if(strcmp(s, "string") == 0)
 			return STRING_T;
-		else if(strcmp(s, "IntLit") == 0)
+		else if(strcmp(s, "integer") == 0)
 			return INTEGER_T;
-		else if(strcmp(s, "RealLit") == 0)
+		else if(strcmp(s, "real") == 0)
 			return REAL_T;
+	}
+
+	char* type2string(type_t type){
+		switch(type){
+			case(STRING_T):
+				return "string";
+			case(INTEGER_T):
+				return "integer";
+			case(REAL_T):
+				return "real";
+		}
 	}
 
 	void parse_tree(Node* p){
@@ -133,10 +144,10 @@
 			
 		}else if(strcmp(p->type, "VarParams") == 0){
 			for(i = 0; i < p->n_op; i++)
-				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->type) );
+				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 		}else if(strcmp(p->type, "VarDecl") == 0){
 			for(i = 0; i < p->n_op-1; i++){
-				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->type) );
+				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			}
 		}else{
 			for(i = 0; i < p->n_op; i++){
@@ -291,8 +302,9 @@ int main(int argc, char **argv){
 			int i, j;
 			for(i=0; i<st_size; i++){
 				for(j=0; j<256; j++)
-					if(strlen(symbol_tables[i][j].name) > 0)
-						printf("%s\n", symbol_tables[i][j].name);
+					if(strlen(symbol_tables[i][j].name) > 0){
+						printf("%s %s\n", symbol_tables[i][j].name, type2string(symbol_tables[i][j].type) );
+					}
 			}
 		}
 		*argv++;
