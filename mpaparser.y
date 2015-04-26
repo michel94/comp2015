@@ -125,6 +125,8 @@
 				return "integer";
 			case(REAL_T):
 				return "real";
+			default:
+				return "undefined";
 		}
 	}
 
