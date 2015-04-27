@@ -6,12 +6,15 @@
 
 int ENABLE_HASH_REGRESSIONS = 0;
 
-typedef enum {INTEGER_T, STRING_T, REAL_T} type_t;
-//typedef 
+typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T} type_t;
+typedef enum {CONSTANT_F, RETURN_F, PARAM_F} flag_t;
+typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;
 
 typedef struct {
 	char name[64];
 	type_t type;
+	flag_t flag;
+	value_t value;
 } element_t;
 
 typedef struct{
@@ -44,7 +47,7 @@ uint64_t hash_fnv1a(char s[]){
 	return hash;
 }
 
-int store(hashtable_t* hashtable, char *s, type_t type){
+element_t* store(hashtable_t* hashtable, char *s, type_t type){
 	int size = hashtable->size;
 	element_t* table = hashtable->elements;
 	uint64_t ind = hash_fnv1a(s) % size;
@@ -54,7 +57,7 @@ int store(hashtable_t* hashtable, char *s, type_t type){
 		strcpy(el->name, s);
 		el->type = type;
 
-		return (el-table) + 1; /* RETURN INDEX IN HASHTABLE PLUS 1 */
+		return el; /* RETURN INDEX IN HASHTABLE PLUS 1 */
 	}
 
 	register int i;
@@ -64,7 +67,7 @@ int store(hashtable_t* hashtable, char *s, type_t type){
 			strcpy(it->name, s);
 			it->type = type;
 
-			return (it-table) + 1; /* RETURN INDEX IN HASHTABLE PLUS 1 */
+			return it; /* RETURN INDEX IN HASHTABLE PLUS 1 */
 		}
 	}
 	
@@ -77,14 +80,14 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 	uint64_t ind = hash_fnv1a(s) % size;
 	element_t *it, *el = &table[ind];
 
-	if(strlen(el->name) == 0){
+	if(strcmp(el->name, s) == 0){
 		return el;
 	}
 
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
-		if(strlen(it->name) == 0)
+		if(strcpy(it->name, s) == 0)
 			return it;
 	}
 

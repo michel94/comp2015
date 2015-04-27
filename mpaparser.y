@@ -28,6 +28,34 @@
 		return (Node *) malloc(sizeof(Node));
 	}
 
+	void create_outer_st(hashtable_t* h){
+
+		element_t* el = store(h, "boolean", TYPE_T);
+		el->flag = CONSTANT_F;
+		el->value = BOOLEAN_V;
+
+		el = store(h, "integer", TYPE_T);
+		el->flag = CONSTANT_F;
+		el->value = INTEGER_V;
+
+		el = store(h, "real", TYPE_T);
+		el->flag = CONSTANT_F;
+		el->value = REAL_V;
+
+		el = store(h, "false", BOOLEAN_T);
+		el->flag = CONSTANT_F;
+		el->value = FALSE_V;
+
+		el = store(h, "true", BOOLEAN_T);
+		el->flag = CONSTANT_F;
+		el->value = TRUE_V;
+
+		el = store(h, "paramcount", FUNCTION_T);
+		
+		el = store(h, "program", PROGRAM_T);
+		
+	}
+
 	Node *make_node(char *node_type, int to_use, int node_operands, ...){
 		Node *prod, **tmp;
 		int i, nodes = 0;
@@ -109,9 +137,7 @@
 	}
 
 	int vartype(char* s){
-		if(strcmp(s, "string") == 0)
-			return STRING_T;
-		else if(strcmp(s, "integer") == 0)
+		if(strcmp(s, "integer") == 0)
 			return INTEGER_T;
 		else if(strcmp(s, "real") == 0)
 			return REAL_T;
@@ -119,12 +145,18 @@
 
 	char* type2string(type_t type){
 		switch(type){
-			case(STRING_T):
-				return "string";
 			case(INTEGER_T):
 				return "integer";
 			case(REAL_T):
 				return "real";
+			case(TYPE_T):
+				return "type";
+			case(PROGRAM_T):
+				return "program";
+			case(FUNCTION_T):
+				return "function";
+			case(BOOLEAN_T):
+				return "boolean";
 			default:
 				return "undefined";
 		}
@@ -147,7 +179,13 @@
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			symbol_tables[st_pointer] = new_hashtable(256, "Function");
-			store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-3]->value) );
+			element_t* t = fetch(symbol_tables[0], p->op[p->n_op-3]->value);
+			if(t == NULL || t->type != TYPE_T)
+				printf("Cannot write values of type <%s> %d %d\n", p->op[p->n_op-3]->value, p->op[p->n_op-3]->type, TYPE_T);
+			else{
+				store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-3]->value) );
+				store(symbol_tables[1], p->op[0]->value, FUNCTION_T );
+			}
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
@@ -310,11 +348,16 @@ int main(int argc, char **argv){
 	if(yyparse())
 		return 0;
 
+	symbol_tables[0] = new_hashtable(256, "Outer");
+	create_outer_st(symbol_tables[0]);
+	st_pointer = 1;
+	st_size++;
+		
+	parse_tree(tree);
 	while(argc--){
 		if(!strcmp(*argv, "-t"))
 			print_tree(tree, 0);
 		else if(!strcmp(*argv, "-s")){
-			parse_tree(tree);
 			int i, j;
 			for(i=0; i<st_size; i++){
 				printf("===== %s Symbol Table =====\n", symbol_tables[i]->name);
