@@ -80,13 +80,13 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 	uint64_t ind = hash_fnv1a(s) % size;
 	element_t *it, *el = &table[ind];
 
-	if(strcmp(el->name, s) == 0){
+	if(strcmp(el->name, s) == 0)
 		return el;
 
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
-		if(strcmp(it->name, s) == 0)
+		if(strcpy(it->name, s) == 0)
 			return it;
 	}
 
