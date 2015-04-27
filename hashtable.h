@@ -77,9 +77,8 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 	uint64_t ind = hash_fnv1a(s) % size;
 	element_t *it, *el = &table[ind];
 
-	if(strlen(el->name) == 0){
+	if(strlen(el->name) == 0)
 		return el;
-	}
 
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
@@ -88,4 +87,5 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 			return it;
 	}
 
+	return NULL;
 }
