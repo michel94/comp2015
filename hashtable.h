@@ -7,6 +7,7 @@
 int ENABLE_HASH_REGRESSIONS = 0;
 
 typedef enum {INTEGER_T, STRING_T, REAL_T} type_t;
+//typedef 
 
 typedef struct {
 	char name[64];
@@ -19,11 +20,13 @@ typedef struct{
 	int size;
 } hashtable_t;
 
-hashtable_t* new_hashtable(int size){
+hashtable_t* new_hashtable(int size, char* str){
 	hashtable_t* h;
 	h = (hashtable_t*) malloc(sizeof(hashtable_t));
 	h->elements = (element_t*) malloc(sizeof(element_t) * size);
+	memset(h->elements, 0, sizeof(element_t) * size);
 	h->size = size;
+	strcpy(h->name, str);
 
 	return h;
 }
@@ -41,7 +44,9 @@ uint64_t hash_fnv1a(char s[]){
 	return hash;
 }
 
-int store(element_t table[], int size, char *s, type_t type){
+int store(hashtable_t* hashtable, char *s, type_t type){
+	int size = hashtable->size;
+	element_t* table = hashtable->elements;
 	uint64_t ind = hash_fnv1a(s) % size;
 	element_t *it, *el = &table[ind];
 	
@@ -66,7 +71,9 @@ int store(element_t table[], int size, char *s, type_t type){
 	return 0;
 }
 
-element_t *fetch(element_t table[], int size, char *s){
+element_t *fetch(hashtable_t* hashtable, char *s){
+	int size = hashtable->size;
+	element_t* table = hashtable->elements;
 	uint64_t ind = hash_fnv1a(s) % size;
 	element_t *it, *el = &table[ind];
 

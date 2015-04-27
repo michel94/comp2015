@@ -21,7 +21,7 @@
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
 
-	element_t* symbol_tables[256];
+	hashtable_t* symbol_tables[256];
 	int st_pointer, st_size=0;
 
 	Node *new_node(){
@@ -136,20 +136,34 @@
 		if(p == NULL)
 			return;
 		
-		if(strcmp(p->type, "Program") == 0 || strcmp(p->type, "FuncDef") == 0 || strcmp(p->type, "FuncDef2") == 0){
+		if(strcmp(p->type, "Program") == 0){
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
-			symbol_tables[st_pointer] = (element_t*) malloc(sizeof(element_t) * 256);
+			symbol_tables[st_pointer] = new_hashtable(256, "Program");
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
-			
-		}else if(strcmp(p->type, "VarParams") == 0){
+		}else if(strcmp(p->type, "FuncDef") == 0){
+			stp_backup = st_pointer;
+			st_pointer = st_size++;
+			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-3]->value) );
 			for(i = 0; i < p->n_op; i++)
-				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
+				parse_tree(p->op[i]);
+			st_pointer = stp_backup;
+		}else if(strcmp(p->type, "FuncDef2") == 0){
+			stp_backup = st_pointer;
+			st_pointer = st_size++;
+			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			for(i = 0; i < p->n_op; i++)
+				parse_tree(p->op[i]);
+			st_pointer = stp_backup;
+		}else if(strcmp(p->type, "VarParams") == 0 || strcmp(p->type, "Params") == 0){
+			for(i = 0; i < p->n_op-1; i++)
+				store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 		}else if(strcmp(p->type, "VarDecl") == 0){
 			for(i = 0; i < p->n_op-1; i++){
-				store(symbol_tables[st_pointer], 256, p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
+				store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			}
 		}else{
 			for(i = 0; i < p->n_op; i++){
@@ -303,9 +317,10 @@ int main(int argc, char **argv){
 			parse_tree(tree);
 			int i, j;
 			for(i=0; i<st_size; i++){
+				printf("===== %s Symbol Table =====\n", symbol_tables[i]->name);
 				for(j=0; j<256; j++)
-					if(strlen(symbol_tables[i][j].name) > 0){
-						printf("%s %s\n", symbol_tables[i][j].name, type2string(symbol_tables[i][j].type) );
+					if(strlen(symbol_tables[i]->elements[j].name) > 0){
+						printf("%s\t_%s_\n", symbol_tables[i]->elements[j].name, type2string(symbol_tables[i]->elements[j].type) );
 					}
 			}
 		}

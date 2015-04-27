@@ -4,23 +4,22 @@
 
 #include "hashtable.h"
 
-#define DEBUG_FILL 0
+#define DEBUG_FILL 1
 #define DEBUG_DISTRIBUTION 0
 
 int fill_regression(){
 	int words = pow(26, 2)+1;
 
 	int dist[words+1];
-	element_t table[words];
 
-	memset(table, 0, sizeof table);
+	hashtable_t* table = new_hashtable(words, "");
 	memset(dist,  0, sizeof dist);
 
 	for(char i = 'a'; i <= 'z'; i++){
 		for(char j = 'a'; j <= 'z'; j++){
 			char str[] = {i, j, 0};
 			
-			int pos = store(table, words, str, STRING_T);
+			int pos = store(table, str, STRING_T);
 			dist[pos]++;
 
 			if(dist[pos] > 1 || pos > words || pos < 0){
@@ -37,7 +36,7 @@ int fill_regression(){
 
 	return dist[0];
 }
-
+/*
 int distribution_regression(){
 
 	if(!ENABLE_HASH_REGRESSIONS)
@@ -85,7 +84,7 @@ int distribution_regression(){
 #endif
 
 	return desv > 10;
-}
+}*/
 
 int main(){
 	if(fill_regression())
