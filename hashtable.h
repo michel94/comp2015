@@ -82,13 +82,13 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 
 	if(strcmp(el->name, s) == 0){
 		return el;
-	}
 
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
-		if(strcpy(it->name, s) == 0)
+		if(strcmp(it->name, s) == 0)
 			return it;
 	}
 
+	return NULL;
 }
