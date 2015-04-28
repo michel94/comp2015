@@ -153,6 +153,8 @@
 			return INTEGER_T;
 		else if(strcmp(s, "real") == 0)
 			return REAL_T;
+		else if(strcmp(s, "boolean") == 0)
+			return BOOLEAN_T;
 	}
 
 	char* type2string(type_t type){
@@ -397,7 +399,7 @@ void print_hashtable(){
 	for(i = 0; i < st_size; i++){
 		printf("===== %s Symbol Table =====\n", symbol_tables[i]->name);
 		for(it = symbol_tables[i]->next; it != symbol_tables[i]->last; ++it){
-			if( (*it)->type == TYPE_T || (*it)->type == BOOLEAN_T)
+			if( ((*it)->type == TYPE_T || (*it)->type == BOOLEAN_T) && i == OUTER_ST)
 				printf("%s\t_%s_\t%s\t_%s_\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag), value2string((*it)->value));
 			else if((*it)->type == FUNCTION_T || (*it)->type == PROGRAM_T)
 				printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
