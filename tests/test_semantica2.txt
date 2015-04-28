@@ -3,12 +3,14 @@ program gcd2(output);
 var x, y: integer;
 function max(a: integer): real; forward;
 function debug;
+	var o: boolean;
+	r : real;
 	begin
 		writeln('bug bug')
 	end;
 
 function min(A : integer; B: integer; var o : real): integer;
-	var a, r : real;
+	var l, r : real;
 	begin
 		if A < B then
 			min := A

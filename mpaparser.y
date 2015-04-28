@@ -184,6 +184,10 @@
 				return "return";
 			case(PARAM_F):
 				return "param";
+			case(VARPARAM_F):
+				return "varparam";
+			case(NONE_F):
+				return "";
 			default:
 				return "undefined";
 		}
@@ -235,6 +239,14 @@
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
+		}else if(strcmp(p->type, "FuncDef2") == 0){
+			stp_backup = st_pointer;
+			st_pointer = st_size++;
+			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			store(symbol_tables[PROGRAM_ST], p->op[0]->value, FUNCTION_T );
+			for(i = 0; i < p->n_op; i++)
+				parse_tree(p->op[i]);
+			st_pointer = stp_backup;
 		}else if(strcmp(p->type, "FuncDecl") == 0){
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
@@ -250,17 +262,15 @@
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
-		}else if(strcmp(p->type, "FuncDef2") == 0){
-			stp_backup = st_pointer;
-			st_pointer = st_size++;
-			symbol_tables[st_pointer] = new_hashtable(256, "Function");
-			for(i = 0; i < p->n_op; i++)
-				parse_tree(p->op[i]);
-			st_pointer = stp_backup;
-		}else if(strcmp(p->type, "VarParams") == 0 || strcmp(p->type, "Params") == 0){
+		}else if(strcmp(p->type, "Params") == 0){
 			for(i = 0; i < p->n_op-1; i++){
 				element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 				el->flag = PARAM_F;
+			}
+		}else if(strcmp(p->type, "VarParams") == 0){
+			for(i = 0; i < p->n_op-1; i++){
+				element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
+				el->flag = VARPARAM_F;
 			}
 		}else if(strcmp(p->type, "VarDecl") == 0){
 			for(i = 0; i < p->n_op-1; i++){
@@ -421,8 +431,12 @@ void print_hashtable(){
 			else{
 				if(i == PROGRAM_ST)
 					printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
-				else
-					printf("%s\t_%s_\t%s\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag) );
+				else{
+					if((*it)->flag != NONE_F)
+						printf("%s\t_%s_\t%s\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag) );
+					else
+						printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+				}
 			}
 		}
 

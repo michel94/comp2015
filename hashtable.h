@@ -5,7 +5,7 @@
 #include <inttypes.h>
 
 typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T} type_t;
-typedef enum {CONSTANT_F, RETURN_F, PARAM_F} flag_t;
+typedef enum {CONSTANT_F, RETURN_F, PARAM_F, VARPARAM_F, NONE_F} flag_t;
 typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;
 
 typedef struct {
@@ -56,6 +56,7 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 	if(strlen(el->name) <= 0){
 		strcpy(el->name, s);
 		el->type = type;
+		el->flag = NONE_F;
 
 		*(hashtable->last)++ = el;
 		return el;
@@ -67,6 +68,7 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 		if(strlen(it->name) <= 0){
 			strcpy(it->name, s);
 			it->type = type;
+			el->flag = NONE_F;
 
 			*(hashtable->last)++ = it;
 			return it;
