@@ -6,7 +6,8 @@
 	#include <string.h>
 	#include "hashtable.h"
 
-	#define PROGRAM_ST 0
+	#define OUTER_ST 0
+	int PROGRAM_ST;
 
 	typedef struct node {
 		int to_use;
@@ -56,6 +57,13 @@
 		
 		el = store(h, "program", PROGRAM_T);
 		
+	}
+
+	void create_useless_tables(){
+		st_pointer = st_size++;
+		symbol_tables[st_pointer] = new_hashtable(256, "Function");
+		element_t* el = store(symbol_tables[1], "paramcount", INTEGER_T);
+		el->flag = RETURN_F;
 	}
 
 	Node *make_node(char *node_type, int to_use, int node_operands, ...){
@@ -159,6 +167,36 @@
 		}
 	}
 
+	char* flag2string(type_t type){
+		switch(type){
+			case(CONSTANT_F):
+				return "constant";
+			case(RETURN_F):
+				return "return";
+			case(PARAM_F):
+				return "param";
+			default:
+				return "undefined";
+		}
+	}
+
+	char* value2string(type_t type){
+		switch(type){
+			case(BOOLEAN_V):
+				return "boolean";
+			case(INTEGER_V):
+				return "integer";
+			case(REAL_V):
+				return "real";
+			case(FALSE_V):
+				return "false";
+			case(TRUE_V):
+				return "true";
+			default:
+				return "undefined";
+		}
+	}
+
 	void parse_tree(Node* p){
 		int stp_backup, i;
 		
@@ -169,6 +207,7 @@
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			symbol_tables[st_pointer] = new_hashtable(256, "Program");
+			PROGRAM_ST = st_pointer;
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
@@ -176,12 +215,13 @@
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			symbol_tables[st_pointer] = new_hashtable(256, "Function");
-			element_t* t = fetch(symbol_tables[PROGRAM_ST], p->op[p->n_op-3]->value);
+			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-3]->value);
 			if(t == NULL || t->type != TYPE_T)
 				printf("Cannot write values of type <%s>\n", p->op[p->n_op-3]->value);
 			else{
-				store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-3]->value) );
-				store(symbol_tables[1], p->op[0]->value, FUNCTION_T );
+				element_t* el = store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-3]->value) );
+				el->flag = RETURN_F;
+				store(symbol_tables[PROGRAM_ST], p->op[0]->value, FUNCTION_T );
 			}
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
@@ -194,8 +234,10 @@
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
 		}else if(strcmp(p->type, "VarParams") == 0 || strcmp(p->type, "Params") == 0){
-			for(i = 0; i < p->n_op-1; i++)
-				store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
+			for(i = 0; i < p->n_op-1; i++){
+				element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
+				el->flag = PARAM_F;
+			}
 		}else if(strcmp(p->type, "VarDecl") == 0){
 			for(i = 0; i < p->n_op-1; i++){
 				store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
@@ -342,12 +384,24 @@ ExprList: ExprList ',' Expr 											{$$ = make_node("ExprList",  0, 2, $1, $3
 %%
 
 void print_hashtable(){
-	int i;
+	int i=0;
 	element_t **it;
+
 	for(i = 0; i < st_size; i++){
 		printf("===== %s Symbol Table =====\n", symbol_tables[i]->name);
-		for(it = symbol_tables[i]->next; it != symbol_tables[i]->last; ++it)
-			printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+		for(it = symbol_tables[i]->next; it != symbol_tables[i]->last; ++it){
+			if( (*it)->type == TYPE_T || (*it)->type == BOOLEAN_T)
+				printf("%s\t_%s_\t%s\t_%s_\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag), value2string((*it)->value));
+			else if((*it)->type == FUNCTION_T || (*it)->type == PROGRAM_T)
+				printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+			else{
+				if(i == PROGRAM_ST)
+					printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+				else
+					printf("%s\t_%s_\t%s\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag) );
+			}
+		}
+		printf("\n");
 	}
 }
 
@@ -356,11 +410,11 @@ int main(int argc, char **argv){
 	if(yyparse())
 		return 0;
 
-	symbol_tables[0] = new_hashtable(256, "Outer");
-	create_outer_st(symbol_tables[0]);
-	st_pointer = 1;
-	st_size++;
-		
+	symbol_tables[OUTER_ST] = new_hashtable(256, "Outer");
+	st_pointer = st_size++;
+	create_outer_st(symbol_tables[OUTER_ST]);
+	create_useless_tables();
+	
 	parse_tree(tree);
 	while(argc--){
 		if(!strcmp(*argv, "-t"))
