@@ -4,6 +4,7 @@
 	#include <stdarg.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include <ctype.h>
 	#include "hashtable.h"
 
 	#define OUTER_ST 0
@@ -106,6 +107,12 @@
 		p->to_use 	= 1;
 		p->n_op 	= 0;
 		p->op 		= NULL;
+
+		if(!strcmp(node_type, "Id")){
+			char *s;
+			for(s = p->value; *s != '\0'; s++)
+				*s = tolower(*s);
+		}
 
 		return p;
 	}

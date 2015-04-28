@@ -5,3 +5,4 @@ rm mpasemantic.zip;
 cp mpaparser.l mpasemantic.l
 cp mpaparser.y mpasemantic.y
 zip mpasemantic.zip mpasemantic.l mpasemantic.y hashtable.h;
+rm mpasemantic.l mpasemantic.y;
