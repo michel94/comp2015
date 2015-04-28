@@ -235,6 +235,21 @@
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
+		}else if(strcmp(p->type, "FuncDecl") == 0){
+			stp_backup = st_pointer;
+			st_pointer = st_size++;
+			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-1]->value);
+			if(t == NULL || t->type != TYPE_T)
+				printf("Cannot write values of type <%s>\n", p->op[p->n_op-1]->value);
+			else{
+				element_t* el = store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-1]->value) );
+				el->flag = RETURN_F;
+				store(symbol_tables[PROGRAM_ST], p->op[0]->value, FUNCTION_T );
+			}
+			for(i = 0; i < p->n_op; i++)
+				parse_tree(p->op[i]);
+			st_pointer = stp_backup;
 		}else if(strcmp(p->type, "FuncDef2") == 0){
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
