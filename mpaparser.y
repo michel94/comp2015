@@ -133,11 +133,6 @@
 		return (p==NULL || p->n_op == 0) ? make_node("StatList", 1, 0) : p;
 	}
 
-	void parse_instruction(){
-
-
-	}
-
 	int vartype(char* s){
 		if(strcmp(s, "integer") == 0)
 			return INTEGER_T;
@@ -183,7 +178,7 @@
 			symbol_tables[st_pointer] = new_hashtable(256, "Function");
 			element_t* t = fetch(symbol_tables[PROGRAM_ST], p->op[p->n_op-3]->value);
 			if(t == NULL || t->type != TYPE_T)
-				printf("Cannot write values of type <%s> %d %d\n", p->op[p->n_op-3]->value, p->op[p->n_op-3]->type, TYPE_T);
+				printf("Cannot write values of type <%s>\n", p->op[p->n_op-3]->value);
 			else{
 				store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-3]->value) );
 				store(symbol_tables[1], p->op[0]->value, FUNCTION_T );
@@ -345,6 +340,17 @@ ExprList: ExprList ',' Expr 											{$$ = make_node("ExprList",  0, 2, $1, $3
 ;
 
 %%
+
+void print_hashtable(){
+	int i;
+	element_t **it;
+	for(i = 0; i < st_size; i++){
+		printf("===== %s Symbol Table =====\n", symbol_tables[i]->name);
+		for(it = symbol_tables[i]->next; it != symbol_tables[i]->last; ++it)
+			printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+	}
+}
+
 int main(int argc, char **argv){
 
 	if(yyparse())
@@ -359,17 +365,10 @@ int main(int argc, char **argv){
 	while(argc--){
 		if(!strcmp(*argv, "-t"))
 			print_tree(tree, 0);
-		else if(!strcmp(*argv, "-s")){
-			int i, j;
-			for(i=0; i<st_size; i++){
-				printf("===== %s Symbol Table =====\n", symbol_tables[i]->name);
-				for(j=0; j<256; j++)
-					if(strlen(symbol_tables[i]->elements[j].name) > 0){
-						printf("%s\t_%s_\n", symbol_tables[i]->elements[j].name, type2string(symbol_tables[i]->elements[j].type) );
-					}
-			}
-		}
-		*argv++;
+		else if(!strcmp(*argv, "-s"))
+			print_hashtable();
+		
+		argv++;
 	}
 	return 0;
 }

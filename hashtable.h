@@ -4,8 +4,6 @@
 #include <string.h>
 #include <inttypes.h>
 
-int ENABLE_HASH_REGRESSIONS = 0;
-
 typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T} type_t;
 typedef enum {CONSTANT_F, RETURN_F, PARAM_F} flag_t;
 typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;
@@ -20,6 +18,7 @@ typedef struct {
 typedef struct{
 	char name[64];
 	element_t *elements;
+	element_t **next, **last;
 	int size;
 } hashtable_t;
 
@@ -27,6 +26,7 @@ hashtable_t* new_hashtable(int size, char* str){
 	hashtable_t* h;
 	h = (hashtable_t*) malloc(sizeof(hashtable_t));
 	h->elements = (element_t*) malloc(sizeof(element_t) * size);
+	h->last = h->next = (element_t **) malloc(sizeof(element_t *) * size);
 	memset(h->elements, 0, sizeof(element_t) * size);
 	h->size = size;
 	strcpy(h->name, str);
@@ -57,7 +57,8 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 		strcpy(el->name, s);
 		el->type = type;
 
-		return el; /* RETURN INDEX IN HASHTABLE PLUS 1 */
+		*(hashtable->last)++ = el;
+		return el;
 	}
 
 	register int i;
@@ -67,7 +68,8 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 			strcpy(it->name, s);
 			it->type = type;
 
-			return it; /* RETURN INDEX IN HASHTABLE PLUS 1 */
+			*(hashtable->last)++ = it;
+			return it;
 		}
 	}
 	
