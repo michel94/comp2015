@@ -410,7 +410,9 @@ void print_hashtable(){
 					printf("%s\t_%s_\t%s\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag) );
 			}
 		}
-		printf("\n");
+
+		if(i < st_size-1)
+			printf("\n");
 	}
 }
 
