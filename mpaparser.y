@@ -131,11 +131,6 @@
 		return (p==NULL || p->n_op == 0) ? make_node("StatList", 1, 0) : p;
 	}
 
-	void parse_instruction(){
-
-
-	}
-
 	int vartype(char* s){
 		if(strcmp(s, "integer") == 0)
 			return INTEGER_T;

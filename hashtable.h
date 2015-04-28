@@ -4,8 +4,6 @@
 #include <string.h>
 #include <inttypes.h>
 
-int ENABLE_HASH_REGRESSIONS = 0;
-
 typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T} type_t;
 typedef enum {CONSTANT_F, RETURN_F, PARAM_F} flag_t;
 typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;
@@ -60,7 +58,7 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 		el->type = type;
 
 		*(hashtable->last)++ = el;
-		return el; /* RETURN INDEX IN HASHTABLE PLUS 1 */
+		return el;
 	}
 
 	register int i;
@@ -71,7 +69,7 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 			it->type = type;
 
 			*(hashtable->last)++ = it;
-			return it; /* RETURN INDEX IN HASHTABLE PLUS 1 */
+			return it;
 		}
 	}
 	
