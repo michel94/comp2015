@@ -6,6 +6,8 @@
 	#include <string.h>
 	#include "hashtable.h"
 
+	#define PROGRAM_ST 0
+
 	typedef struct node {
 		int to_use;
 		int n_op;
@@ -179,7 +181,7 @@
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			symbol_tables[st_pointer] = new_hashtable(256, "Function");
-			element_t* t = fetch(symbol_tables[0], p->op[p->n_op-3]->value);
+			element_t* t = fetch(symbol_tables[PROGRAM_ST], p->op[p->n_op-3]->value);
 			if(t == NULL || t->type != TYPE_T)
 				printf("Cannot write values of type <%s> %d %d\n", p->op[p->n_op-3]->value, p->op[p->n_op-3]->type, TYPE_T);
 			else{
