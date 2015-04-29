@@ -1,4 +1,0 @@
-PROGRAM test(OUTPUT);
-var i: integer;
-BEGIN
-END.
