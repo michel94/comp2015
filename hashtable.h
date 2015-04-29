@@ -4,6 +4,8 @@
 #include <string.h>
 #include <inttypes.h>
 
+#define TABLE_SIZE 256
+
 typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T} type_t;
 typedef enum {CONSTANT_F, RETURN_F, PARAM_F, VARPARAM_F, NONE_F} flag_t;
 typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;

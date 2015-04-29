@@ -25,7 +25,7 @@
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
 
-	hashtable_t* symbol_tables[256];
+	hashtable_t* symbol_tables[TABLE_SIZE];
 	int st_pointer, st_size=0;
 
 	Node *new_node(){
@@ -62,7 +62,7 @@
 
 	void create_useless_tables(){
 		st_pointer = st_size++;
-		symbol_tables[st_pointer] = new_hashtable(256, "Function");
+		symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 		element_t* el = store(symbol_tables[1], "paramcount", INTEGER_T);
 		el->flag = RETURN_F;
 	}
@@ -232,7 +232,7 @@
 		if(strcmp(p->type, "Program") == 0){
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
-			symbol_tables[st_pointer] = new_hashtable(256, "Program");
+			symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Program");
 			PROGRAM_ST = st_pointer;
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
@@ -241,7 +241,7 @@
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			
-			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 			strcpy(symbol_tables[st_pointer]->func, p->op[0]->value);
 			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-3]->value);
 			if(t == NULL || t->type != TYPE_T)
@@ -266,7 +266,7 @@
 		}else if(strcmp(p->type, "FuncDecl") == 0){
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
-			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 			strcpy(symbol_tables[st_pointer]->func, p->op[0]->value);
 
 			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-1]->value);
@@ -468,7 +468,7 @@ int main(int argc, char **argv){
 	if(yyparse())
 		return 0;
 
-	symbol_tables[OUTER_ST] = new_hashtable(256, "Outer");
+	symbol_tables[OUTER_ST] = new_hashtable(TABLE_SIZE, "Outer");
 	st_pointer = st_size++;
 	create_outer_st(symbol_tables[OUTER_ST]);
 	create_useless_tables();
