@@ -69,8 +69,8 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
-		if(strcmp(el->name, s) == 0)
-			return el;
+		if(strcmp(it->name, s) == 0)
+			return it;
 		if(strlen(it->name) <= 0){
 			strcpy(it->name, s);
 			it->type = type;
