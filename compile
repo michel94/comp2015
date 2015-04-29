@@ -4,5 +4,5 @@ gcc -o mpaparser y.tab.c lex.yy.c -ly -g
 rm mpasemantic.zip; 
 cp mpaparser.l mpasemantic.l
 cp mpaparser.y mpasemantic.y
-zip mpasemantic.zip mpasemantic.l mpasemantic.y hashtable.h;
+zip mpasemantic.zip mpasemantic.l mpasemantic.y hashtable.h parsing.h types.h;
 rm mpasemantic.l mpasemantic.y;

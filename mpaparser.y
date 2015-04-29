@@ -6,27 +6,13 @@
 	#include <string.h>
 	#include <ctype.h>
 	#include "hashtable.h"
-
-	#define OUTER_ST 0
-	int PROGRAM_ST;
-
-	typedef struct node {
-		int to_use;
-		int n_op;
-		
-		char *value;
-		char *type;
-
-		struct node **op;
-	} Node;
+	#include "parsing.h"
 
 	Node *tree, *merge_nodes[2048];
 
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
 
-	hashtable_t* symbol_tables[256];
-	int st_pointer, st_size=0;
 
 	Node *new_node(){
 		return (Node *) malloc(sizeof(Node));
@@ -62,7 +48,7 @@
 
 	void create_useless_tables(){
 		st_pointer = st_size++;
-		symbol_tables[st_pointer] = new_hashtable(256, "Function");
+		symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 		element_t* el = store(symbol_tables[1], "paramcount", INTEGER_T);
 		el->flag = RETURN_F;
 	}
@@ -149,7 +135,7 @@
 	}
 	
 
-	int findFunc(char* s){
+	int fetch_func(char* s){
 		int i;
 		if(fetch(symbol_tables[PROGRAM_ST], s) == NULL){
 			return -1;
@@ -164,61 +150,37 @@
 
 	void parse_tree(Node* p){
 		int stp_backup, i;
+		stp_backup = st_pointer;
 		
 		if(p == NULL)
 			return;
 		
 		if(strcmp(p->type, "Program") == 0){
-			stp_backup = st_pointer;
 			st_pointer = st_size++;
-			symbol_tables[st_pointer] = new_hashtable(256, "Program");
+			
+			symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Program");
 			PROGRAM_ST = st_pointer;
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
-			st_pointer = stp_backup;
-		}else if(strcmp(p->type, "FuncDef") == 0){
-			stp_backup = st_pointer;
-			st_pointer = st_size++;
 			
-			symbol_tables[st_pointer] = new_hashtable(256, "Function");
-			strcpy(symbol_tables[st_pointer]->func, p->op[0]->value);
-			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-3]->value);
-			if(t == NULL || t->type != TYPE_T)
-				printf("Cannot write values of type <%s>\n", p->op[p->n_op-3]->value);
-			else{
-				element_t* el = store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-3]->value) );
-				el->flag = RETURN_F;
-				store(symbol_tables[PROGRAM_ST], p->op[0]->value, FUNCTION_T );
-			}
-			for(i = 0; i < p->n_op; i++)
-				parse_tree(p->op[i]);
-			st_pointer = stp_backup;
+		}else if(strcmp(p->type, "FuncDef") == 0){
+			parse_funchead(p->op[0]->value, p->n_op-3, p->op+1, p->op[p->n_op-3]->value);
+			
+			parse_tree(p->op[p->n_op-2]);
+			parse_tree(p->op[p->n_op-1]);
 
 		}else if(strcmp(p->type, "FuncDef2") == 0){
-			int h = findFunc(p->op[0]->value);
-			stp_backup = st_pointer;
-			st_pointer = h;
+			st_pointer = fetch_func(p->op[0]->value);
+			if(st_pointer == -1)
+				printf("Function identifier expected???");
+			else
+				for(i = 0; i < p->n_op; i++)
+					parse_tree(p->op[i]);
 
-			for(i = 0; i < p->n_op; i++)
-				parse_tree(p->op[i]);
-			st_pointer = stp_backup;
 		}else if(strcmp(p->type, "FuncDecl") == 0){
-			stp_backup = st_pointer;
-			st_pointer = st_size++;
-			symbol_tables[st_pointer] = new_hashtable(256, "Function");
-			strcpy(symbol_tables[st_pointer]->func, p->op[0]->value);
 
-			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-1]->value);
-			if(t == NULL || t->type != TYPE_T)
-				printf("Cannot write values of type <%s>\n", p->op[p->n_op-1]->value);
-			else{
-				element_t* el = store(symbol_tables[st_pointer], p->op[0]->value, vartype(p->op[p->n_op-1]->value) );
-				el->flag = RETURN_F;
-				store(symbol_tables[PROGRAM_ST], p->op[0]->value, FUNCTION_T );
-			}
-			for(i = 0; i < p->n_op; i++)
-				parse_tree(p->op[i]);
-			st_pointer = stp_backup;
+			parse_funchead(p->op[0]->value, p->n_op-1, p->op+1, p->op[p->n_op-1]->value);
+			
 		}else if(strcmp(p->type, "Params") == 0){
 			for(i = 0; i < p->n_op-1; i++){
 				element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
@@ -238,6 +200,9 @@
 				parse_tree(p->op[i]);
 			}
 		}
+
+
+		st_pointer = stp_backup;
 
 	}
 
@@ -407,7 +372,7 @@ int main(int argc, char **argv){
 	if(yyparse())
 		return 0;
 
-	symbol_tables[OUTER_ST] = new_hashtable(256, "Outer");
+	symbol_tables[OUTER_ST] = new_hashtable(TABLE_SIZE, "Outer");
 	st_pointer = st_size++;
 	create_outer_st(symbol_tables[OUTER_ST]);
 	create_useless_tables();

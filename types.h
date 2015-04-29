@@ -1,7 +1,22 @@
+#ifndef TYPES_H
+#define TYPES_H
+
+typedef struct node {
+	int to_use;
+	int n_op;
+	
+	char *value;
+	char *type;
+
+	struct node **op;
+} Node;
+
 
 typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T} type_t;
 typedef enum {CONSTANT_F, RETURN_F, PARAM_F, VARPARAM_F, NONE_F} flag_t;
 typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;
+
+#define TABLE_SIZE 256
 
 int vartype(char* s){
 	if(strcmp(s, "integer") == 0)
@@ -65,3 +80,4 @@ char* value2string(type_t type){
 	}
 }
 
+#endif

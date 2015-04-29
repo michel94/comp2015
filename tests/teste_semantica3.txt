@@ -7,6 +7,11 @@ function dev(a: integer): real;
 	begin
 		a := 0
 	end;
+function max(a: integer): real;
+	var o : boolean;
+	begin
+		a := 0
+	end;
 
 begin
 	if paramcount >= 2 then
