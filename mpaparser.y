@@ -210,6 +210,19 @@
 		}
 	}
 
+	int findFunc(char* s){
+		int i;
+		if(fetch(symbol_tables[PROGRAM_ST], s) == NULL){
+			return -1;
+		}
+		for(i=PROGRAM_ST+1; i<st_size; i++){
+			if(strcmp(symbol_tables[i]->func, s) == 0){
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	void parse_tree(Node* p){
 		int stp_backup, i;
 		
@@ -227,7 +240,9 @@
 		}else if(strcmp(p->type, "FuncDef") == 0){
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
+			
 			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			strcpy(symbol_tables[st_pointer]->func, p->op[0]->value);
 			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-3]->value);
 			if(t == NULL || t->type != TYPE_T)
 				printf("Cannot write values of type <%s>\n", p->op[p->n_op-3]->value);
@@ -239,11 +254,12 @@
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
+
 		}else if(strcmp(p->type, "FuncDef2") == 0){
+			int h = findFunc(p->op[0]->value);
 			stp_backup = st_pointer;
-			st_pointer = st_size++;
-			symbol_tables[st_pointer] = new_hashtable(256, "Function");
-			store(symbol_tables[PROGRAM_ST], p->op[0]->value, FUNCTION_T );
+			st_pointer = h;
+
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
 			st_pointer = stp_backup;
@@ -251,6 +267,8 @@
 			stp_backup = st_pointer;
 			st_pointer = st_size++;
 			symbol_tables[st_pointer] = new_hashtable(256, "Function");
+			strcpy(symbol_tables[st_pointer]->func, p->op[0]->value);
+
 			element_t* t = fetch(symbol_tables[OUTER_ST], p->op[p->n_op-1]->value);
 			if(t == NULL || t->type != TYPE_T)
 				printf("Cannot write values of type <%s>\n", p->op[p->n_op-1]->value);

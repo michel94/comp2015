@@ -2,9 +2,11 @@
 program gcd2(output);
 var x, y: integer;
 function max(a: integer): real; forward;
+function debug(o: integer) : real; forward;
+
 function debug;
 	var o: boolean;
-	r : real;
+		r : real;
 	begin
 		writeln('bug bug')
 	end;

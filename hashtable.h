@@ -17,6 +17,7 @@ typedef struct {
 
 typedef struct{
 	char name[64];
+	char func[64];
 	element_t *elements;
 	element_t **next, **last;
 	int size;
@@ -53,6 +54,9 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 	uint64_t ind = hash_fnv1a(s) % size;
 	element_t *it, *el = &table[ind];
 	
+	if(strcmp(el->name, s) == 0)
+		return el;
+
 	if(strlen(el->name) <= 0){
 		strcpy(el->name, s);
 		el->type = type;
@@ -65,6 +69,8 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
+		if(strcmp(el->name, s) == 0)
+			return el;
 		if(strlen(it->name) <= 0){
 			strcpy(it->name, s);
 			it->type = type;
@@ -90,7 +96,7 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
-		if(strcpy(it->name, s) == 0)
+		if(strcmp(it->name, s) == 0)
 			return it;
 	}
 
