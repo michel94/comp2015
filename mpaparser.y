@@ -147,68 +147,7 @@
 			return p;
 		return (p==NULL || p->n_op == 0) ? make_node("StatList", 1, 0) : p;
 	}
-
-	int vartype(char* s){
-		if(strcmp(s, "integer") == 0)
-			return INTEGER_T;
-		else if(strcmp(s, "real") == 0)
-			return REAL_T;
-		else if(strcmp(s, "boolean") == 0)
-			return BOOLEAN_T;
-	}
-
-	char* type2string(type_t type){
-		switch(type){
-			case(INTEGER_T):
-				return "integer";
-			case(REAL_T):
-				return "real";
-			case(TYPE_T):
-				return "type";
-			case(PROGRAM_T):
-				return "program";
-			case(FUNCTION_T):
-				return "function";
-			case(BOOLEAN_T):
-				return "boolean";
-			default:
-				return "undefined";
-		}
-	}
-
-	char* flag2string(type_t type){
-		switch(type){
-			case(CONSTANT_F):
-				return "constant";
-			case(RETURN_F):
-				return "return";
-			case(PARAM_F):
-				return "param";
-			case(VARPARAM_F):
-				return "varparam";
-			case(NONE_F):
-				return "";
-			default:
-				return "undefined";
-		}
-	}
-
-	char* value2string(type_t type){
-		switch(type){
-			case(BOOLEAN_V):
-				return "boolean";
-			case(INTEGER_V):
-				return "integer";
-			case(REAL_V):
-				return "real";
-			case(FALSE_V):
-				return "false";
-			case(TRUE_V):
-				return "true";
-			default:
-				return "undefined";
-		}
-	}
+	
 
 	int findFunc(char* s){
 		int i;
