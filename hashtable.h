@@ -70,14 +70,14 @@ element_t* store(hashtable_t* hashtable, char *s, type_t type){
 		if(strlen(it->name) <= 0){
 			strcpy(it->name, s);
 			it->type = type;
-			el->flag = NONE_F;
+			it->flag = NONE_F;
 
 			*(hashtable->last)++ = it;
 			return it;
 		}
 	}
 	
-	return 0;
+	return NULL;
 }
 
 element_t *fetch(hashtable_t* hashtable, char *s){
@@ -88,10 +88,14 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 
 	if(strcmp(el->name, s) == 0)
 		return el;
+	if(strlen(el->name) == 0)
+		return NULL;
 
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
+		if(strlen(el->name) == 0)
+			return NULL;
 		if(strcmp(it->name, s) == 0)
 			return it;
 	}

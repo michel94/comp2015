@@ -55,7 +55,7 @@ int is_boolean(Node* p){
 	return p->op_type == BOOLEAN_T;
 }
 
-void print_stat(char* stat, type_t type1, type_t type2){
+void print_stat_error(char* stat, type_t type1, type_t type2){
 	printf("Incompatible type in statement %s (got %s, expected %s)", stat, type2string(type1), type2string(type2) );
 }
 
@@ -147,7 +147,7 @@ void parse_tree(Node* p){
 	}else if(strcmp(p->type, "FuncDef2") == 0){
 		st_pointer = fetch_func(p->op[0]->value);
 		if(st_pointer == -1)
-			;//printf("Function identifier expected???");
+			printf("Function identifier expected???");
 		else
 			for(i = 0; i < p->n_op; i++)
 				parse_tree(p->op[i]);
@@ -171,7 +171,7 @@ void parse_tree(Node* p){
 			element_t *el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			el->flag = NONE_F;
 		}
-	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
+	}/*else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
 		parse_op(p);
 	}else if(!strcmp(p->type, "Or") || !strcmp(p->type, "And") ){
 		parse_compop(p);
@@ -181,7 +181,7 @@ void parse_tree(Node* p){
 		p->op_type = INTEGER_T;
 	}else if(!strcmp(p->type, "RealLit")){
 		p->op_type = REAL_T;
-	}else{
+	}*/else{
 		for(i = 0; i < p->n_op; i++){
 			parse_tree(p->op[i]);
 		}
