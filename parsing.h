@@ -67,7 +67,7 @@ void print_stat_error(Node *p){
 }
 
 void print_assign_error(Node *p){
-	printf("Line %d, col %d: Incompatible type is assignment to %s (got %s, expected %s)\n", 
+	printf("Line %d, col %d: Incompatible type in assignment to %s (got %s, expected %s)\n", 
 		p->r, p->c, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
@@ -99,11 +99,9 @@ int parse_assign(Node* p){
 }
 
 int parse_boolop(Node* p){ // or,and
-	int err = parse_tree(p->op[0]);
-	err += parse_tree(p->op[1]);
-	if(err)
-		return 1;
-
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+	
 	if(!is_boolean(p->op[0]) || !is_boolean(p->op[1])){
 		print_stat_error(p);
 		return 1;
@@ -121,8 +119,7 @@ int parse_compop(Node* p){ // <,=,>,<=,>=
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
 		print_stat_error(p);
 		return 1;
-	}
-	else
+	}else
 		p->op_type = BOOLEAN_T;
 	return 0;
 }
@@ -130,17 +127,17 @@ int parse_compop(Node* p){ // <,=,>,<=,>=
 int parse_unary(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 
-	if(strcmp(p->type, "Not") ){
+	if(!strcmp(p->type, "Not") ){
 		if(!is_boolean(p->op[0])){
-			;
+			printf("Unary error\n");
 			return 1;
-		}
-		else
+		}else
 			p->op_type = BOOLEAN_T;
 	}else{
-		if(!is_boolean(p->op[0]))
-			;
-		else
+		if(is_boolean(p->op[0])){
+			printf("Unary error\n");
+			return 1;
+		}else
 			p->op_type = p->op[0]->op_type;
 	}
 	return 0;
@@ -165,6 +162,29 @@ int parse_id(Node* p){
 	}
 	printf("variable not declared??? %s\n", p->value);
 	return 1;
+
+}
+
+int parse_intop(Node* p){
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+
+	if(!is_int(p->op[0]) || !is_int(p->op[1])){
+		printf("err\n");// stat error here
+		return 1;
+	}else
+		p->op_type = INTEGER_T;
+}
+
+int parse_realop(Node* p){
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+
+	if(is_boolean(p->op[0]) || is_boolean(p->op[1])){
+		printf("err\n");// stat error here
+		return 1;
+	}else
+		p->op_type = REAL_T;
 
 }
 
@@ -219,7 +239,13 @@ int parse_tree(Node* p){
 		return parse_boolop(p);
 	}else if(!strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Neq") ){
 		return parse_compop(p);
-	}else if(!strcmp(p->type, "IntLit")){
+	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not") ){
+		return parse_unary(p);
+	}else if(!strcmp(p->type, "RealDiv")){
+		return parse_realop(p);
+	}else if(!strcmp(p->type, "Div") || !strcmp(p->type, "Mod")){
+		return parse_intop(p);
+	}else if(!strcmp(p->type, "IntLit") ){
 		p->op_type = INTEGER_T;
 	}else if(!strcmp(p->type, "RealLit")){
 		p->op_type = REAL_T;
