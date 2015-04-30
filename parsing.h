@@ -47,6 +47,8 @@ int parse_funchead(char* name, int n_args, Node** args, char* ret_type){
 			if(parse_tree(args[i])) return 1;
 	}
 
+	return 0;
+
 }
 
 int is_int(Node* p){
@@ -283,7 +285,7 @@ int parse_tree(Node* p){
 			if(parse_tree(p->op[i])) return 1;
 		
 	}else if(strcmp(p->type, "FuncDef") == 0){
-		parse_funchead(p->op[0]->value, p->n_op-3, p->op+1, p->op[p->n_op-3]->value);
+		if(parse_funchead(p->op[0]->value, p->n_op-3, p->op+1, p->op[p->n_op-3]->value)) return 1;
 		
 		if(parse_tree(p->op[p->n_op-2])) return 1;
 		if(parse_tree(p->op[p->n_op-1])) return 1;
