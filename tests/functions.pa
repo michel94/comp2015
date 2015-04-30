@@ -1,15 +1,10 @@
 program gcd(output);
 var a, b: integer;
-function abc(a: r): integer; FORWARD;
-function a:a;
+function abc(A01, b02, c03, d04, e05, F06, g07, I08, H09, J10: boolean): integer; FORWARD;
+function ABC;
+	var a , B: integer;
+	begin
+		
+	end;
 begin
-	writeln(jhsdkjsd)
-end;
-function asd(e, r, t: it; var a, d, e: ee; a, d, d: o): o;
-begin
-	a := 1;
-end;
-
-begin
-
 end.

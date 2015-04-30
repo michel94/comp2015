@@ -11,6 +11,7 @@ typedef struct node {
 	int to_use;
 	int n_op;
 	
+	char *value2;
 	char *value;
 	char *type;
 
@@ -79,6 +80,13 @@ char* value2string(type_t type){
 		default:
 			return "undefined";
 	}
+}
+
+
+void to_lower(char *value){
+	char *s;
+	for(s = value; *s != '\0'; s++)
+		*s = tolower(*s);
 }
 
 #endif
