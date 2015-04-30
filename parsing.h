@@ -7,7 +7,7 @@ int PROGRAM_ST;
 hashtable_t* symbol_tables[TABLE_SIZE];
 int st_pointer, st_size=0;
 
-void parse_tree(Node* p);
+int parse_tree(Node* p);
 
 int type_is_valid(char* ret_type){
 	element_t* t = fetch(symbol_tables[OUTER_ST], ret_type);
@@ -29,20 +29,22 @@ int fetch_func(char* s){
 	return -1;
 }
 
-void parse_funchead(char* name, int n_args, Node** args, char* ret_type){
+int parse_funchead(char* name, int n_args, Node** args, char* ret_type){
 	int i;
 	st_pointer = st_size++;
 	
 	symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 	strcpy(symbol_tables[st_pointer]->func, name);
-	if(!type_is_valid(ret_type))
+	if(!type_is_valid(ret_type)){
 		printf("Cannot write values of type <%s>\n", ret_type);
+		return 1;
+	}
 	else{
 		element_t* el = store(symbol_tables[st_pointer], name, vartype(ret_type) );
 		el->flag = RETURN_F;
 		store(symbol_tables[PROGRAM_ST], name, FUNCTION_T);
 		for(i = 0; i < n_args; i++)
-			parse_tree(args[i]);
+			if(parse_tree(args[i])) return 1;
 	}
 
 }
@@ -55,106 +57,146 @@ int is_boolean(Node* p){
 	return p->op_type == BOOLEAN_T;
 }
 
+int is_real(Node* p){
+	return p->op_type == REAL_T;
+}
+
 void print_stat_error(char* stat, type_t type1, type_t type2){
-	printf("Incompatible type in statement %s (got %s, expected %s)", stat, type2string(type1), type2string(type2) );
+	printf("Operator %s cannot be applied to types %s, %s", stat, type2string(type1), type2string(type2) );
 }
 
-void parse_op(Node* p){ // +,-,/,*
-	parse_tree(p->op[0]);
-	parse_tree(p->op[1]);
+void print_assign_error(char* var, type_t type1, type_t type2){
+	printf("Incompatible type is assignment to %s (got %s, expected %s)\n", var, type2string(type1), type2string(type2));
+}
 
+int parse_op(Node* p){ // +,-,*
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+	
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
-		if(is_boolean(p->op[0]))
-			;//printf("Incompatible type in statement %s (got %s, expected real/int?)", p->type, p->op_type);
-		if(is_boolean(p->op[1]))
-			;//printf("Incompatible type in statement %s (got %s, expected real/int?)", p->type, p->op_type);
-	}
-	else if(is_int(p->op[0]) && is_int(p->op[1]) )
+		print_stat_error(p->type, p->op[0]->op_type, p->op[1]->op_type);
+		return 1;
+	}else if(is_int(p->op[0]) && is_int(p->op[1]) ){
 		p->op_type = INTEGER_T;
-	else
+	}else{
 		p->op_type = REAL_T;
+	}
+	return 0;
+
 }
 
-void parse_boolop(Node* p){ // or,and
-	parse_tree(p->op[0]);
-	parse_tree(p->op[1]);
+int parse_assign(Node* p){
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+
+	if(is_int(p->op[0]) && !is_int(p->op[1])  || is_real(p->op[0]) && is_boolean(p->op[1]) || is_boolean(p->op[0]) && !is_boolean(p->op[1]) ){
+		print_assign_error(p->op[0]->value, p->op[1]->op_type, p->op[0]->op_type);
+		return 1;
+	}
+	return 0;
+}
+
+int parse_boolop(Node* p){ // or,and
+	int err = parse_tree(p->op[0]);
+	err += parse_tree(p->op[1]);
+	if(err)
+		return 1;
 
 	if(!is_boolean(p->op[0]) || !is_boolean(p->op[1])){
-		if(!is_boolean(p->op[0]))
-			;//printf("Incompatible type in statement %s (got %s, expected boolean)", p->type, p->op_type); // Dar fix disto???
-		if(!is_boolean(p->op[1]))
-			;//printf("Incompatible type in statement %s (got %s, expected boolean)", p->type, p->op_type);
+		print_stat_error(p->type, p->op[0]->op_type, p->op[1]->op_type);
+		return 1;
 	}else{
 		p->op_type = BOOLEAN_T;
 	}
-
+	return 0;
 
 }
 
-void parse_compop(Node* p){ // <,=,>,<=,>=
-	parse_tree(p->op[0]);
-	parse_tree(p->op[1]);
+int parse_compop(Node* p){ // <,=,>,<=,>=
+	int err = parse_tree(p->op[0]);
+	err += parse_tree(p->op[1]);
+	if(err)
+		return 1;
 
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
-		if(is_boolean(p->op[0]))
-			;//printf("Incompatible type in statement %s (got %s, expected real/int?)\n", p->type, p->op_type);
-		if(is_boolean(p->op[1]))
-			;//printf("Incompatible type in statement %s (got %s, expected real/int?)\n", p->type, p->op_type);
+		print_stat_error(p->type, p->op[0]->op_type, p->op[1]->op_type);
+		return 1;
 	}
 	else
 		p->op_type = BOOLEAN_T;
+	return 0;
 }
 
+int parse_unary(Node* p){
+	if(parse_tree(p->op[0])) return 1;
 
-void parse_unary(Node* p){
-	parse_tree(p->op[0]);
 	if(strcmp(p->type, "Not") ){
-		if(!is_boolean(p->op[0]))
-			;//printf("Incompatible type in statement %s (got %s, expected real/int?)\n", p->type, p->op_type);
+		if(!is_boolean(p->op[0])){
+			;
+			return 1;
+		}
 		else
 			p->op_type = BOOLEAN_T;
 	}else{
 		if(!is_boolean(p->op[0]))
-			;//printf("Incompatible type in statement %s (got %s, expected real/int?)\n", p->type, p->op_type);
+			;
 		else
 			p->op_type = p->op[0]->op_type;
 	}
+	return 0;
 
 }
 
+int parse_id(Node* p){
+	element_t * t = fetch(symbol_tables[st_pointer], p->value);
+	if(t != NULL){
+		p->op_type = t->type;
+		return 0;
+	}
+	t = fetch(symbol_tables[PROGRAM_ST], p->value);
+	if(t != NULL){
+		p->op_type = t->type;
+		return 0;
+	}
+	t = fetch(symbol_tables[OUTER_ST], p->value);
+	if(t != NULL){
+		p->op_type = t->type;
+		return 0;
+	}
+	printf("variable not declared??? %s\n", p->value);
+	return 1;
 
-void parse_tree(Node* p){
+}
+
+int parse_tree(Node* p){
 	int stp_backup, i;
 	stp_backup = st_pointer;
 	
 	if(p == NULL)
-		return;
+		return 0;
 	
 	if(strcmp(p->type, "Program") == 0){
 		st_pointer = st_size++;
 		
 		symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Program");
 		PROGRAM_ST = st_pointer;
-		for(i = 0; i < p->n_op; i++)
-			parse_tree(p->op[i]);
+		for(i = 1; i < p->n_op; i++)
+			if(parse_tree(p->op[i])) return 1;
 		
 	}else if(strcmp(p->type, "FuncDef") == 0){
 		parse_funchead(p->op[0]->value, p->n_op-3, p->op+1, p->op[p->n_op-3]->value);
 		
-		parse_tree(p->op[p->n_op-2]);
-		parse_tree(p->op[p->n_op-1]);
-
+		if(parse_tree(p->op[p->n_op-2])) return 1;
+		if(parse_tree(p->op[p->n_op-1])) return 1;
 	}else if(strcmp(p->type, "FuncDef2") == 0){
 		st_pointer = fetch_func(p->op[0]->value);
 		if(st_pointer == -1)
 			printf("Function identifier expected???");
 		else
 			for(i = 0; i < p->n_op; i++)
-				parse_tree(p->op[i]);
-
+				if(parse_tree(p->op[i])) return 1;
 	}else if(strcmp(p->type, "FuncDecl") == 0){
-
-		parse_funchead(p->op[0]->value, p->n_op-1, p->op+1, p->op[p->n_op-1]->value);
+		return parse_funchead(p->op[0]->value, p->n_op-1, p->op+1, p->op[p->n_op-1]->value);
 		
 	}else if(strcmp(p->type, "Params") == 0){
 		for(i = 0; i < p->n_op-1; i++){
@@ -171,23 +213,28 @@ void parse_tree(Node* p){
 			element_t *el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			el->flag = NONE_F;
 		}
-	}/*else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
-		parse_op(p);
+	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
+		return parse_op(p);
 	}else if(!strcmp(p->type, "Or") || !strcmp(p->type, "And") ){
-		parse_compop(p);
+		return parse_compop(p);
 	}else if(!strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Neq") ){
-		parse_unary(p);
+		return parse_unary(p);
 	}else if(!strcmp(p->type, "IntLit")){
 		p->op_type = INTEGER_T;
 	}else if(!strcmp(p->type, "RealLit")){
 		p->op_type = REAL_T;
-	}*/else{
+	}else if(!strcmp(p->type, "Id")){
+		return parse_id(p);
+	}else if(!strcmp(p->type, "Assign")){
+		return parse_assign(p);
+	}else{
 		for(i = 0; i < p->n_op; i++){
-			parse_tree(p->op[i]);
+			if(parse_tree(p->op[i])) return 1;
 		}
 	}
 
 
 	st_pointer = stp_backup;
 
+	return 0;
 }

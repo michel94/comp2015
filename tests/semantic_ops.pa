@@ -1,0 +1,8 @@
+
+program gcd2(output);
+var x: integer;
+	y : real;
+begin
+	x := x * x - x * 2.0
+end.
+
