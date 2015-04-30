@@ -90,28 +90,24 @@
 		Node* p 	= new_node();
 		p->type 	= node_type;
 		p->value 	= (char *) strdup(s);
+		p->value2 	= (char *) strdup(s);
 		p->to_use 	= 1;
 		p->n_op 	= 0;
 		p->op 		= NULL;
 
-		if(!strcmp(node_type, "Id")){
-			char *s;
-			for(s = p->value; *s != '\0'; s++)
-				*s = tolower(*s);
-		}
-
+		to_lower(p->value);
 		return p;
 	}
 
 	void print_data(Node* p){
 		if(strcmp(p->type, "Id") == 0)
-			printf("Id(%s)\n", p->value);
+			printf("Id(%s)\n", p->value2);
 		else if(strcmp(p->type, "String") == 0)
-			printf("String(%s)\n", p->value);
+			printf("String(%s)\n", p->value2);
 		else if(strcmp(p->type, "IntLit") == 0)
-			printf("IntLit(%s)\n", p->value);
+			printf("IntLit(%s)\n", p->value2);
 		else if(strcmp(p->type, "RealLit") == 0)
-			printf("RealLit(%s)\n", p->value);
+			printf("RealLit(%s)\n", p->value2);
 		else
 			printf("%s\n", p->type);
 	}
@@ -133,9 +129,6 @@
 			return p;
 		return (p==NULL || p->n_op == 0) ? make_node("StatList", 1, 0) : p;
 	}
-
-
-
 %}
 
 %union{
