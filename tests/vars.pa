@@ -4,6 +4,6 @@ var x: integer;
 	y : real;
 	a, b : BOOLEAN;
 begin
-	y := x / y
+	x := 2 / 2
 end.
 

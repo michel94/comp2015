@@ -110,8 +110,8 @@ int parse_op(Node* p){ // +,-,*
 int parse_assign(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
-
-	if(is_int(p->op[0]) && !is_int(p->op[1])  || is_real(p->op[0]) && is_boolean(p->op[1]) || is_boolean(p->op[0]) && !is_boolean(p->op[1]) ){
+	
+	if(is_int(p->op[0]) && !is_int(p->op[1]) || is_real(p->op[0]) && is_boolean(p->op[1]) || is_boolean(p->op[0]) && !is_boolean(p->op[1]) ){
 		print_assign_error(p);
 		return 1;
 	}
@@ -195,18 +195,21 @@ int parse_intop(Node* p){
 		return 1;
 	}else
 		p->op_type = INTEGER_T;
+
+	return 0;
 }
 
 int parse_realop(Node* p){ // USED ONCE
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
-
+	
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1])){
 		print_op_error(p);
 		return 1;
 	}else
 		p->op_type = REAL_T;
 
+	return 0;
 }
 
 int parse_var(Node *p, type_t type, flag_t flag){
@@ -303,7 +306,7 @@ int parse_tree(Node* p){
 	}else if(strcmp(p->type, "VarDecl") == 0){
 		return parse_decl(p, NONE_F);
 
-	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
+	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") ){
 		return parse_op(p);
 	}else if(!strcmp(p->type, "Or") || !strcmp(p->type, "And") ){
 		return parse_boolop(p);
@@ -311,9 +314,9 @@ int parse_tree(Node* p){
 		return parse_compop(p);
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not") ){
 		return parse_unary(p);
-	} else if(!strcmp(p->type, "RealDiv")){ // RealDiv is already being parsed by parse_op()?  -> RealDiv returns real, always
-		return parse_realop(p);}
-	else if(!strcmp(p->type, "Div") || !strcmp(p->type, "Mod")){
+	} else if(!strcmp(p->type, "RealDiv")){
+		return parse_realop(p);
+	}else if(!strcmp(p->type, "Div") || !strcmp(p->type, "Mod")){
 		return parse_intop(p);
 	}else if(!strcmp(p->type, "IntLit") ){
 		p->op_type = INTEGER_T;
