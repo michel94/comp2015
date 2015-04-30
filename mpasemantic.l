@@ -8,7 +8,7 @@ whitespace							[\t ]
 
 %{
 	#include "y.tab.h"
-	#define YY_USER_ACTION col+=yyleng;
+	#define YY_USER_ACTION col+=yyleng; yylloc.first_line = yylineno; yylloc.first_column = col-yyleng; //printf("lex: %d %d\n", yylineno, col-yyleng);
 	
 	int col=1, stcol, stline;
 %}

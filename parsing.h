@@ -63,12 +63,12 @@ int is_real(Node* p){
 
 void print_stat_error(Node *p){
 	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", 
-		p->r, p->c, p->type, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
+		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
 }
 
 void print_assign_error(Node *p){
 	printf("Line %d, col %d: Incompatible type in assignment to %s (got %s, expected %s)\n", 
-		p->r, p->c, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
+		p->loc.first_line, p->loc.first_column, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
 int parse_op(Node* p){ // +,-,*

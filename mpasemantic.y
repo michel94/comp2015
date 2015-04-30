@@ -81,9 +81,7 @@
 		prod->op = (Node **) malloc(nodes * sizeof(Node *));
 		memcpy(prod->op, merge_nodes, nodes * sizeof(Node *));
 		prod->n_op = nodes;
-		prod->r = yylineno;
-		prod->c = col - (int)yyleng;
-
+		
 		va_end(args);
 		return prod;
 	}
@@ -93,8 +91,6 @@
 		p->type 	= node_type;
 		p->value 	= (char *) strdup(s);
 		p->value2 	= (char *) strdup(s);
-		p->c 		= col - (int)yyleng;
-		p->r 		= yylineno;
 		p->to_use 	= 1;
 		p->n_op 	= 0;
 		p->op 		= NULL;
@@ -215,7 +211,7 @@ Stat: CompStat															{$$ = make_node("CompStat", 0, 1, $1); }
 	| VAL '(' PARAMSTR '(' Expr ')' ',' IdProd ')'						{$$ = make_node("ValParam", 1, 2, $5, $8); }
 	| WRITELN WriteList  												{$$ = make_node("WriteLn",  1, 1, $2); }
 	| WRITELN 															{$$ = make_node("WriteLn",  1, 0); }
-	| IdProd ASSIGN Expr 												{$$ = make_node("Assign", 	1, 2, $1, $3); }
+	| IdProd ASSIGN Expr 												{$$ = make_node("Assign", 	1, 2, $1, $3); $$->loc = @2; }
 	| %empty															{$$ = NULL; }
 ;
 

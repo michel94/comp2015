@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include "y.tab.h"
 #define TABLE_SIZE 1024
 
 typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T} type_t;
@@ -11,8 +12,6 @@ typedef struct node {
 	int to_use;
 	int n_op;
 
-	int r, c;
-	
 	char *value2;
 	char *value;
 	char *type;
@@ -20,6 +19,8 @@ typedef struct node {
 	type_t op_type;
 
 	struct node **op;
+
+	YYLTYPE loc;
 } Node;
 
 int vartype(char* s){
