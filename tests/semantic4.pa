@@ -1,0 +1,14 @@
+program gcd2(output);
+var a, b: integer;
+
+function gcd(B, C, D, D: integer; var B: real): integer;
+	begin
+		a := C + 30 + a;
+		{b := C + 30 + e + D;}
+		{a := 30 MOD 50.0;}
+		{b := true / 5;}
+	end;
+	
+begin
+end.
+

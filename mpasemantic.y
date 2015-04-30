@@ -169,7 +169,7 @@ IdList: IdProd IdListLoop												{$$ = make_node("IdList", 	  0, 2, $1, $2);
 IdListLoop: IdListLoop ',' IdProd										{$$ = make_node("IdListLoop", 0, 2, $1, $3);};
 	| %empty															{$$ = NULL; }
 ;
-IdProd: ID 																{$$ = terminal("Id", $1); };
+IdProd: ID 																{$$ = terminal("Id", $1); $$->loc = @1;};
 
 FuncPart: FuncDeclarationList 											{$$ = make_node("FuncPart"			 , 1, 1, $1); };
 FuncDeclarationList: FuncDeclarationList FuncDeclaration ';' 			{$$ = make_node("FuncDeclarationList", 0, 2, $1, $2); }
@@ -242,9 +242,9 @@ AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); }
 ;
 Term: Factor															{$$ = $1; }
 	| Term '*' Factor													{$$ = make_node("Mul", 	   1, 2, $1, $3); }
-	| Term '/' Factor  													{$$ = make_node("RealDiv", 1, 2, $1, $3); }
-	| Term DIV Factor  													{$$ = make_node("Div", 	   1, 2, $1, $3); }
-	| Term MOD Factor  													{$$ = make_node("Mod", 	   1, 2, $1, $3); }
+	| Term '/' Factor  													{$$ = make_node("RealDiv", 1, 2, $1, $3); $$->loc = @2;}
+	| Term DIV Factor  													{$$ = make_node("Div", 	   1, 2, $1, $3); $$->loc = @2;}
+	| Term MOD Factor  													{$$ = make_node("Mod", 	   1, 2, $1, $3); $$->loc = @2;}
 	| Term AND Factor  													{$$ = make_node("And", 	   1, 2, $1, $3); }
 ;
 Factor:	'(' Expr ')' 													{$$ = $2; }

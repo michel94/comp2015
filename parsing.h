@@ -71,6 +71,11 @@ void print_assign_error(Node *p){
 		p->loc.first_line, p->loc.first_column, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
+void print_unary_error(Node *p){
+	printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", 
+		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type));
+}
+
 int parse_op(Node* p){ // +,-,*
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
@@ -124,11 +129,6 @@ int parse_compop(Node* p){ // <,=,>,<=,>=
 	return 0;
 }
 
-void print_unary_error(Node *p){
-	printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", 
-		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type));
-}
-
 int parse_unary(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 
@@ -165,7 +165,8 @@ int parse_id(Node* p){
 		p->op_type = t->type;
 		return 0;
 	}
-	printf("variable not declared??? %s\n", p->value);
+
+	printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->value);
 	return 1;
 
 }
@@ -175,22 +176,44 @@ int parse_intop(Node* p){
 	if(parse_tree(p->op[1])) return 1;
 
 	if(!is_int(p->op[0]) || !is_int(p->op[1])){
-		printf("err\n");// stat error here
+		print_stat_error(p);
 		return 1;
 	}else
 		p->op_type = INTEGER_T;
 }
 
-int parse_realop(Node* p){
+int parse_realop(Node* p){ // NOT USED
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1])){
-		printf("err\n");// stat error here
+		printf("err\n"); // stat error here
 		return 1;
 	}else
 		p->op_type = REAL_T;
 
+}
+
+int parse_decl(Node *p){
+	int err = 0;
+
+	element_t *t = fetch(symbol_tables[st_pointer], p->value);
+	if(t != NULL) err++;
+
+	if(st_pointer == PROGRAM_ST){
+		t = fetch(symbol_tables[PROGRAM_ST], p->value);
+		if(t != NULL) err++;
+	}
+
+	t = fetch(symbol_tables[OUTER_ST], p->value);
+	if(t != NULL) err++;
+
+	if(err > 0){
+		printf("Line %d, col %d: Symbol %s already defined\n", p->loc.first_line, p->loc.first_column, p->value);
+		return 1;
+	}
+
+	return 0;
 }
 
 int parse_tree(Node* p){
@@ -225,16 +248,22 @@ int parse_tree(Node* p){
 		
 	}else if(strcmp(p->type, "Params") == 0){
 		for(i = 0; i < p->n_op-1; i++){
+			if(parse_decl(p->op[i])) return 1;
+
 			element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			el->flag = PARAM_F;
 		}
 	}else if(strcmp(p->type, "VarParams") == 0){
 		for(i = 0; i < p->n_op-1; i++){
+			if(parse_decl(p->op[i])) return 1;
+
 			element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			el->flag = VARPARAM_F;
 		}
 	}else if(strcmp(p->type, "VarDecl") == 0){
 		for(i = 0; i < p->n_op-1; i++){
+			if(parse_decl(p->op[i])) return 1;
+
 			element_t *el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			el->flag = NONE_F;
 		}
@@ -246,9 +275,9 @@ int parse_tree(Node* p){
 		return parse_compop(p);
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not") ){
 		return parse_unary(p);
-	}else if(!strcmp(p->type, "RealDiv")){
-		return parse_realop(p);
-	}else if(!strcmp(p->type, "Div") || !strcmp(p->type, "Mod")){
+	} /*else if(!strcmp(p->type, "RealDiv")){ // RealDiv is already being parsed by parse_op()?
+		return parse_realop(p);}*/
+	else if(!strcmp(p->type, "Div") || !strcmp(p->type, "Mod")){
 		return parse_intop(p);
 	}else if(!strcmp(p->type, "IntLit") ){
 		p->op_type = INTEGER_T;
