@@ -36,7 +36,7 @@ int parse_funchead(char* name, int n_args, Node** args, char* ret_type){
 	symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 	strcpy(symbol_tables[st_pointer]->func, name);
 	if(!type_is_valid(ret_type)){
-		printf("Cannot write values of type <%s>\n", ret_type);
+		printf("Cannot write values of type %s\n", ret_type);
 		return 1;
 	}
 	else{
@@ -256,7 +256,7 @@ int parse_repeat(Node* p){
 
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
-		printf("INVALID TYPE TODO\n");
+		printf("Cannot write values of type %s\n", p->op[p->n_op-1]->value);
 		return 1;
 	}
 	type_t type = vartype(p->op[p->n_op-1]->value);
