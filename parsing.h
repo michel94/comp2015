@@ -61,7 +61,7 @@ int is_real(Node* p){
 	return p->op_type == REAL_T;
 }
 
-void print_stat_error(Node *p){
+void print_op_error(Node *p){
 	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", 
 		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
 }
@@ -71,7 +71,7 @@ void print_assign_error(Node *p){
 		p->loc.first_line, p->loc.first_column, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
-void _print_stat_error(Node* p, type_t type1, type_t type2){ //colocar linhas
+void print_stat_error(Node* p, type_t type1, type_t type2){ //colocar linhas
 	if(!strcmp(p->type, "IfElse"))
 		printf("Incompatible type in if-else statement");
 	else if(!strcmp(p->type, "While"))
@@ -91,7 +91,7 @@ int parse_op(Node* p){ // +,-,*
 	if(parse_tree(p->op[1])) return 1;
 	
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
-		print_stat_error(p);
+		print_op_error(p);
 		return 1;
 	}else if(is_int(p->op[0]) && is_int(p->op[1]) ){
 		p->op_type = INTEGER_T;
@@ -118,7 +118,7 @@ int parse_boolop(Node* p){ // or,and
 	if(parse_tree(p->op[1])) return 1;
 	
 	if(!is_boolean(p->op[0]) || !is_boolean(p->op[1])){
-		print_stat_error(p);
+		print_op_error(p);
 		return 1;
 	}else{
 		p->op_type = BOOLEAN_T;
@@ -132,7 +132,7 @@ int parse_compop(Node* p){ // <,=,>,<=,>=
 	if(parse_tree(p->op[1])) return 1;
 
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
-		print_stat_error(p);
+		print_op_error(p);
 		return 1;
 	}else
 		p->op_type = BOOLEAN_T;
@@ -215,7 +215,7 @@ int parse_if_while(Node* p){
 	if(parse_tree(p->op[2])) return 1;
 
 	if(!is_boolean(p->op[0])){
-		_print_stat_error(p, p->op[0]->op_type, BOOLEAN_T);
+		print_stat_error(p, p->op[0]->op_type, BOOLEAN_T);
 		return 1;
 	}
 
@@ -229,7 +229,7 @@ int parse_repeat(Node* p){
 	if(parse_tree(p->op[2])) return 1;
 
 	if(!is_boolean(p->op[1])){
-		_print_stat_error(p, p->op[1]->op_type, BOOLEAN_T);
+		print_stat_error(p, p->op[1]->op_type, BOOLEAN_T);
 		return 1;
 	}
 
