@@ -191,7 +191,7 @@ int parse_intop(Node* p){
 	if(parse_tree(p->op[1])) return 1;
 
 	if(!is_int(p->op[0]) || !is_int(p->op[1])){
-		print_stat_error(p);
+		//print_stat_error(p);
 		return 1;
 	}else
 		p->op_type = INTEGER_T;
@@ -252,15 +252,10 @@ int parse_repeat(Node* p){
 
 	if(!is_boolean(p->op[1])){
 		print_stat_error(p, p->op[1]->op_type, BOOLEAN_T);
->>>>>>> c439abfd8ed7b63e2c8f0494714a9591a5caed4a
 		return 1;
 	}
 
 	return 0;
-<<<<<<< HEAD
-=======
-
->>>>>>> c439abfd8ed7b63e2c8f0494714a9591a5caed4a
 }
 
 int parse_tree(Node* p){
@@ -309,19 +304,16 @@ int parse_tree(Node* p){
 		}
 	}else if(strcmp(p->type, "VarDecl") == 0){
 		for(i = 0; i < p->n_op-1; i++){
-<<<<<<< HEAD
 			if(parse_decl(p->op[i])) return 1;
 
-			element_t *el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
-=======
-			element_t *el = fetch(symbol_tables[st_pointer], p->op[i]->value);
+			/*element_t *el = fetch(symbol_tables[st_pointer], p->op[i]->value);
 			if(el != NULL){
 				print_already_def_error(p->op[i]);
 				return 1;
 			}
 			el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
->>>>>>> c439abfd8ed7b63e2c8f0494714a9591a5caed4a
-			el->flag = NONE_F;
+			el->flag = NONE_F;*/ 
+
 		}
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
 		return parse_op(p);
