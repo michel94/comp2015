@@ -124,18 +124,23 @@ int parse_compop(Node* p){ // <,=,>,<=,>=
 	return 0;
 }
 
+void print_unary_error(Node *p){
+	printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", 
+		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type));
+}
+
 int parse_unary(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 
 	if(!strcmp(p->type, "Not") ){
 		if(!is_boolean(p->op[0])){
-			printf("Unary error\n");
+			print_unary_error(p);
 			return 1;
 		}else
 			p->op_type = BOOLEAN_T;
 	}else{
 		if(is_boolean(p->op[0])){
-			printf("Unary error\n");
+			print_unary_error(p);
 			return 1;
 		}else
 			p->op_type = p->op[0]->op_type;
@@ -194,7 +199,7 @@ int parse_tree(Node* p){
 	
 	if(p == NULL)
 		return 0;
-	
+
 	if(strcmp(p->type, "Program") == 0){
 		st_pointer = st_size++;
 		

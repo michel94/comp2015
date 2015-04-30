@@ -36,6 +36,7 @@ analyser
 
 # Yacc files
 mpaparser
+mpasemantic
 y.tab.c
 y.tab.h
 y.output

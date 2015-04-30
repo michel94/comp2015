@@ -1,0 +1,16 @@
+program gcd2(output);
+var x, y: integer;
+function gcd(X, Y: integer): integer;
+var a: integer;
+	b: boolean;
+	c: integer;
+begin
+{c := -b;}
+{c := +b;}
+b := NOT a;
+end;
+
+begin
+
+end.
+
