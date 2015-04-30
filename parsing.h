@@ -256,7 +256,7 @@ int parse_repeat(Node* p){
 
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
-		printf("Cannot write values of type %s\n", p->op[p->n_op-1]->value);
+		printf("Type identifier expected\n");
 		return 1;
 	}
 	type_t type = vartype(p->op[p->n_op-1]->value);
