@@ -1,14 +1,15 @@
 
 program gcd2(output);
-var x, y: integer;
-function max(a: integer): real; forward;
-function dev(a: integer): real;
-	var o : boolean;
+var x, y: real;
+function max(a: integer; var b: boolean): real; forward;
+function dev(a: real): real;
+	var o : real;
 	begin
 		a := 0
 	end;
-function max(a: integer): real;
-	var o : boolean;
+function max;
+	var o : real;
+		f : real;
 	begin
 		a := 0
 	end;

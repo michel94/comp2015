@@ -133,78 +133,8 @@
 			return p;
 		return (p==NULL || p->n_op == 0) ? make_node("StatList", 1, 0) : p;
 	}
-	
-
-	int fetch_func(char* s){
-		int i;
-		if(fetch(symbol_tables[PROGRAM_ST], s) == NULL){
-			return -1;
-		}
-		for(i=PROGRAM_ST+1; i<st_size; i++){
-			if(strcmp(symbol_tables[i]->func, s) == 0){
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	void parse_tree(Node* p){
-		int stp_backup, i;
-		stp_backup = st_pointer;
-		
-		if(p == NULL)
-			return;
-		
-		if(strcmp(p->type, "Program") == 0){
-			st_pointer = st_size++;
-			
-			symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Program");
-			PROGRAM_ST = st_pointer;
-			for(i = 0; i < p->n_op; i++)
-				parse_tree(p->op[i]);
-			
-		}else if(strcmp(p->type, "FuncDef") == 0){
-			parse_funchead(p->op[0]->value, p->n_op-3, p->op+1, p->op[p->n_op-3]->value);
-			
-			parse_tree(p->op[p->n_op-2]);
-			parse_tree(p->op[p->n_op-1]);
-
-		}else if(strcmp(p->type, "FuncDef2") == 0){
-			st_pointer = fetch_func(p->op[0]->value);
-			if(st_pointer == -1)
-				printf("Function identifier expected???");
-			else
-				for(i = 0; i < p->n_op; i++)
-					parse_tree(p->op[i]);
-
-		}else if(strcmp(p->type, "FuncDecl") == 0){
-
-			parse_funchead(p->op[0]->value, p->n_op-1, p->op+1, p->op[p->n_op-1]->value);
-			
-		}else if(strcmp(p->type, "Params") == 0){
-			for(i = 0; i < p->n_op-1; i++){
-				element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
-				el->flag = PARAM_F;
-			}
-		}else if(strcmp(p->type, "VarParams") == 0){
-			for(i = 0; i < p->n_op-1; i++){
-				element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
-				el->flag = VARPARAM_F;
-			}
-		}else if(strcmp(p->type, "VarDecl") == 0){
-			for(i = 0; i < p->n_op-1; i++){
-				store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
-			}
-		}else{
-			for(i = 0; i < p->n_op; i++){
-				parse_tree(p->op[i]);
-			}
-		}
 
 
-		st_pointer = stp_backup;
-
-	}
 
 %}
 
