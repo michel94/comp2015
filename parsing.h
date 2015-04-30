@@ -88,7 +88,7 @@ void print_stat_error(Node* p, type_t type1, type_t type2){ //colocar linhas
 }
 
 void print_already_def_error(Node* p){
-	printf("Symbol %s already defined\n", p->value2);
+	printf("Line %d, col %d: Symbol %s already defined\n", p->loc.first_line, p->loc.first_column, p->value2);
 }
 
 int parse_op(Node* p){ // +,-,*
@@ -191,42 +191,33 @@ int parse_intop(Node* p){
 	if(parse_tree(p->op[1])) return 1;
 
 	if(!is_int(p->op[0]) || !is_int(p->op[1])){
-		//print_stat_error(p);
+		print_op_error(p);
 		return 1;
 	}else
 		p->op_type = INTEGER_T;
 }
 
-int parse_realop(Node* p){ // NOT USED
+int parse_realop(Node* p){ // USED ONCE
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1])){
-		printf("err\n"); // stat error here
+		print_op_error(p);
 		return 1;
 	}else
 		p->op_type = REAL_T;
 
 }
 
-int parse_decl(Node *p){
-	int err = 0;
+int parse_var(Node *p, type_t type, flag_t flag){
 
 	element_t *t = fetch(symbol_tables[st_pointer], p->value);
-	if(t != NULL) err++;
-
-	if(st_pointer == PROGRAM_ST){
-		t = fetch(symbol_tables[PROGRAM_ST], p->value);
-		if(t != NULL) err++;
-	}
-
-	t = fetch(symbol_tables[OUTER_ST], p->value);
-	if(t != NULL) err++;
-
-	if(err > 0){
-		printf("Line %d, col %d: Symbol %s already defined\n", p->loc.first_line, p->loc.first_column, p->value);
+	if(t != NULL){
+		print_already_def_error(p);
 		return 1;
 	}
+	t = store(symbol_tables[st_pointer], p->value, type);
+	t->flag = flag;
 
 	return 0;
 }
@@ -253,6 +244,21 @@ int parse_repeat(Node* p){
 	if(!is_boolean(p->op[1])){
 		print_stat_error(p, p->op[1]->op_type, BOOLEAN_T);
 		return 1;
+	}
+
+	return 0;
+}
+
+int parse_decl(Node* p, flag_t flag){
+	if(!type_is_valid(p->op[p->n_op-1]->value)){
+		printf("INVALID TYPE TODO\n");
+		return 1;
+	}
+	type_t type = vartype(p->op[p->n_op-1]->value);
+
+	int i;
+	for(i = 0; i < p->n_op-1; i++){
+		if(parse_var(p->op[i], type, flag)) return 1;
 	}
 
 	return 0;
@@ -289,32 +295,14 @@ int parse_tree(Node* p){
 		return parse_funchead(p->op[0]->value, p->n_op-1, p->op+1, p->op[p->n_op-1]->value);
 		
 	}else if(strcmp(p->type, "Params") == 0){
-		for(i = 0; i < p->n_op-1; i++){
-			if(parse_decl(p->op[i])) return 1;
-
-			element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
-			el->flag = PARAM_F;
-		}
+		return parse_decl(p, PARAM_F);
+		
 	}else if(strcmp(p->type, "VarParams") == 0){
-		for(i = 0; i < p->n_op-1; i++){
-			if(parse_decl(p->op[i])) return 1;
-
-			element_t* el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
-			el->flag = VARPARAM_F;
-		}
+		return parse_decl(p, VARPARAM_F);
+		
 	}else if(strcmp(p->type, "VarDecl") == 0){
-		for(i = 0; i < p->n_op-1; i++){
-			if(parse_decl(p->op[i])) return 1;
+		return parse_decl(p, NONE_F);
 
-			/*element_t *el = fetch(symbol_tables[st_pointer], p->op[i]->value);
-			if(el != NULL){
-				print_already_def_error(p->op[i]);
-				return 1;
-			}
-			el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
-			el->flag = NONE_F;*/ 
-
-		}
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
 		return parse_op(p);
 	}else if(!strcmp(p->type, "Or") || !strcmp(p->type, "And") ){
@@ -323,8 +311,8 @@ int parse_tree(Node* p){
 		return parse_compop(p);
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not") ){
 		return parse_unary(p);
-	} /*else if(!strcmp(p->type, "RealDiv")){ // RealDiv is already being parsed by parse_op()?
-		return parse_realop(p);}*/
+	} else if(!strcmp(p->type, "RealDiv")){ // RealDiv is already being parsed by parse_op()?  -> RealDiv returns real, always
+		return parse_realop(p);}
 	else if(!strcmp(p->type, "Div") || !strcmp(p->type, "Mod")){
 		return parse_intop(p);
 	}else if(!strcmp(p->type, "IntLit") ){

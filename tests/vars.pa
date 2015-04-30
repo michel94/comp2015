@@ -3,8 +3,7 @@ program vars(output);
 var x: integer;
 	y : real;
 	a, b : BOOLEAN;
-	X: BOOLEAN;
 begin
-	
+	y := x / y
 end.
 
