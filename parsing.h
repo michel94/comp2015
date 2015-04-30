@@ -71,6 +71,21 @@ void print_assign_error(Node *p){
 		p->loc.first_line, p->loc.first_column, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
+void _print_stat_error(Node* p, type_t type1, type_t type2){ //colocar linhas
+	if(!strcmp(p->type, "IfElse"))
+		printf("Incompatible type in if-else statement");
+	else if(!strcmp(p->type, "While"))
+		printf("Incompatible type in while statement");
+	else
+		printf("Incompatible type in repeat-until statement");
+	
+	printf(" (got <%s>, expected <%s>)\n", type2string(type1), type2string(type2));
+}
+
+void print_already_def_error(Node* p){
+	printf("Symbol %s already defined\n", p->value2);
+}
+
 int parse_op(Node* p){ // +,-,*
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
@@ -188,6 +203,35 @@ int parse_realop(Node* p){
 
 }
 
+
+int parse_if_while(Node* p){
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+	if(parse_tree(p->op[2])) return 1;
+
+	if(!is_boolean(p->op[0])){
+		_print_stat_error(p, p->op[0]->op_type, BOOLEAN_T);
+		return 1;
+	}
+
+	return 0;
+
+}
+
+int parse_repeat(Node* p){
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+	if(parse_tree(p->op[2])) return 1;
+
+	if(!is_boolean(p->op[1])){
+		_print_stat_error(p, p->op[1]->op_type, BOOLEAN_T);
+		return 1;
+	}
+
+	return 0;
+
+}
+
 int parse_tree(Node* p){
 	int stp_backup, i;
 	stp_backup = st_pointer;
@@ -230,7 +274,12 @@ int parse_tree(Node* p){
 		}
 	}else if(strcmp(p->type, "VarDecl") == 0){
 		for(i = 0; i < p->n_op-1; i++){
-			element_t *el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
+			element_t *el = fetch(symbol_tables[st_pointer], p->op[i]->value);
+			if(el != NULL){
+				print_already_def_error(p->op[i]);
+				return 1;
+			}
+			el = store(symbol_tables[st_pointer], p->op[i]->value, vartype(p->op[p->n_op-1]->value) );
 			el->flag = NONE_F;
 		}
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
@@ -253,6 +302,10 @@ int parse_tree(Node* p){
 		return parse_id(p);
 	}else if(!strcmp(p->type, "Assign")){
 		return parse_assign(p);
+	}else if(!strcmp(p->type, "IfElse") || !strcmp(p->type, "While")){
+		return parse_if_while(p);
+	}else if(!strcmp(p->type, "Repeat")){
+		return parse_repeat(p);
 	}else{
 		for(i = 0; i < p->n_op; i++){
 			if(parse_tree(p->op[i])) return 1;

@@ -1,0 +1,10 @@
+
+program booleans(output);
+var x: integer;
+	y : real;
+	a, b : BOOLEAN;
+begin
+	b := true or false or a and b or a;
+	a := not (x < (y*y));
+end.
+

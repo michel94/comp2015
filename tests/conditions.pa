@@ -1,0 +1,18 @@
+
+program booleans(output);
+var x: integer;
+	y : real;
+	a, b : BOOLEAN;
+begin
+	while true do
+		begin
+			x := 8;
+			if x > y then
+				repeat
+					begin
+						x := x + 1
+					end
+				until x > 10
+		end;
+end.
+
