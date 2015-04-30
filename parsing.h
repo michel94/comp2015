@@ -62,7 +62,7 @@ int is_real(Node* p){
 }
 
 void print_stat_error(char* stat, type_t type1, type_t type2){
-	printf("Operator %s cannot be applied to types %s, %s", stat, type2string(type1), type2string(type2) );
+	printf("Operator %s cannot be applied to types %s, %s\n", stat, type2string(type1), type2string(type2) );
 }
 
 void print_assign_error(char* var, type_t type1, type_t type2){
@@ -113,10 +113,8 @@ int parse_boolop(Node* p){ // or,and
 }
 
 int parse_compop(Node* p){ // <,=,>,<=,>=
-	int err = parse_tree(p->op[0]);
-	err += parse_tree(p->op[1]);
-	if(err)
-		return 1;
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
 
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
 		print_stat_error(p->type, p->op[0]->op_type, p->op[1]->op_type);
@@ -216,9 +214,9 @@ int parse_tree(Node* p){
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "RealDiv")){ // Div supports reals??
 		return parse_op(p);
 	}else if(!strcmp(p->type, "Or") || !strcmp(p->type, "And") ){
-		return parse_compop(p);
+		return parse_boolop(p);
 	}else if(!strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Neq") ){
-		return parse_unary(p);
+		return parse_compop(p);
 	}else if(!strcmp(p->type, "IntLit")){
 		p->op_type = INTEGER_T;
 	}else if(!strcmp(p->type, "RealLit")){

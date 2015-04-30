@@ -2,7 +2,9 @@
 program gcd2(output);
 var x: integer;
 	y : real;
+	a, b : BOOLEAN;
 begin
-	x := x * x - x * 2.0
+	x := (x * x - x * 2);
+	a := (x * 3 - 4.2 > 3.1)
 end.
 
