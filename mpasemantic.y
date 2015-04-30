@@ -81,8 +81,10 @@
 		prod->op = (Node **) malloc(nodes * sizeof(Node *));
 		memcpy(prod->op, merge_nodes, nodes * sizeof(Node *));
 		prod->n_op = nodes;
-		va_end(args);
+		prod->r = yylineno;
+		prod->c = col - (int)yyleng;
 
+		va_end(args);
 		return prod;
 	}
 
@@ -91,6 +93,8 @@
 		p->type 	= node_type;
 		p->value 	= (char *) strdup(s);
 		p->value2 	= (char *) strdup(s);
+		p->c 		= col - (int)yyleng;
+		p->r 		= yylineno;
 		p->to_use 	= 1;
 		p->n_op 	= 0;
 		p->op 		= NULL;
@@ -300,11 +304,11 @@ int main(int argc, char **argv){
 	create_outer_st(symbol_tables[OUTER_ST]);
 	create_useless_tables();
 	
-	parse_tree(tree);
+	int err = parse_tree(tree);
 	while(argc--){
 		if(!strcmp(*argv, "-t"))
 			print_tree(tree, 0);
-		else if(!strcmp(*argv, "-s"))
+		else if(!err && !strcmp(*argv, "-s"))
 			print_hashtable();
 		
 		argv++;

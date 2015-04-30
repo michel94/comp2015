@@ -10,6 +10,8 @@ typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;
 typedef struct node {
 	int to_use;
 	int n_op;
+
+	int r, c;
 	
 	char *value2;
 	char *value;

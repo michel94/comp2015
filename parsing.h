@@ -61,12 +61,14 @@ int is_real(Node* p){
 	return p->op_type == REAL_T;
 }
 
-void print_stat_error(char* stat, type_t type1, type_t type2){
-	printf("Operator %s cannot be applied to types %s, %s\n", stat, type2string(type1), type2string(type2) );
+void print_stat_error(Node *p){
+	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", 
+		p->r, p->c, p->type, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
 }
 
-void print_assign_error(char* var, type_t type1, type_t type2){
-	printf("Incompatible type is assignment to %s (got %s, expected %s)\n", var, type2string(type1), type2string(type2));
+void print_assign_error(Node *p){
+	printf("Line %d, col %d: Incompatible type is assignment to %s (got %s, expected %s)\n", 
+		p->r, p->c, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
 int parse_op(Node* p){ // +,-,*
@@ -74,7 +76,7 @@ int parse_op(Node* p){ // +,-,*
 	if(parse_tree(p->op[1])) return 1;
 	
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
-		print_stat_error(p->type, p->op[0]->op_type, p->op[1]->op_type);
+		print_stat_error(p);
 		return 1;
 	}else if(is_int(p->op[0]) && is_int(p->op[1]) ){
 		p->op_type = INTEGER_T;
@@ -90,7 +92,7 @@ int parse_assign(Node* p){
 	if(parse_tree(p->op[1])) return 1;
 
 	if(is_int(p->op[0]) && !is_int(p->op[1])  || is_real(p->op[0]) && is_boolean(p->op[1]) || is_boolean(p->op[0]) && !is_boolean(p->op[1]) ){
-		print_assign_error(p->op[0]->value, p->op[1]->op_type, p->op[0]->op_type);
+		print_assign_error(p);
 		return 1;
 	}
 	return 0;
@@ -103,7 +105,7 @@ int parse_boolop(Node* p){ // or,and
 		return 1;
 
 	if(!is_boolean(p->op[0]) || !is_boolean(p->op[1])){
-		print_stat_error(p->type, p->op[0]->op_type, p->op[1]->op_type);
+		print_stat_error(p);
 		return 1;
 	}else{
 		p->op_type = BOOLEAN_T;
@@ -117,7 +119,7 @@ int parse_compop(Node* p){ // <,=,>,<=,>=
 	if(parse_tree(p->op[1])) return 1;
 
 	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
-		print_stat_error(p->type, p->op[0]->op_type, p->op[1]->op_type);
+		print_stat_error(p);
 		return 1;
 	}
 	else
@@ -230,7 +232,6 @@ int parse_tree(Node* p){
 			if(parse_tree(p->op[i])) return 1;
 		}
 	}
-
 
 	st_pointer = stp_backup;
 
