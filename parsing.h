@@ -194,8 +194,7 @@ int parse_id(Node* p){
 int parse_intop(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
-
-	printf("%d\n", is_int(p->op[1]));
+	
 	if(!is_int(p->op[0]) || !is_int(p->op[1])){
 		print_op_error(p);
 		return 1;
@@ -295,7 +294,7 @@ int parse_call(Node* p){
 		types[n_args_def] = (*el)->type;
 		n_args_def++;
 	}
-	printf("%d %d\n", p->n_op-1, n_args_def);
+	//printf("%d %d\n", p->n_op-1, n_args_def); // do not remove, useful for debug 
 	if(p->n_op-1 != n_args_def){
 		printf("Wrong number of arguments in call to function <token> (got <type>, expected <type>) TODO\n");
 		return 1;
@@ -309,6 +308,9 @@ int parse_call(Node* p){
 			return 1;
 		}
 	}
+	type_t func_type = symbol_tables[f_st]->next[0]->type;
+	p->op_type = func_type;
+	return 0;
 
 }
 

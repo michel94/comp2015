@@ -1,0 +1,18 @@
+
+program vars(output);
+var x: integer;
+	y : real;
+	a, b : integer;
+
+function gcd(var A: integer; B: real; var C: boolean): real;
+	begin
+		if A = 0 then
+			gcd := B
+		else
+			gcd := A
+	end;
+
+begin
+	y := 2 div gcd(2, 1, false);
+end.
+
