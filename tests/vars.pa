@@ -2,8 +2,17 @@
 program vars(output);
 var x: integer;
 	y : real;
-	a, b : BOOLEAN;
+	a, b : integer;
+
+function gcd(var A: integer; B: real; var C: boolean): real;
+	begin
+		if A = 0 then
+			gcd := B
+		else
+			gcd := A
+	end;
+
 begin
-	x := 2 / 2
+	y := 2 / gcd(2, 1, false);
 end.
 

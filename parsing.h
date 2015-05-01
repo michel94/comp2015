@@ -21,7 +21,7 @@ int fetch_func(char* s){
 	if(fetch(symbol_tables[PROGRAM_ST], s) == NULL){
 		return -1;
 	}
-	for(i=PROGRAM_ST+1; i<st_size; i++){
+	for(i=OUTER_ST+1; i<st_size; i++){
 		if(strcmp(symbol_tables[i]->func, s) == 0){
 			return i;
 		}
@@ -70,7 +70,7 @@ void print_op_error(Node *p){
 
 void print_assign_error(Node *p){
 	printf("Line %d, col %d: Incompatible type in assignment to %s (got %s, expected %s)\n", 
-		p->loc.first_line, p->loc.first_column, p->op[0]->value, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
+		p->loc.first_line, p->loc.first_column, p->op[0]->value2, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
 void print_unary_error(Node *p){
@@ -195,6 +195,7 @@ int parse_intop(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
+	printf("%d\n", is_int(p->op[1]));
 	if(!is_int(p->op[0]) || !is_int(p->op[1])){
 		print_op_error(p);
 		return 1;
@@ -272,6 +273,46 @@ int parse_decl(Node* p, flag_t flag){
 	return 0;
 }
 
+int parse_call(Node* p){
+	int f_st = fetch_func(p->op[0]->value), i;
+
+	if(f_st == -1){
+		printf("Function identifier expected TODO\n");
+		return 1;
+	}
+	for(i=1; i<p->n_op; i++){
+		if(parse_tree(p->op[i])) return 1;
+	}
+	symbol_tables[f_st]->next[0];
+	int n_args_def = 0;
+
+	type_t types[TABLE_SIZE];
+	element_t** el;
+	for(el = symbol_tables[f_st]->next+1; el != symbol_tables[f_st]->last; ++el){
+		flag_t flag = (*el)->flag;
+		if(flag != VARPARAM_F && flag != PARAM_F)
+			break;
+		types[n_args_def] = (*el)->type;
+		n_args_def++;
+	}
+	printf("%d %d\n", p->n_op-1, n_args_def);
+	if(p->n_op-1 != n_args_def){
+		printf("Wrong number of arguments in call to function <token> (got <type>, expected <type>) TODO\n");
+		return 1;
+	}
+	for(i=0; i<n_args_def; i++){
+		type_t t1, t2;
+		t1 = types[i];
+		t2 = p->op[i+1]->op_type;
+		if(t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 == BOOLEAN_T){
+			printf("Wrong number of arguments in call to function <token> (got <type>, expected <type>) TODO\n");
+			return 1;
+		}
+	}
+
+}
+
+
 int parse_tree(Node* p){
 	int stp_backup, i;
 	stp_backup = st_pointer;
@@ -335,6 +376,8 @@ int parse_tree(Node* p){
 		return parse_if_while(p);
 	}else if(!strcmp(p->type, "Repeat")){
 		return parse_repeat(p);
+	}else if(!strcmp(p->type, "Call")){
+		return parse_call(p);
 	}else{
 		for(i = 0; i < p->n_op; i++){
 			if(parse_tree(p->op[i])) return 1;
