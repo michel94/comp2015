@@ -186,7 +186,7 @@ int parse_id(Node* p){
 		return 0;
 	}
 
-	printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->value);
+	printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->value2);
 	return 1;
 
 }
