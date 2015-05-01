@@ -13,6 +13,6 @@ function gcd(var A: integer; B: real; var C: boolean): real;
 	end;
 
 begin
-	y := 2 div gcd(2, 1, false);
+   y := 2   div      gcd(2, true, true);
 end.
 

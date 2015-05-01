@@ -252,7 +252,7 @@ Factor:	'(' Expr ')' 													{$$ = $2; }
 	| REALLIT 															{$$ = terminal("RealLit", $1); $$->loc = @1;}
 	| ID 																{$$ = terminal("Id", 	  $1); $$->loc = @1;};
 	| NOT Factor 														{$$ = make_node("Not",  1, 1, $2); $$->loc = @1;}
-	| IdProd ParamList 													{$$ = make_node("Call", 1, 2, $1, $2); }
+	| IdProd ParamList 													{$$ = make_node("Call", 1, 2, $1, $2); $$->loc = @1;}
 ;
 
 ParamList: '(' Expr ExprList ')'										{$$ = make_node("ParamList", 0, 2, $2, $3); };

@@ -296,7 +296,8 @@ int parse_call(Node* p){
 	}
 	//printf("%d %d\n", p->n_op-1, n_args_def); // do not remove, useful for debug 
 	if(p->n_op-1 != n_args_def){
-		printf("Wrong number of arguments in call to function <token> (got <type>, expected <type>) TODO\n");
+		printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %d, expected %d)\n", 
+			p->loc.first_line, p->loc.first_column, p->op[0]->value, p->n_op-1, n_args_def);
 		return 1;
 	}
 	for(i=0; i<n_args_def; i++){
@@ -304,14 +305,15 @@ int parse_call(Node* p){
 		t1 = types[i];
 		t2 = p->op[i+1]->op_type;
 		if(t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 == BOOLEAN_T){
-			printf("Wrong number of arguments in call to function <token> (got <type>, expected <type>) TODO\n");
+			printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
+				p->loc.first_line, p->loc.first_column, i+1, p->op[0]->value, type2string(t2), type2string(t1));
 			return 1;
 		}
 	}
+
 	type_t func_type = symbol_tables[f_st]->next[0]->type;
 	p->op_type = func_type;
 	return 0;
-
 }
 
 
