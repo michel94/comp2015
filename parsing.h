@@ -78,7 +78,7 @@ void print_unary_error(Node *p){
 		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type));
 }
 
-void print_stat_error(Node* p, type_t type1, type_t type2){ //colocar linhas
+void print_stat_error(Node* p, type_t type1, type_t type2){
 	if(!strcmp(p->type, "IfElse"))
 		printf("Line %d, col %d: Incompatible type in if-else statement",
 			p->loc.first_line, p->loc.first_column);
