@@ -318,7 +318,7 @@ int parse_call(Node* p){
 		t2 = p->op[i+1]->op_type;
 		if(t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 == BOOLEAN_T){
 			printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
-				p->loc.first_line, p->loc.first_column, i+1, p->op[0]->value, type2string(t2), type2string(t1));
+				p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value, type2string(t2), type2string(t1));
 			return 1;
 		}
 	}
