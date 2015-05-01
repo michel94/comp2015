@@ -164,7 +164,7 @@ VarPart: VAR VarDeclaration ';' VarDeclarationList 						{$$ = make_node("VarPar
 VarDeclarationList: VarDeclarationList VarDeclaration ';' 				{$$ = make_node("VarDeclarationList", 0, 2, $1, $2);} 
 	| %empty															{$$ = NULL; }
 ;
-VarDeclaration: IdList ':' IdProd										{$$ = make_node("VarDecl", 	  1, 2, $1, $3); } ;
+VarDeclaration: IdList ':' IdProd										{$$ = make_node("VarDecl", 	  1, 2, $1, $3); $$->loc = @3;} ;
 IdList: IdProd IdListLoop												{$$ = make_node("IdList", 	  0, 2, $1, $2);};
 IdListLoop: IdListLoop ',' IdProd										{$$ = make_node("IdListLoop", 0, 2, $1, $3);};
 	| %empty															{$$ = NULL; }

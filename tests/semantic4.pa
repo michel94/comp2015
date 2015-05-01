@@ -1,5 +1,9 @@
 program gcd2(output);
-var a, b: rekt;
+var o: integer;
+r: real;
+z: boolean;
+t: rekt;
+x: asd;
 
 function gcd(B, C, D, D: integer; var B: real): integer;
 	begin

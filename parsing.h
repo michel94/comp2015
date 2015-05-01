@@ -259,7 +259,7 @@ int parse_repeat(Node* p){
 
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
-		printf("Type identifier expected\n");
+		printf("Line %d, col %d: Type identifier expected\n", p->loc.first_line, p->loc.first_column);
 		return 1;
 	}
 	type_t type = vartype(p->op[p->n_op-1]->value);
