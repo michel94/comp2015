@@ -63,6 +63,14 @@ int is_real(Node* p){
 	return p->op_type == REAL_T;
 }
 
+int is_type(Node* p){
+	return p->op_type == TYPE_T;
+}
+
+int is_string(Node* p){
+	return p->op_type == NONE_T;
+}
+
 void print_op_error(Node *p){
 	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", 
 		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
@@ -94,6 +102,10 @@ void print_stat_error(Node* p, type_t type1, type_t type2){
 
 void print_already_def_error(Node* p){
 	printf("Line %d, col %d: Symbol %s already defined\n", p->loc.first_line, p->loc.first_column, p->value2);
+}
+
+void print_writeln_error(Node* p){
+	printf("Line %d, col %d: Cannot write values of type %s\n", p->loc.first_line, p->loc.first_column, type2string(p->op_type) );
 }
 
 int parse_op(Node* p){ // +,-,*
@@ -314,6 +326,20 @@ int parse_call(Node* p){
 
 }
 
+int parse_writeln(Node *p){
+	int i;
+	for(i=0; i<p->n_op; i++){
+		if(parse_tree(p->op[i])) return 1;
+	}
+	for(i=0; i<p->n_op; i++){
+		if(!is_boolean(p->op[i]) && !is_int(p->op[i]) && !is_real(p->op[i]) && !is_string(p->op[i]) ){
+			print_writeln_error(p->op[i]);
+			return 1;
+		}
+	}
+
+	return 0;
+}
 
 int parse_tree(Node* p){
 	int stp_backup, i;
@@ -380,6 +406,11 @@ int parse_tree(Node* p){
 		return parse_repeat(p);
 	}else if(!strcmp(p->type, "Call")){
 		return parse_call(p);
+	}else if(!strcmp(p->type, "WriteLn")){
+		return parse_writeln(p);
+	}else if(!strcmp(p->type, "String")){
+		p->op_type = NONE_T;
+		return 0;
 	}else{
 		for(i = 0; i < p->n_op; i++){
 			if(parse_tree(p->op[i])) return 1;

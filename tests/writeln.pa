@@ -9,11 +9,10 @@ function gcd(var A: integer; B: real; var C: boolean): real;
 		if A = 0 then
 			gcd := B
 		else
-			gcd := A;
-		O := a;
+			gcd := A
 	end;
 
 begin
-	y := 2 / gcd(2, 1, false);
+	writeln(a, b, true, x, y, gcd(a, b, a < b), 'asdasd');
 end.
 
