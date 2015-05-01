@@ -204,10 +204,10 @@ StatListLoop: StatListLoop ';' Stat 									{$$ = make_node("StatListLoop", 0, 
 
 CompStat: BEG StatList END	 											{$$ = make_node("CompStat", 0, 1, $2); };
 Stat: CompStat															{$$ = make_node("CompStat", 0, 1, $1); }
-	| IF Expr THEN Stat 												{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist(NULL)); }
-	| IF Expr THEN Stat ELSE Stat 										{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist($6)); }
-	| WHILE Expr DO Stat 												{$$ = make_node("While", 	1, 2, $2, gen_statlist($4)); }
-	| REPEAT StatList UNTIL Expr 										{$$ = make_node("Repeat", 	1, 2, gen_statlist($2), $4); }
+	| IF Expr THEN Stat 												{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist(NULL)); $$->loc = @1;}
+	| IF Expr THEN Stat ELSE Stat 										{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist($6)); $$->loc = @1;}
+	| WHILE Expr DO Stat 												{$$ = make_node("While", 	1, 2, $2, gen_statlist($4)); $$->loc = @1;}
+	| REPEAT StatList UNTIL Expr 										{$$ = make_node("Repeat", 	1, 2, gen_statlist($2), $4); $$->loc = @1;}
 	| VAL '(' PARAMSTR '(' Expr ')' ',' IdProd ')'						{$$ = make_node("ValParam", 1, 2, $5, $8); }
 	| WRITELN WriteList  												{$$ = make_node("WriteLn",  1, 1, $2); }
 	| WRITELN 															{$$ = make_node("WriteLn",  1, 0); }
@@ -223,34 +223,34 @@ ExprString: Expr 														{$$ = make_node("ExprString", 0, 1, $1); }
 	| STRING 															{$$ = terminal("String", $1); }
 ;
 
-Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); }
-	| SimpleExpr '>' SimpleExpr 										{$$ = make_node("Gt",  1, 2, $1, $3); }
-	| SimpleExpr '=' SimpleExpr 										{$$ = make_node("Eq",  1, 2, $1, $3); }
-	| SimpleExpr NEQ SimpleExpr 										{$$ = make_node("Neq", 1, 2, $1, $3); }
-	| SimpleExpr LEQ SimpleExpr 										{$$ = make_node("Leq", 1, 2, $1, $3); }
-	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq", 1, 2, $1, $3); }
+Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); $$->loc = @2;}
+	| SimpleExpr '>' SimpleExpr 										{$$ = make_node("Gt",  1, 2, $1, $3); $$->loc = @2;}
+	| SimpleExpr '=' SimpleExpr 										{$$ = make_node("Eq",  1, 2, $1, $3); $$->loc = @2;}
+	| SimpleExpr NEQ SimpleExpr 										{$$ = make_node("Neq", 1, 2, $1, $3); $$->loc = @2;}
+	| SimpleExpr LEQ SimpleExpr 										{$$ = make_node("Leq", 1, 2, $1, $3); $$->loc = @2;}
+	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq", 1, 2, $1, $3); $$->loc = @2;}
 	| SimpleExpr 														{$$ = $1; }
 ;
 SimpleExpr: AddOp														{$$ = $1;}
 	| Term 																{$$ = $1;}
 ;
-AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); }
-	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); }
-	| SimpleExpr OR Term 												{$$ = make_node("Or", 	 1, 2, $1, $3); }
+AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); $$->loc = @2;}
+	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); $$->loc = @2;}
+	| SimpleExpr OR Term 												{$$ = make_node("Or", 	 1, 2, $1, $3); $$->loc = @2;}
 	| '+' Term															{$$ = make_node("Plus",  1, 1, $2); $$->loc = @1;}
 	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); $$->loc = @1;}
 ;
 Term: Factor															{$$ = $1; }
-	| Term '*' Factor													{$$ = make_node("Mul", 	   1, 2, $1, $3); }
+	| Term '*' Factor													{$$ = make_node("Mul", 	   1, 2, $1, $3); $$->loc = @2;}
 	| Term '/' Factor  													{$$ = make_node("RealDiv", 1, 2, $1, $3); $$->loc = @2;}
 	| Term DIV Factor  													{$$ = make_node("Div", 	   1, 2, $1, $3); $$->loc = @2;}
 	| Term MOD Factor  													{$$ = make_node("Mod", 	   1, 2, $1, $3); $$->loc = @2;}
-	| Term AND Factor  													{$$ = make_node("And", 	   1, 2, $1, $3); }
+	| Term AND Factor  													{$$ = make_node("And", 	   1, 2, $1, $3); $$->loc = @2;}
 ;
 Factor:	'(' Expr ')' 													{$$ = $2; }
-	| INTLIT 															{$$ = terminal("IntLit",  $1); }
-	| REALLIT 															{$$ = terminal("RealLit", $1); }
-	| ID 																{$$ = terminal("Id", 	  $1); };
+	| INTLIT 															{$$ = terminal("IntLit",  $1); $$->loc = @1;}
+	| REALLIT 															{$$ = terminal("RealLit", $1); $$->loc = @1;}
+	| ID 																{$$ = terminal("Id", 	  $1); $$->loc = @1;};
 	| NOT Factor 														{$$ = make_node("Not",  1, 1, $2); $$->loc = @1;}
 	| IdProd ParamList 													{$$ = make_node("Call", 1, 2, $1, $2); }
 ;

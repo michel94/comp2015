@@ -1,0 +1,24 @@
+program gcd2(output);
+var a, b: integer;
+
+function gcd(C, D: boolean; var E: real): integer;
+	begin
+	
+	
+
+
+  if true then
+		writeln(b)
+else
+	begin
+		if a then
+			begin
+				c := a > 3;
+			end
+	end
+
+end;
+	
+begin
+end.
+

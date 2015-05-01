@@ -80,13 +80,16 @@ void print_unary_error(Node *p){
 
 void print_stat_error(Node* p, type_t type1, type_t type2){ //colocar linhas
 	if(!strcmp(p->type, "IfElse"))
-		printf("Incompatible type in if-else statement");
+		printf("Line %d, col %d: Incompatible type in if-else statement",
+			p->loc.first_line, p->loc.first_column);
 	else if(!strcmp(p->type, "While"))
-		printf("Incompatible type in while statement");
+		printf("Line %d, col %d: Incompatible type in while statement",
+			p->loc.first_line, p->loc.first_column);
 	else
-		printf("Incompatible type in repeat-until statement");
+		printf("Line %d, col %d: Incompatible type in repeat-until statement",
+			p->loc.first_line, p->loc.first_column);
 	
-	printf(" (got <%s>, expected <%s>)\n", type2string(type1), type2string(type2));
+	printf(" (got %s, expected %s)\n", type2string(type1), type2string(type2));
 }
 
 void print_already_def_error(Node* p){
