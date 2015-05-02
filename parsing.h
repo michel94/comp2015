@@ -18,10 +18,10 @@ int type_is_valid(char* ret_type){
 
 int fetch_func(char* s){
 	int i;
-	if(fetch(symbol_tables[PROGRAM_ST], s) == NULL){
+	if(fetch(symbol_tables[PROGRAM_ST], s) == NULL && fetch(symbol_tables[OUTER_ST], s) == NULL){
 		return -1;
 	}
-	for(i=OUTER_ST+1; i<st_size; i++){
+	for(i=OUTER_ST; i<st_size; i++){
 		if(strcmp(symbol_tables[i]->func, s) == 0){
 			return i;
 		}
@@ -309,6 +309,7 @@ int parse_call(Node* p){
 	int f_st = fetch_func(p->op[0]->value), i;
 
 	if(f_st == -1){
+		printf("ERR\n");
 		printf("Line %d, col %d: Function identifier expected\n", p->loc.first_line, p->loc.first_column);
 		return 1;
 	}
@@ -430,7 +431,18 @@ int parse_tree(Node* p){
 	}else if(!strcmp(p->type, "RealLit")){
 		p->op_type = REAL_T;
 	}else if(!strcmp(p->type, "Id")){
-		return parse_id(p, 0);
+		if(parse_id(p, 0)) return 1;
+		if(p->op_type == FUNCTION_T){
+			p->op = (Node **) malloc(sizeof(Node *));
+			p->op[0] = new_node();
+			p->n_op = 1;
+			p->op[0]->value = (char*) strdup(p->value);
+			p->op[0]->type = (char*) strdup("Id");
+
+			p->type = (char*) strdup("Call");
+			p->value = NULL;
+			if(parse_call(p)) return 1;
+		}
 	}else if(!strcmp(p->type, "Assign")){
 		return parse_assign(p);
 	}else if(!strcmp(p->type, "IfElse") || !strcmp(p->type, "While")){

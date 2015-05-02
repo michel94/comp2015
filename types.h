@@ -23,6 +23,10 @@ typedef struct node {
 	YYLTYPE loc;
 } Node;
 
+Node *new_node(){
+	return (Node *) malloc(sizeof(Node));
+}
+
 int vartype(char* s){
 	if(strcmp(s, "integer") == 0)
 		return INTEGER_T;

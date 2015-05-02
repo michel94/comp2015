@@ -13,11 +13,6 @@
 	extern int yylineno, col, yyleng;
 	extern char* yytext;
 
-
-	Node *new_node(){
-		return (Node *) malloc(sizeof(Node));
-	}
-
 	void create_outer_st(hashtable_t* h){
 
 		element_t* el = store(h, "boolean", TYPE_T);
@@ -49,6 +44,7 @@
 	void create_useless_tables(){
 		st_pointer = st_size++;
 		symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
+		strcpy(symbol_tables[st_pointer]->func, "paramcount");
 		element_t* el = store(symbol_tables[1], "paramcount", INTEGER_T);
 		el->flag = RETURN_F;
 	}
