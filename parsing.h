@@ -454,7 +454,6 @@ int parse_tree(Node* p){
 		return parse_writeln(p);
 	}else if(!strcmp(p->type, "String")){
 		p->op_type = NONE_T;
-		return 0;
 	}else{
 		for(i = 0; i < p->n_op; i++){
 			if(parse_tree(p->op[i])) return 1;
