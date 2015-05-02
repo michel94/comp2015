@@ -1,18 +1,13 @@
 program gcd(output);
-var a, b: integer;
-	abc: real;
-	real: real;
 
-function asd(boolean: boolean; a: integer): integer; FORWARD;
-
+function asd(boolean: boolean): integer; FORWARD;
 function asd;
-	var b : boolean;
+	var b: 		 teste;
 		integer: boolean;
-		false: boolean;
+		false: 	 boolean;
 
 	begin
 		b := boolean AND integer;
 	end;
-
 begin
 end.

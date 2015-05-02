@@ -194,23 +194,27 @@ int parse_unary(Node* p){
 
 }
 
-int parse_id(Node* p){
+int parse_id(Node* p, int verbose){
 	element_t * t = fetch(symbol_tables[st_pointer], p->value);
 	if(t != NULL){
-		p->op_type = t->type;
+		if(!verbose)
+			p->op_type = t->type;
 		return 0;
 	}
 	t = fetch(symbol_tables[PROGRAM_ST], p->value);
 	if(t != NULL){
-		p->op_type = t->type;
+		if(!verbose)
+			p->op_type = t->type;
 		return 0;
 	}
 	t = fetch(symbol_tables[OUTER_ST], p->value);
 	if(t != NULL){
-		p->op_type = t->type;
+		if(!verbose)
+			p->op_type = t->type;
 		return 0;
 	}
 
+	if(!verbose)
 	printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->value2);
 	return 1;
 
@@ -284,7 +288,11 @@ int parse_repeat(Node* p){
 
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
-		printf("Line %d, col %d: Type identifier expected\n", p->loc.first_line, p->loc.first_column);
+		if(parse_id(p->op[p->n_op-1], 1))
+			printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->op[p->n_op-1]->value);
+		else 
+			printf("Line %d, col %d: Type identifier expected\n", p->loc.first_line, p->loc.first_column);
+
 		return 1;
 	}
 	type_t type = vartype(p->op[p->n_op-1]->value);
@@ -422,7 +430,7 @@ int parse_tree(Node* p){
 	}else if(!strcmp(p->type, "RealLit")){
 		p->op_type = REAL_T;
 	}else if(!strcmp(p->type, "Id")){
-		return parse_id(p);
+		return parse_id(p, 0);
 	}else if(!strcmp(p->type, "Assign")){
 		return parse_assign(p);
 	}else if(!strcmp(p->type, "IfElse") || !strcmp(p->type, "While")){
