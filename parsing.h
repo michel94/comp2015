@@ -114,6 +114,7 @@ int parse_funchead(Node* p, int n_args, Node** args, char* ret_type){
 	}
 
 	if(!type_is_valid(ret_type)){ // TODO
+		printf("%s\n", ret_type);
 		printf("Type identifier expected TODO\n");
 		return 1;
 	}
