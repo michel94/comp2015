@@ -33,20 +33,21 @@ int parse_funchead(char* name, int n_args, Node** args, char* ret_type){
 	int i;
 	st_pointer = st_size++;
 	
+	// TODO: check if function was already the declared and show appropriate error message
 	symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 	strcpy(symbol_tables[st_pointer]->func, name);
+
+	for(i = 0; i < n_args; i++)
+		if(parse_tree(args[i])) return 1;
+	
 	if(!type_is_valid(ret_type)){
 		printf("Cannot write values of type %s\n", ret_type);
 		return 1;
 	}
-	else{
-		element_t* el = store(symbol_tables[st_pointer], name, vartype(ret_type) );
-		el->flag = RETURN_F;
-		store(symbol_tables[PROGRAM_ST], name, FUNCTION_T);
-		for(i = 0; i < n_args; i++)
-			if(parse_tree(args[i])) return 1;
-	}
-
+	element_t* el = store(symbol_tables[st_pointer], name, vartype(ret_type) );
+	el->flag = RETURN_F;
+	store(symbol_tables[PROGRAM_ST], name, FUNCTION_T);
+	
 	return 0;
 
 }
