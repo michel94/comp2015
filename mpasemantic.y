@@ -300,15 +300,30 @@ int main(int argc, char **argv){
 	create_outer_st(symbol_tables[OUTER_ST]);
 	create_useless_tables();
 	
-	int err = parse_tree(tree);
+	int t_flag=0, s_flag=0;
+
 	while(argc--){
 		if(!strcmp(*argv, "-t"))
-			print_tree(tree, 0);
-		else if(!err && !strcmp(*argv, "-s"))
-			print_hashtable();
-		
+			t_flag=1;
+		else if(!strcmp(*argv, "-s"))
+			s_flag = 1;		
 		argv++;
 	}
+
+	if(t_flag && !s_flag){
+		print_tree(tree, 0);
+	}else if(t_flag && s_flag){
+		print_tree(tree, 0);
+		if(parse_tree(tree)) return 0;
+		print_hashtable();
+	}else if(!t_flag && s_flag){
+		if(parse_tree(tree)) return 0;
+		print_hashtable();
+	}else{
+		parse_tree(tree);
+	}
+	
+	
 	return 0;
 }
 
