@@ -6,5 +6,10 @@ function ABC;
 	begin
 		
 	end;
+function o;
+	var o : integer;
+	begin
+	end;
+
 begin
 end.

@@ -369,9 +369,10 @@ int parse_tree(Node* p){
 		if(parse_tree(p->op[p->n_op-1])) return 1;
 	}else if(strcmp(p->type, "FuncDef2") == 0){
 		st_pointer = fetch_func(p->op[0]->value);
-		if(st_pointer == -1)
-			printf("Function identifier expected???");
-		else
+		if(st_pointer == -1){
+			printf("Function identifier expected??? TODO\n");
+			return 1;
+		}else
 			for(i = 0; i < p->n_op; i++)
 				if(parse_tree(p->op[i])) return 1;
 	}else if(strcmp(p->type, "FuncDecl") == 0){
