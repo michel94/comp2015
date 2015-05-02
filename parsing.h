@@ -119,9 +119,7 @@ int parse_funchead(Node* p, int n_args, Node** args, char* ret_type){
 	}
 	
 	return 0;
-
 }
-
 
 int parse_op(Node* p){ // +,-,*
 	if(parse_tree(p->op[0])) return 1;
@@ -382,12 +380,12 @@ int parse_tree(Node* p){
 		
 		element_t* el = fetch(symbol_tables[PROGRAM_ST], p->op[0]->value);
 		if(el == NULL || el->flag != FUNCDECL_F){
-			printf("Function identifier expected??? TODO\n");
+			printf("Line %d, col %d: Function identifier expected\n", p->op[0]->loc.first_line, p->op[0]->loc.first_column);
 			return 1;
 		}
 		st_pointer = fetch_func(p->op[0]->value);
 		if(st_pointer == -1){
-			printf("Function identifier expected??? TODO\n");
+			printf("Line %d, col %d: Function identifier expected\n", p->op[0]->loc.first_line, p->op[0]->loc.first_column);
 			return 1;
 		}
 		el->flag = NONE_F;
