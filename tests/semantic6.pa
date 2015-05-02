@@ -1,0 +1,10 @@
+
+program booleans(output);
+var x: INTEGER;
+	y : REAL;
+	a, b : BOOLEAN;
+begin
+	y := 2 * x;
+	x := x Mod integer;
+end.
+

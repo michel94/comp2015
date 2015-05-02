@@ -55,12 +55,16 @@ int is_int(Node* p){
 	return p->op_type == INTEGER_T;
 }
 
-int is_boolean(Node* p){
-	return p->op_type == BOOLEAN_T;
-}
-
 int is_real(Node* p){
 	return p->op_type == REAL_T;
+}
+
+int is_real_or_int(Node* p){
+	return p->op_type == REAL_T || p->op_type == INTEGER_T;
+}
+
+int is_boolean(Node* p){
+	return p->op_type == BOOLEAN_T;
 }
 
 int is_type(Node* p){
@@ -112,7 +116,7 @@ int parse_op(Node* p){ // +,-,*
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 	
-	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
+	if(!is_real_or_int(p->op[0]) || !is_real_or_int(p->op[1]) ){
 		print_op_error(p);
 		return 1;
 	}else if(is_int(p->op[0]) && is_int(p->op[1]) ){
@@ -128,7 +132,7 @@ int parse_assign(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 	
-	if(is_int(p->op[0]) && !is_int(p->op[1]) || is_real(p->op[0]) && is_boolean(p->op[1]) || is_boolean(p->op[0]) && !is_boolean(p->op[1]) ){
+	if(is_int(p->op[0]) && !is_int(p->op[1]) || is_real(p->op[0]) && !is_real_or_int(p->op[1]) || is_boolean(p->op[0]) && !is_boolean(p->op[1]) ){
 		print_assign_error(p);
 		return 1;
 	}
@@ -153,7 +157,7 @@ int parse_compop(Node* p){ // <,=,>,<=,>=
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
-	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) ){
+	if(!is_real_or_int(p->op[0]) || !is_real_or_int(p->op[1]) ){
 		print_op_error(p);
 		return 1;
 	}else
@@ -171,7 +175,7 @@ int parse_unary(Node* p){
 		}else
 			p->op_type = BOOLEAN_T;
 	}else{
-		if(is_boolean(p->op[0])){
+		if(!is_real_or_int(p->op[0])){
 			print_unary_error(p);
 			return 1;
 		}else
