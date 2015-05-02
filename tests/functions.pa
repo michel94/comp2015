@@ -1,6 +1,6 @@
 program gcd(output);
 var a, b: integer;
-function abc(A01, b02, c03, d04, e05, F06, g07, I08, H09, J10: boolean): integer; FORWARD;
+function abc(a1: boolean): integer; FORWARD;
 function ABC;
 	var a , B: integer;
 	begin
@@ -9,6 +9,7 @@ function ABC;
 
 function osd(a: integer): real;
 	begin
+		a := abc(true);
 	end;
 function osd(a: integer): real;
 	begin

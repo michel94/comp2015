@@ -39,8 +39,8 @@ int parse_funchead(char* name, int n_args, Node** args, char* ret_type){
 
 	for(i = 0; i < n_args; i++)
 		if(parse_tree(args[i])) return 1;
-	
-	if(!type_is_valid(ret_type)){
+
+	if(!type_is_valid(ret_type)){ // TODO
 		printf("Cannot write values of type %s\n", ret_type);
 		return 1;
 	}
@@ -293,7 +293,7 @@ int parse_call(Node* p){
 	int f_st = fetch_func(p->op[0]->value), i;
 
 	if(f_st == -1){
-		printf("Function identifier expected TODO\n");
+		printf("Line %d, col %d: Function identifier expected\n", p->loc.first_line, p->loc.first_column);
 		return 1;
 	}
 	for(i=1; i<p->n_op; i++){
