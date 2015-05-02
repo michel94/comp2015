@@ -1,20 +1,14 @@
 program gcd(output);
 var a, b: integer;
-
-function osd(a: integer): real;
-	begin
-	end;
-function f(a: boolean; var o: integer): integer;
-	var n:integer;
-	begin
-	end;
-
+	
 function abc(a1: boolean): integer; FORWARD;
+
 function ABC;
 	var a , B: integer;
 	begin
 		
 	end;
+
 
 function osd(a: integer): real;
 	begin

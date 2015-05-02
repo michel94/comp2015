@@ -1,0 +1,14 @@
+program gcd(output);
+var a, b: integer;
+	abc: real;
+
+function abc(a1: boolean): integer; FORWARD;
+
+
+function osd(a: integer): real;
+	begin
+		a := abc(true);
+	end;
+
+begin
+end.

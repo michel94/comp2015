@@ -29,29 +29,6 @@ int fetch_func(char* s){
 	return -1;
 }
 
-int parse_funchead(char* name, int n_args, Node** args, char* ret_type){
-	int i;
-	st_pointer = st_size++;
-	
-	// TODO: check if function was already the declared and show appropriate error message
-	symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
-	strcpy(symbol_tables[st_pointer]->func, name);
-
-	for(i = 0; i < n_args; i++)
-		if(parse_tree(args[i])) return 1;
-
-	if(!type_is_valid(ret_type)){ // TODO
-		printf("Cannot write values of type %s\n", ret_type);
-		return 1;
-	}
-	element_t* el = store(symbol_tables[st_pointer], name, vartype(ret_type) );
-	el->flag = RETURN_F;
-	store(symbol_tables[PROGRAM_ST], name, FUNCTION_T);
-	
-	return 0;
-
-}
-
 int is_int(Node* p){
 	return p->op_type == INTEGER_T;
 }
@@ -112,6 +89,39 @@ void print_already_def_error(Node* p){
 void print_writeln_error(Node* p){
 	printf("Line %d, col %d: Cannot write values of type %s\n", p->loc.first_line, p->loc.first_column, type2string(p->op_type) );
 }
+
+
+int parse_funchead(Node* p, int n_args, Node** args, char* ret_type){
+	char* name = p->op[0]->value;
+	int i;
+	st_pointer = st_size++;
+	
+	element_t* f = fetch(symbol_tables[PROGRAM_ST], name);
+	if(f != NULL){
+		print_already_def_error(p->op[0]);
+		return 1;
+	}
+
+	symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
+	strcpy(symbol_tables[st_pointer]->func, name);
+
+	element_t* el = store(symbol_tables[st_pointer], name, vartype(ret_type) );
+	el->flag = RETURN_F;
+	store(symbol_tables[PROGRAM_ST], name, FUNCTION_T);
+
+	for(i = 0; i < n_args; i++){
+		if(parse_tree(args[i])) return 1;
+	}
+
+	if(!type_is_valid(ret_type)){ // TODO
+		printf("Type identifier expected TODO\n");
+		return 1;
+	}
+	
+	return 0;
+
+}
+
 
 int parse_op(Node* p){ // +,-,*
 	if(parse_tree(p->op[0])) return 1;
@@ -364,21 +374,30 @@ int parse_tree(Node* p){
 			if(parse_tree(p->op[i])) return 1;
 		
 	}else if(strcmp(p->type, "FuncDef") == 0){
-		if(parse_funchead(p->op[0]->value, p->n_op-3, p->op+1, p->op[p->n_op-3]->value)) return 1;
+		if(parse_funchead(p, p->n_op-3, p->op+1, p->op[p->n_op-3]->value)) return 1;
 		
 		if(parse_tree(p->op[p->n_op-2])) return 1;
 		if(parse_tree(p->op[p->n_op-1])) return 1;
 	}else if(strcmp(p->type, "FuncDef2") == 0){
+		
+		element_t* el = fetch(symbol_tables[PROGRAM_ST], p->op[0]->value);
+		if(el == NULL || el->flag != FUNCDECL_F){
+			printf("Function identifier expected??? TODO\n");
+			return 1;
+		}
 		st_pointer = fetch_func(p->op[0]->value);
 		if(st_pointer == -1){
 			printf("Function identifier expected??? TODO\n");
 			return 1;
-		}else
-			for(i = 0; i < p->n_op; i++)
-				if(parse_tree(p->op[i])) return 1;
-	}else if(strcmp(p->type, "FuncDecl") == 0){
-		return parse_funchead(p->op[0]->value, p->n_op-1, p->op+1, p->op[p->n_op-1]->value);
+		}
+		el->flag = NONE_F;
+		for(i = 0; i < p->n_op; i++)
+			if(parse_tree(p->op[i])) return 1;
 		
+	}else if(strcmp(p->type, "FuncDecl") == 0){
+		if(parse_funchead(p, p->n_op-2, p->op+1, p->op[p->n_op-1]->value)) return 1;
+		element_t *el = fetch(symbol_tables[PROGRAM_ST], p->op[0]->value);
+		el->flag = FUNCDECL_F;
 	}else if(strcmp(p->type, "Params") == 0){
 		return parse_decl(p, PARAM_F);
 		
