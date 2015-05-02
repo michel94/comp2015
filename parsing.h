@@ -309,7 +309,6 @@ int parse_call(Node* p){
 	int f_st = fetch_func(p->op[0]->value), i;
 
 	if(f_st == -1){
-		printf("ERR\n");
 		printf("Line %d, col %d: Function identifier expected\n", p->loc.first_line, p->loc.first_column);
 		return 1;
 	}
