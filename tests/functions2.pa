@@ -2,12 +2,12 @@ program gcd(output);
 var a, b: integer;
 	abc: real;
 
-function abc(a1: boolean): integer; FORWARD;
+function asd(a1: boolean; asd: integer): int; FORWARD;
 
 
 function osd(a: integer): real;
 	begin
-		a := abc(true);
+		a := asd(true, 1);
 	end;
 
 begin
