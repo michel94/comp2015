@@ -206,11 +206,23 @@ int parse_boolop(Node* p){ // or,and
 
 }
 
-int parse_compop(Node* p){ // <,=,>,<=,>=
+int parse_compop(Node* p){ // <,>,<=,>=
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
 	if(!is_real_or_int(p->op[0]) || !is_real_or_int(p->op[1]) ){
+		print_op_error(p);
+		return 1;
+	}else
+		p->op_type = BOOLEAN_T;
+	return 0;
+}
+
+int parse_eq(Node* p){ // =,<>
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_tree(p->op[1])) return 1;
+
+	if( (is_real_or_int(p->op[0]) && !is_real_or_int(p->op[1])) || (is_boolean(p->op[0]) && !is_boolean(p->op[1])) ){
 		print_op_error(p);
 		return 1;
 	}else
@@ -491,8 +503,10 @@ int parse_tree(Node* p){
 		return parse_op(p);
 	}else if(!strcmp(p->type, "Or") || !strcmp(p->type, "And") ){
 		return parse_boolop(p);
-	}else if(!strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Neq") ){
+	}else if(!strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") ){
 		return parse_compop(p);
+	}else if(!strcmp(p->type, "Eq") || !strcmp(p->type, "Neq")){
+		return parse_eq(p);
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not") ){
 		return parse_unary(p);
 	} else if(!strcmp(p->type, "RealDiv")){
