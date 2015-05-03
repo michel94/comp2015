@@ -229,8 +229,8 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); 
 SimpleExpr: AddOp														{$$ = $1;}
 	| Term 																{$$ = $1;}
 ;
-AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;  }
-	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2; }
+AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| SimpleExpr OR Term 												{$$ = make_node("Or", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| '+' Term															{$$ = make_node("Plus",  1, 1, $2); $$->loc = @1; $$->token = $1;}
 	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); $$->loc = @1; $$->token = $1;}
@@ -246,7 +246,7 @@ Factor:	'(' Expr ')' 													{$$ = $2; }
 	| INTLIT 															{$$ = terminal("IntLit",  $1); $$->loc = @1;}
 	| REALLIT 															{$$ = terminal("RealLit", $1); $$->loc = @1;}
 	| ID 																{$$ = terminal("Id", 	  $1); $$->loc = @1;};
-	| NOT Factor 														{$$ = make_node("Not",  1, 1, $2); $$->loc = @1;}
+	| NOT Factor 														{$$ = make_node("Not",  1, 1, $2); $$->loc = @1; $$->token = $1;}
 	| IdProd ParamList 													{$$ = make_node("Call", 1, 2, $1, $2); $$->loc = @1;}
 ;
 
