@@ -139,13 +139,11 @@ int parse_funchead(Node* p, int n_args, Node** args, Node* ret){
 	symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 	strcpy(symbol_tables[st_pointer]->func, name);
 
-	
 	if(parse_id(ret)) return 1;
-	if(!type_is_valid(ret->value)){
-		printf("Line %d, col %d: Type identifier expected\n", p->op[n_args+1]->loc.first_line, p->op[n_args+1]->loc.first_column);
+	if(ret->op_type != TYPE_T){
+		printf("Line %d, col %d: Type identifier expected\n", ret->loc.first_line, ret->loc.first_column);
 		return 1;
 	}
-
 
 	element_t* el = store(symbol_tables[st_pointer], name, vartype(ret->value) );
 	el->flag = RETURN_F;
@@ -459,6 +457,7 @@ int parse_tree(Node* p){
 		
 		if(parse_tree(p->op[p->n_op-2])) return 1;
 		if(parse_tree(p->op[p->n_op-1])) return 1;
+		
 	}else if(strcmp(p->type, "FuncDef2") == 0){
 		
 		element_t* el = fetch(symbol_tables[PROGRAM_ST], p->op[0]->value);
