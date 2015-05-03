@@ -1,9 +1,8 @@
 program gcd(output);
-var a, b: integer;
+var a : integer;
 begin
-	val(paramstr(1), a);
-	val(paramstr(2), b);
-	if a = 0 then
+
+if a - 0 + 5 then
 		writeln(b)
 	else
 		begin
