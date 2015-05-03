@@ -4,9 +4,9 @@ var x: integer;
 	y : real;
 	a, b : BOOLEAN;
 begin
-	paramcount := a;
+	a := a;
 	a := b aNd a;
-x := a dIv b;
+	x := z dIv b;
 	x := (x * x + x * 2);
 	a := (x * 3 - 4.2 > 3.1);
 	x := -2;

@@ -10,7 +10,7 @@ function gcd(var A: integer; B: real; var C: boolean): real;
 			gcd := B
 		else
 			gcd := A;
-		O := a;
+		a := x;
 	end;
 
 begin
