@@ -363,7 +363,7 @@ int parse_valparam(Node* p){
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
 		if(id_exists(p->op[p->n_op-1]))
-			printf("Line %d, col %d: Symbol %s not defined\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column, p->op[p->n_op-1]->value);
+			printf("Line %d, col %d: Symbol %s not defined\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column, p->op[p->n_op-1]->value2);
 		else 
 			printf("Line %d, col %d: Type identifier expected\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column);
 
@@ -405,7 +405,7 @@ int parse_call(Node* p){
 	//printf("%d %d\n", p->n_op-1, n_args_def); // do not remove, useful for debug 
 	if(p->n_op-1 != n_args_def){
 		printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %d, expected %d)\n", 
-			p->loc.first_line, p->loc.first_column, p->op[0]->value, p->n_op-1, n_args_def);
+			p->loc.first_line, p->loc.first_column, p->op[0]->value2, p->n_op-1, n_args_def);
 		return 1;
 	}
 	for(i=0; i<n_args_def; i++){
@@ -414,7 +414,7 @@ int parse_call(Node* p){
 		t2 = p->op[i+1]->op_type;
 		if(t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 == BOOLEAN_T){
 			printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
-				p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value, type2string(t2), type2string(t1));
+				p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value2, type2string(t2), type2string(t1));
 			return 1;
 		}
 	}
