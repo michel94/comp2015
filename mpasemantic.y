@@ -134,9 +134,8 @@
 }
 
 %token <str> ID STRING REALLIT INTLIT
+%token <str> '+' '-' OR '<' '>' '=' NEQ LEQ GEQ '*' '/' DIV MOD AND ASSIGN NOT
 
-%token NOT AND OR MOD DIV
-%token ASSIGN NEQ LEQ GEQ
 %token IF THEN ELSE BEG END
 %token DO REPEAT UNTIL WHILE
 %token VAR VAL FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN RESERVED
@@ -230,23 +229,23 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); 
 SimpleExpr: AddOp														{$$ = $1;}
 	| Term 																{$$ = $1;}
 ;
-AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); $$->loc = @2;}
-	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); $$->loc = @2;}
-	| SimpleExpr OR Term 												{$$ = make_node("Or", 	 1, 2, $1, $3); $$->loc = @2;}
-	| '+' Term															{$$ = make_node("Plus",  1, 1, $2); $$->loc = @1;}
-	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); $$->loc = @1;}
+AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;  }
+	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2; }
+	| SimpleExpr OR Term 												{$$ = make_node("Or", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| '+' Term															{$$ = make_node("Plus",  1, 1, $2); $$->loc = @1; $$->token = $1;}
+	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); $$->loc = @1; $$->token = $1;}
 ;
-Term: Factor															{$$ = $1; }
-	| Term '*' Factor													{$$ = make_node("Mul", 	   1, 2, $1, $3); $$->loc = @2;}
-	| Term '/' Factor  													{$$ = make_node("RealDiv", 1, 2, $1, $3); $$->loc = @2;}
-	| Term DIV Factor  													{$$ = make_node("Div", 	   1, 2, $1, $3); $$->loc = @2;}
-	| Term MOD Factor  													{$$ = make_node("Mod", 	   1, 2, $1, $3); $$->loc = @2;}
-	| Term AND Factor  													{$$ = make_node("And", 	   1, 2, $1, $3); $$->loc = @2;}
+Term: Factor															{$$ = $1;}
+	| Term '*' Factor													{$$ = make_node("Mul", 	   1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| Term '/' Factor  													{$$ = make_node("RealDiv", 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| Term DIV Factor  													{$$ = make_node("Div", 	   1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| Term MOD Factor  													{$$ = make_node("Mod", 	   1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| Term AND Factor  													{$$ = make_node("And", 	   1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 ;
 Factor:	'(' Expr ')' 													{$$ = $2; }
 	| INTLIT 															{$$ = terminal("IntLit",  $1); $$->loc = @1;}
 	| REALLIT 															{$$ = terminal("RealLit", $1); $$->loc = @1;}
-	| ID 																{$$ = terminal("Id", 	  $1); $$->loc = @1;};
+	| ID 																{$$ = terminal("Id", 	  $1); $$->loc = @1; $$->loc = @1;};
 	| NOT Factor 														{$$ = make_node("Not",  1, 1, $2); $$->loc = @1;}
 	| IdProd ParamList 													{$$ = make_node("Call", 1, 2, $1, $2); $$->loc = @1;}
 ;
@@ -266,17 +265,17 @@ void print_hashtable(){
 		printf("===== %s Symbol Table =====\n", symbol_tables[i]->name);
 		for(it = symbol_tables[i]->next; it != symbol_tables[i]->last; ++it){
 			if( ((*it)->type == TYPE_T || (*it)->type == BOOLEAN_T) && i == OUTER_ST)
-				printf("%s\t_%s_\t%s\t_%s_\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag), value2string((*it)->value));
+				printf("%s\t%s\t%s\t%s\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag), value2string((*it)->value));
 			else if((*it)->type == FUNCTION_T || (*it)->type == PROGRAM_T)
-				printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+				printf("%s\t%s\n", (*it)->name, type2string((*it)->type));
 			else{
 				if(i == PROGRAM_ST)
-					printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+					printf("%s\t%s\n", (*it)->name, type2string((*it)->type));
 				else{
 					if((*it)->flag != NONE_F)
-						printf("%s\t_%s_\t%s\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag) );
+						printf("%s\t%s\t%s\n", (*it)->name, type2string((*it)->type), flag2string((*it)->flag) );
 					else
-						printf("%s\t_%s_\n", (*it)->name, type2string((*it)->type));
+						printf("%s\t%s\n", (*it)->name, type2string((*it)->type));
 				}
 			}
 		}

@@ -8,17 +8,17 @@ whitespace							[\t ]
 
 %{
 	#include "y.tab.h"
-	#define YY_USER_ACTION col+=yyleng; yylloc.first_line = yylineno; yylloc.first_column = col-(int)yyleng;
+	#define YY_USER_ACTION col+=yyleng; yylloc.first_line = yylineno; yylloc.first_column = col-(int)yyleng; yylval.str=(char *) strdup(yytext);
 	
 	int col=1, stcol, stline;
 %}
 
 %%
 
-({num}"."{num})|({num}e[+-]?{num})|({num}"."{num}e[+-]?{num}) {yylval.str=(char *) strdup(yytext); return REALLIT; }
-{num}														{yylval.str=(char *) strdup(yytext); return INTLIT; }
+({num}"."{num})|({num}e[+-]?{num})|({num}"."{num}e[+-]?{num}) {return REALLIT; }
+{num}														{return INTLIT; }
 
-'([^'\n]|'')+'												{yylval.str=(char *) strdup(yytext); return STRING; }
+'([^'\n]|'')+'												{return STRING; }
 '([^'\n]|'')+												{printf("Line %d, col %d: unterminated string\n", yylineno, col - (int)yyleng);}
 
 "{"|"(*"													{BEGIN COMMENT; stcol = col-yyleng; stline = yylineno; }

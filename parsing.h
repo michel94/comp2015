@@ -29,6 +29,28 @@ int fetch_func(char* s){
 	return -1;
 }
 
+int parse_assign_arg1(Node* p){
+	int i;
+	element_t *el = fetch(symbol_tables[st_pointer], p->value);
+	if(el != NULL){
+		p->op_type = el->type;
+		return 0;
+	}
+
+	el = fetch(symbol_tables[PROGRAM_ST], p->value);
+	if(el != NULL){
+		p->op_type = el->type;
+		return 0;
+	}
+
+	el = fetch(symbol_tables[OUTER_ST], p->value);
+	if(el != NULL){
+		p->op_type = el->type;
+		return 0;
+	}
+	return 1;
+}
+
 int is_int(Node* p){
 	return p->op_type == INTEGER_T;
 }
@@ -55,7 +77,12 @@ int is_string(Node* p){
 
 void print_op_error(Node *p){
 	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", 
-		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
+		p->loc.first_line, p->loc.first_column, p->token, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
+}
+
+void print_variable_expected(Node* p){
+	printf("Line %d, col %d: Variable identifier expected\n", 
+		p->loc.first_line, p->loc.first_column);
 }
 
 void print_assign_error(Node *p){
@@ -138,9 +165,13 @@ int parse_op(Node* p){ // +,-,*
 }
 
 int parse_assign(Node* p){
-	if(parse_tree(p->op[0])) return 1;
+	int r = parse_assign_arg1(p->op[0]);
+	if(r == 1 || (!is_int(p->op[0]) && !is_real(p->op[0]) && !is_boolean(p->op[0])) ){
+		print_variable_expected(p);
+		return 1;
+	}
+
 	if(parse_tree(p->op[1])) return 1;
-	
 	if(is_int(p->op[0]) && !is_int(p->op[1]) || is_real(p->op[0]) && !is_real_or_int(p->op[1]) || is_boolean(p->op[0]) && !is_boolean(p->op[1]) ){
 		print_assign_error(p);
 		return 1;
@@ -289,9 +320,9 @@ int parse_repeat(Node* p){
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
 		if(parse_id(p->op[p->n_op-1], 1))
-			printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->op[p->n_op-1]->value);
+			printf("Line %d, col %d: Symbol %s not defined\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column, p->op[p->n_op-1]->value);
 		else 
-			printf("Line %d, col %d: Type identifier expected\n", p->loc.first_line, p->loc.first_column);
+			printf("Line %d, col %d: Type identifier expected\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column);
 
 		return 1;
 	}

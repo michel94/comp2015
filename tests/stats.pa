@@ -1,9 +1,5 @@
 PROGRAM test(OUTPUT);
 var i: integer;
 BEGIN
-	BEGIN
-	END
-	; 
-	BEGIN
-	END
+	i := 2.0
 END.

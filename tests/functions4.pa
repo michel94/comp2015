@@ -1,7 +1,7 @@
 program gcd(output);
 var a, b: integer;
 	
-function abc(a1: boolean): integer; FORWARD;
+function abc(a1: boolean; var o: bool): integer; FORWARD;
 
 function ABC;
 	var a , B: integer;

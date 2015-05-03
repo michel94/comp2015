@@ -10,7 +10,7 @@ function f(a: boolean; var o: integer): integer;
 	begin
 	end;
 
- function   abc(a1   :  boolean)  :   rekt; FORWARD;
+function   abc(a1   :  boolean)  :   rekt; FORWARD;
 function ABC;
 	var a , B: integer;
 	begin

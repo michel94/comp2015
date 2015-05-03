@@ -4,7 +4,10 @@ var x: integer;
 	y : real;
 	a, b : BOOLEAN;
 begin
-	x := (x * x - x * 2);
+	paramcount := a;
+	a := b aNd a;
+x := a dIv b;
+	x := (x * x + x * 2);
 	a := (x * 3 - 4.2 > 3.1);
 	x := -2;
 	b := false and true or a;

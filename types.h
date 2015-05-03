@@ -15,6 +15,7 @@ typedef struct node {
 	char *value2;
 	char *value;
 	char *type;
+	char *token;
 
 	type_t op_type;
 
@@ -39,19 +40,19 @@ int vartype(char* s){
 char* type2string(type_t type){
 	switch(type){
 		case(INTEGER_T):
-			return "integer";
+			return "_integer_";
 		case(REAL_T):
-			return "real";
+			return "_real_";
 		case(TYPE_T):
-			return "type";
+			return "_type_";
 		case(PROGRAM_T):
-			return "program";
+			return "_program_";
 		case(FUNCTION_T):
-			return "function";
+			return "_function_";
 		case(BOOLEAN_T):
-			return "boolean";
+			return "_boolean_";
 		default:
-			return "undefined";
+			return "_undefined_";
 	}
 }
 
@@ -75,15 +76,15 @@ char* flag2string(type_t type){
 char* value2string(type_t type){
 	switch(type){
 		case(BOOLEAN_V):
-			return "boolean";
+			return "_boolean_";
 		case(INTEGER_V):
-			return "integer";
+			return "_integer_";
 		case(REAL_V):
-			return "real";
+			return "_real_";
 		case(FALSE_V):
-			return "false";
+			return "_false_";
 		case(TRUE_V):
-			return "true";
+			return "_true_";
 		default:
 			return "undefined";
 	}
