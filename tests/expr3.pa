@@ -1,6 +1,10 @@
 program gcd(output);
-var a, d, s: integer;
+
+var x: INTEGER;
+	c: REAL;
 
 begin
-a := NOT d;
+
+x := (1 MOD 2) / 3;
+
 end.
