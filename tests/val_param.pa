@@ -1,0 +1,14 @@
+program gcd2(output);
+var a : integer;
+	c : boolean;
+
+function asd(b : boolean) : integer;
+	begin
+		
+	end;
+
+begin
+VAL(PARAMSTR(asd(false)), c);
+	{paramcount := paramcount;}
+end.
+

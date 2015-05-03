@@ -202,8 +202,8 @@ Stat: CompStat															{$$ = make_node("CompStat", 0, 1, $1); }
 	| IF Expr THEN Stat 												{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist(NULL)); $$->loc = @2;}
 	| IF Expr THEN Stat ELSE Stat 										{$$ = make_node("IfElse", 	1, 3, $2, gen_statlist($4), gen_statlist($6)); $$->loc = @2;}
 	| WHILE Expr DO Stat 												{$$ = make_node("While", 	1, 2, $2, gen_statlist($4)); $$->loc = @2; }
-	| REPEAT StatList UNTIL Expr 										{$$ = make_node("Repeat", 	1, 2, gen_statlist($2), $4); $$->loc = @1; }
-	| VAL '(' PARAMSTR '(' Expr ')' ',' IdProd ')'						{$$ = make_node("ValParam", 1, 2, $5, $8); $$->loc = @1;}
+	| REPEAT StatList UNTIL Expr 										{$$ = make_node("Repeat", 	1, 2, gen_statlist($2), $4); $$->loc = @4; }
+	| VAL '(' PARAMSTR '(' Expr ')' ',' IdProd ')'						{$$ = make_node("ValParam", 1, 2, $5, $8); $$->loc = @5;}
 	| WRITELN WriteList  												{$$ = make_node("WriteLn",  1, 1, $2); }
 	| WRITELN 															{$$ = make_node("WriteLn",  1, 0); }
 	| IdProd ASSIGN Expr 												{$$ = make_node("Assign", 	1, 2, $1, $3); $$->loc = @1; }

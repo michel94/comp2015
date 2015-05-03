@@ -95,6 +95,11 @@ void print_assign_error(Node *p){
 		p->loc.first_line, p->loc.first_column, p->op[0]->value2, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
+void print_valparam_error(Node *p, type_t type1, type_t type2){
+	printf("Line %d, col %d: Incompatible type in val-paramstr statement (got %s, expected %s)\n",
+		p->loc.first_line, p->loc.first_column, type2string(type1), type2string(type2));
+}
+
 void print_stat_error(Node* p, type_t type1, type_t type2){
 	if(!strcmp(p->type, "IfElse"))
 		printf("Line %d, col %d: Incompatible type in if-else statement",
@@ -102,12 +107,9 @@ void print_stat_error(Node* p, type_t type1, type_t type2){
 	else if(!strcmp(p->type, "While"))
 		printf("Line %d, col %d: Incompatible type in while statement",
 			p->op[0]->loc.first_line, p->op[0]->loc.first_column);
-	else if(!strcmp(p->type, "ValParam"))
-		printf("Line %d, col %d: Incompatible type in val-paramstr statement",
-			p->op[0]->loc.first_line, p->op[0]->loc.first_column);
 	else{
 		int nop = p->n_op;
-		
+
 		printf("Line %d, col %d: Incompatible type in repeat-until statement",
 			p->op[nop-1]->loc.first_line, p->op[nop-1]->loc.first_column);
 	}
@@ -346,11 +348,11 @@ int parse_valparam(Node* p){
 	if(parse_id(p->op[1])) return 1;
 	
 	if(!is_int(p->op[0]) ){
-		print_stat_error(p, p->op[0]->op_type, INTEGER_T);
+		print_valparam_error(p->op[0], p->op[0]->op_type, INTEGER_T);
 		return 1;
 	}
 	if(!is_int(p->op[1]) && !is_real(p->op[1]) ){
-		print_stat_error(p, p->op[1]->op_type, INTEGER_T);
+		print_valparam_error(p->op[1], p->op[1]->op_type, INTEGER_T);
 		return 1;
 	}
 
