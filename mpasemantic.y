@@ -218,12 +218,12 @@ ExprString: Expr 														{$$ = make_node("ExprString", 0, 1, $1); }
 	| STRING 															{$$ = terminal("String", $1); }
 ;
 
-Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); $$->loc = @2;}
-	| SimpleExpr '>' SimpleExpr 										{$$ = make_node("Gt",  1, 2, $1, $3); $$->loc = @2;}
-	| SimpleExpr '=' SimpleExpr 										{$$ = make_node("Eq",  1, 2, $1, $3); $$->loc = @2;}
-	| SimpleExpr NEQ SimpleExpr 										{$$ = make_node("Neq", 1, 2, $1, $3); $$->loc = @2;}
-	| SimpleExpr LEQ SimpleExpr 										{$$ = make_node("Leq", 1, 2, $1, $3); $$->loc = @2;}
-	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq", 1, 2, $1, $3); $$->loc = @2;}
+Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| SimpleExpr '>' SimpleExpr 										{$$ = make_node("Gt",  1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| SimpleExpr '=' SimpleExpr 										{$$ = make_node("Eq",  1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| SimpleExpr NEQ SimpleExpr 										{$$ = make_node("Neq", 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| SimpleExpr LEQ SimpleExpr 										{$$ = make_node("Leq", 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
+	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq", 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| SimpleExpr 														{$$ = $1; }
 ;
 SimpleExpr: AddOp														{$$ = $1;}

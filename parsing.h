@@ -238,6 +238,7 @@ int parse_unary(Node* p){
 
 }
 
+
 int parse_id(Node* p){
 	element_t * t = fetch(symbol_tables[st_pointer], p->value);
 	if(t != NULL){

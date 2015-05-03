@@ -4,6 +4,8 @@ var x: integer;
 	y : real;
 	a, b, c : BOOLEAN;
 begin
-	a := not b aNd c;
+ a := not b aNd c;
+ A := b MoD a and c	;
+ y := 3 mod (3 mod (5 * 0.0));
 end.
 
