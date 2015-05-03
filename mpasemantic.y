@@ -245,7 +245,7 @@ Term: Factor															{$$ = $1;}
 Factor:	'(' Expr ')' 													{$$ = $2; }
 	| INTLIT 															{$$ = terminal("IntLit",  $1); $$->loc = @1;}
 	| REALLIT 															{$$ = terminal("RealLit", $1); $$->loc = @1;}
-	| ID 																{$$ = terminal("Id", 	  $1); $$->loc = @1; $$->loc = @1;};
+	| ID 																{$$ = terminal("Id", 	  $1); $$->loc = @1;};
 	| NOT Factor 														{$$ = make_node("Not",  1, 1, $2); $$->loc = @1;}
 	| IdProd ParamList 													{$$ = make_node("Call", 1, 2, $1, $2); $$->loc = @1;}
 ;

@@ -315,16 +315,15 @@ int parse_var(Node *p, type_t type, flag_t flag){
 
 int parse_if_while(Node* p){
 	if(parse_tree(p->op[0])) return 1;
-	if(parse_tree(p->op[1])) return 1;
-	if(parse_tree(p->op[2])) return 1;
-
 	if(!is_boolean(p->op[0])){
 		print_stat_error(p, p->op[0]->op_type, BOOLEAN_T);
 		return 1;
 	}
 
-	return 0;
+	if(parse_tree(p->op[1])) return 1;
+	if(parse_tree(p->op[2])) return 1;
 
+	return 0;
 }
 
 int parse_repeat(Node* p){
