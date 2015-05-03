@@ -105,9 +105,12 @@ void print_stat_error(Node* p, type_t type1, type_t type2){
 	else if(!strcmp(p->type, "ValParam"))
 		printf("Line %d, col %d: Incompatible type in val-paramstr statement",
 			p->op[0]->loc.first_line, p->op[0]->loc.first_column);
-	else
+	else{
+		int nop = p->n_op;
+		
 		printf("Line %d, col %d: Incompatible type in repeat-until statement",
-			p->op[0]->loc.first_line, p->op[0]->loc.first_column);
+			p->op[nop-1]->loc.first_line, p->op[nop-1]->loc.first_column);
+	}
 	
 	printf(" (got %s, expected %s)\n", type2string(type1), type2string(type2));
 }
@@ -119,7 +122,6 @@ void print_already_def_error(Node* p){
 void print_writeln_error(Node* p){
 	printf("Line %d, col %d: Cannot write values of type %s\n", p->loc.first_line, p->loc.first_column, type2string(p->op_type) );
 }
-
 
 int parse_funchead(Node* p, int n_args, Node** args, Node* ret){
 	char* name = p->op[0]->value;
