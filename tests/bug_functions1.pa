@@ -4,11 +4,6 @@ var x: integer;
 	y : real;
 	a, b, c : BOOLEAN;
 
-function integer(a, b, c: integer; var f2, g, h : boolean) : integer;
-	begin
-		integer := 2
-	end;
-
 function ola : integer;
 	begin
 	end;

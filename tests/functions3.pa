@@ -3,14 +3,14 @@ var a, b: integer;
 	
 function abc(a1: boolean): integer; FORWARD;
 
-function ABC(a1: boolean): integer;
+function integer(a1: boolean): integer;
 	var a , B: integer;
 	begin
 		
 	end;
 
 
-function osd(a: integer): real;
+function integer(a: integer): real;
 	begin
 		a := abc(true);
 	end;
