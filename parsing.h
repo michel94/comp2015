@@ -80,6 +80,11 @@ void print_op_error(Node *p){
 		p->loc.first_line, p->loc.first_column, p->token, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
 }
 
+void print_unary_error(Node *p){
+	printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", 
+		p->loc.first_line, p->loc.first_column, p->token, type2string(p->op[0]->op_type));
+}
+
 void print_variable_expected(Node* p){
 	printf("Line %d, col %d: Variable identifier expected\n", 
 		p->loc.first_line, p->loc.first_column);
@@ -90,17 +95,15 @@ void print_assign_error(Node *p){
 		p->loc.first_line, p->loc.first_column, p->op[0]->value2, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
 
-void print_unary_error(Node *p){
-	printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", 
-		p->loc.first_line, p->loc.first_column, p->type, type2string(p->op[0]->op_type));
-}
-
 void print_stat_error(Node* p, type_t type1, type_t type2){
 	if(!strcmp(p->type, "IfElse"))
 		printf("Line %d, col %d: Incompatible type in if-else statement",
 			p->loc.first_line, p->loc.first_column);
 	else if(!strcmp(p->type, "While"))
 		printf("Line %d, col %d: Incompatible type in while statement",
+			p->loc.first_line, p->loc.first_column);
+	else if(!strcmp(p->type, "ValParam"))
+		printf("Line %d, col %d: Incompatible type in val-paramstr statement",
 			p->loc.first_line, p->loc.first_column);
 	else
 		printf("Line %d, col %d: Incompatible type in repeat-until statement",
@@ -118,7 +121,7 @@ void print_writeln_error(Node* p){
 }
 
 
-int parse_funchead(Node* p, int n_args, Node** args, char* ret_type){
+int parse_funchead(Node* p, int n_args, Node** args, Node* ret){
 	char* name = p->op[0]->value;
 	int i;
 	st_pointer = st_size++;
@@ -128,11 +131,19 @@ int parse_funchead(Node* p, int n_args, Node** args, char* ret_type){
 		print_already_def_error(p->op[0]);
 		return 1;
 	}
-
+	
 	symbol_tables[st_pointer] = new_hashtable(TABLE_SIZE, "Function");
 	strcpy(symbol_tables[st_pointer]->func, name);
 
-	element_t* el = store(symbol_tables[st_pointer], name, vartype(ret_type) );
+	
+	if(parse_id(ret)) return 1;
+	if(!type_is_valid(ret->value)){
+		printf("Line %d, col %d: Type identifier expected\n", p->op[n_args+1]->loc.first_line, p->op[n_args+1]->loc.first_column);
+		return 1;
+	}
+
+
+	element_t* el = store(symbol_tables[st_pointer], name, vartype(ret->value) );
 	el->flag = RETURN_F;
 	store(symbol_tables[PROGRAM_ST], name, FUNCTION_T);
 
@@ -140,10 +151,6 @@ int parse_funchead(Node* p, int n_args, Node** args, char* ret_type){
 		if(parse_tree(args[i])) return 1;
 	}
 
-	if(!type_is_valid(ret_type)){
-		printf("Line %d, col %d: Type identifier expected\n", p->op[n_args+1]->loc.first_line, p->op[n_args+1]->loc.first_column);
-		return 1;
-	}
 	
 	return 0;
 }
@@ -166,6 +173,10 @@ int parse_op(Node* p){ // +,-,*
 
 int parse_assign(Node* p){
 	int r = parse_assign_arg1(p->op[0]);
+	if(r){
+		printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->op[0]->value2);
+		return 1;
+	}
 	if(r == 1 || (!is_int(p->op[0]) && !is_real(p->op[0]) && !is_boolean(p->op[0])) ){
 		print_variable_expected(p);
 		return 1;
@@ -225,30 +236,42 @@ int parse_unary(Node* p){
 
 }
 
-int parse_id(Node* p, int verbose){
+int parse_id(Node* p){
 	element_t * t = fetch(symbol_tables[st_pointer], p->value);
 	if(t != NULL){
-		if(!verbose)
-			p->op_type = t->type;
+		p->op_type = t->type;
 		return 0;
 	}
 	t = fetch(symbol_tables[PROGRAM_ST], p->value);
 	if(t != NULL){
-		if(!verbose)
-			p->op_type = t->type;
+		p->op_type = t->type;
 		return 0;
 	}
 	t = fetch(symbol_tables[OUTER_ST], p->value);
 	if(t != NULL){
-		if(!verbose)
-			p->op_type = t->type;
+		p->op_type = t->type;
 		return 0;
 	}
 
-	if(!verbose)
 	printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->value2);
 	return 1;
 
+}
+
+int id_exists(Node* p){
+	element_t * t = fetch(symbol_tables[st_pointer], p->value);
+	if(t != NULL){
+		return 0;
+	}
+	t = fetch(symbol_tables[PROGRAM_ST], p->value);
+	if(t != NULL){
+		return 0;
+	}
+	t = fetch(symbol_tables[OUTER_ST], p->value);
+	if(t != NULL){
+		return 0;
+	}
+	return 1;
 }
 
 int parse_intop(Node* p){
@@ -317,9 +340,25 @@ int parse_repeat(Node* p){
 	return 0;
 }
 
+int parse_valparam(Node* p){
+	if(parse_tree(p->op[0])) return 1;
+	if(parse_id(p->op[1])) return 1;
+	
+	if(!is_int(p->op[0]) ){
+		print_stat_error(p, p->op[0]->op_type, INTEGER_T);
+		return 1;
+	}
+	if(!is_int(p->op[1]) && !is_real(p->op[1]) ){
+		print_stat_error(p, p->op[1]->op_type, INTEGER_T);
+		return 1;
+	}
+
+	return 0;
+}
+
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
-		if(parse_id(p->op[p->n_op-1], 1))
+		if(id_exists(p->op[p->n_op-1]))
 			printf("Line %d, col %d: Symbol %s not defined\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column, p->op[p->n_op-1]->value);
 		else 
 			printf("Line %d, col %d: Type identifier expected\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column);
@@ -339,6 +378,7 @@ int parse_decl(Node* p, flag_t flag){
 int parse_call(Node* p){
 	int f_st = fetch_func(p->op[0]->value), i;
 
+	if(parse_id(p->op[0])) return 1;
 	if(f_st == -1){
 		printf("Line %d, col %d: Function identifier expected\n", p->loc.first_line, p->loc.first_column);
 		return 1;
@@ -411,7 +451,7 @@ int parse_tree(Node* p){
 			if(parse_tree(p->op[i])) return 1;
 		
 	}else if(strcmp(p->type, "FuncDef") == 0){
-		if(parse_funchead(p, p->n_op-3, p->op+1, p->op[p->n_op-3]->value)) return 1;
+		if(parse_funchead(p, p->n_op-3, p->op+1, p->op[p->n_op-3])) return 1;
 		
 		if(parse_tree(p->op[p->n_op-2])) return 1;
 		if(parse_tree(p->op[p->n_op-1])) return 1;
@@ -432,7 +472,7 @@ int parse_tree(Node* p){
 			if(parse_tree(p->op[i])) return 1;
 		
 	}else if(strcmp(p->type, "FuncDecl") == 0){
-		if(parse_funchead(p, p->n_op-2, p->op+1, p->op[p->n_op-1]->value)) return 1;
+		if(parse_funchead(p, p->n_op-2, p->op+1, p->op[p->n_op-1])) return 1;
 		element_t *el = fetch(symbol_tables[PROGRAM_ST], p->op[0]->value);
 		el->flag = FUNCDECL_F;
 	}else if(strcmp(p->type, "Params") == 0){
@@ -461,7 +501,7 @@ int parse_tree(Node* p){
 	}else if(!strcmp(p->type, "RealLit")){
 		p->op_type = REAL_T;
 	}else if(!strcmp(p->type, "Id")){
-		if(parse_id(p, 0)) return 1;
+		if(parse_id(p)) return 1;
 		if(p->op_type == FUNCTION_T){
 			p->op = (Node **) malloc(sizeof(Node *));
 			p->op[0] = new_node();
@@ -479,6 +519,8 @@ int parse_tree(Node* p){
 		return parse_if_while(p);
 	}else if(!strcmp(p->type, "Repeat")){
 		return parse_repeat(p);
+	}else if(!strcmp(p->type, "ValParam")){
+		return parse_valparam(p);
 	}else if(!strcmp(p->type, "Call")){
 		return parse_call(p);
 	}else if(!strcmp(p->type, "WriteLn")){

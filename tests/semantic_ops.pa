@@ -3,7 +3,18 @@ program gcd2(output);
 var x: integer;
 	y : real;
 	a, b : BOOLEAN;
+
+function asd(a : integer) : boolean;
+	begin
+		b := true;
+	end;
+
 begin
+	VAL(PARAMSTR(asd(false)), a);
+	{paramcount := paramcount;}
+	{a := asdasd(2, 3);}
+	a := -a;
+
 	a := a;
 	a := b aNd a;
 	x := z dIv b;
