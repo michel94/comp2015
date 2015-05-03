@@ -1,5 +1,7 @@
 PROGRAM test(OUTPUT);
 var i: integer;
 BEGIN
-	i := 2.0
+	false := true;
+	if true then
+		i := 1;
 END.

@@ -29,26 +29,26 @@ int fetch_func(char* s){
 	return -1;
 }
 
-int parse_assign_arg1(Node* p){
+element_t* parse_assign_arg1(Node* p){
 	int i;
 	element_t *el = fetch(symbol_tables[st_pointer], p->value);
 	if(el != NULL){
 		p->op_type = el->type;
-		return 0;
+		return el;
 	}
 
 	el = fetch(symbol_tables[PROGRAM_ST], p->value);
 	if(el != NULL){
 		p->op_type = el->type;
-		return 0;
+		return el;
 	}
 
 	el = fetch(symbol_tables[OUTER_ST], p->value);
 	if(el != NULL){
 		p->op_type = el->type;
-		return 0;
+		return el;
 	}
-	return 1;
+	return NULL;
 }
 
 int is_int(Node* p){
@@ -174,12 +174,12 @@ int parse_op(Node* p){ // +,-,*
 }
 
 int parse_assign(Node* p){
-	int r = parse_assign_arg1(p->op[0]);
-	if(r){
+	element_t* r = parse_assign_arg1(p->op[0]);
+	if(r == NULL){
 		printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->op[0]->value2);
 		return 1;
 	}
-	if(r == 1 || (!is_int(p->op[0]) && !is_real(p->op[0]) && !is_boolean(p->op[0])) ){
+	if( (!is_int(p->op[0]) && !is_real(p->op[0]) && !is_boolean(p->op[0])) || r->flag == CONSTANT_F ){
 		print_variable_expected(p);
 		return 1;
 	}
@@ -222,7 +222,8 @@ int parse_eq(Node* p){ // =,<>
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
-	if( (is_real_or_int(p->op[0]) && !is_real_or_int(p->op[1])) || (is_boolean(p->op[0]) && !is_boolean(p->op[1])) ){
+	if( (is_real_or_int(p->op[0]) && !is_real_or_int(p->op[1])) || (is_boolean(p->op[0]) && !is_boolean(p->op[1])) 
+		|| (!is_real_or_int(p->op[0]) && !is_boolean(p->op[0])) || (!is_real_or_int(p->op[1]) && !is_boolean(p->op[1]) ) ){
 		print_op_error(p);
 		return 1;
 	}else
