@@ -49,6 +49,31 @@ element_t* parse_assign_arg1(Node* p){
 	return NULL;
 }
 
+element_t* get_id(Node* p){
+	element_t *t = fetch(symbol_tables[st_pointer], p->value);
+	if(t != NULL)
+		return t;
+	t = fetch(symbol_tables[PROGRAM_ST], p->value);
+	if(t != NULL)
+		return t;
+	t = fetch(symbol_tables[OUTER_ST], p->value);
+	if(t != NULL)
+		return t;
+
+	return NULL;
+}
+
+int id_exists(Node* p){
+	if(fetch(symbol_tables[st_pointer], p->value) != NULL)
+		return 0;
+	if(fetch(symbol_tables[PROGRAM_ST], p->value) != NULL)
+		return 0;
+	if(fetch(symbol_tables[OUTER_ST],   p->value) != NULL)
+		return 0;
+
+	return 1;
+}
+
 void print_op_error(Node *p){
 	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", 
 		p->loc.first_line, p->loc.first_column, p->token, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );
@@ -223,31 +248,6 @@ int parse_id(Node* p){
 
 	printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->value2);
 	return 1;
-}
-
-int id_exists(Node* p){
-	if(fetch(symbol_tables[st_pointer], p->value) != NULL)
-		return 0;
-	if(fetch(symbol_tables[PROGRAM_ST], p->value) != NULL)
-		return 0;
-	if(fetch(symbol_tables[OUTER_ST],   p->value) != NULL)
-		return 0;
-
-	return 1;
-}
-
-element_t* get_id(Node* p){
-	element_t *t = fetch(symbol_tables[st_pointer], p->value);
-	if(t != NULL)
-		return t;
-	t = fetch(symbol_tables[PROGRAM_ST], p->value);
-	if(t != NULL)
-		return t;
-	t = fetch(symbol_tables[OUTER_ST], p->value);
-	if(t != NULL)
-		return t;
-
-	return NULL;
 }
 
 int parse_intop(Node* p){
