@@ -206,24 +206,12 @@ int parse_boolop(Node* p){ // or,and
 
 }
 
-int parse_compop(Node* p){ // <,>,<=,>=
+int parse_eq(Node* p){ // =,<>, <,>,<=,>=
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
-	if(!is_real_or_int(p->op[0]) || !is_real_or_int(p->op[1]) ){
-		print_op_error(p);
-		return 1;
-	}else
-		p->op_type = BOOLEAN_T;
-	return 0;
-}
-
-int parse_eq(Node* p){ // =,<>
-	if(parse_tree(p->op[0])) return 1;
-	if(parse_tree(p->op[1])) return 1;
-
-	if( (is_real_or_int(p->op[0]) && !is_real_or_int(p->op[1])) || (is_boolean(p->op[0]) && !is_boolean(p->op[1])) 
-		|| (!is_real_or_int(p->op[0]) && !is_boolean(p->op[0])) || (!is_real_or_int(p->op[1]) && !is_boolean(p->op[1]) ) ){
+	if((is_real_or_int(p->op[0]) && !is_real_or_int(p->op[1])) || (is_boolean(p->op[0]) && !is_boolean(p->op[1])) 
+		|| (!is_boolean(p->op[0]) && is_boolean(p->op[1])) || (!is_real_or_int(p->op[0]) && is_real_or_int(p->op[1]))){
 		print_op_error(p);
 		return 1;
 	}else
@@ -323,7 +311,7 @@ int parse_realop(Node* p){ // USED ONCE
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 	
-	if(is_boolean(p->op[0]) || is_boolean(p->op[1])){
+	if(is_boolean(p->op[0]) || is_boolean(p->op[1]) || is_type(p->op[0]) || is_type(p->op[1])){
 		print_op_error(p);
 		return 1;
 	}else
@@ -504,10 +492,15 @@ int parse_tree(Node* p){
 	}else if(strcmp(p->type, "FuncDef2") == 0){
 		
 		element_t* el = fetch(symbol_tables[PROGRAM_ST], p->op[0]->value);
-		if(el == NULL || el->flag != FUNCDECL_F){
+		if(el == NULL){
 			printf("Line %d, col %d: Function identifier expected\n", p->op[0]->loc.first_line, p->op[0]->loc.first_column);
 			return 1;
 		}
+		else if(el->flag != FUNCDECL_F){
+			print_already_def_error(p->op[0]);
+			return 1;
+		}
+
 		st_pointer = fetch_func(p->op[0]->value);
 		if(st_pointer == -1){
 			printf("Line %d, col %d: Function identifier expected\n", p->op[0]->loc.first_line, p->op[0]->loc.first_column);
@@ -534,9 +527,7 @@ int parse_tree(Node* p){
 		return parse_op(p);
 	}else if(!strcmp(p->type, "Or") || !strcmp(p->type, "And") ){
 		return parse_boolop(p);
-	}else if(!strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") ){
-		return parse_compop(p);
-	}else if(!strcmp(p->type, "Eq") || !strcmp(p->type, "Neq")){
+	}else if(!strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Neq") ){
 		return parse_eq(p);
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not") ){
 		return parse_unary(p);
