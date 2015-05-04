@@ -210,8 +210,7 @@ int parse_eq(Node* p){ // =,<>, <,>,<=,>=
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
 
-	if((is_real_or_int(p->op[0]) && !is_real_or_int(p->op[1])) || (is_boolean(p->op[0]) && !is_boolean(p->op[1])) 
-		|| (!is_boolean(p->op[0]) && is_boolean(p->op[1])) || (!is_real_or_int(p->op[0]) && is_real_or_int(p->op[1]))){
+	if(!(is_real_or_int(p->op[0]) && is_real_or_int(p->op[1]) || is_boolean(p->op[0]) && is_boolean(p->op[1]) )) {
 		print_op_error(p);
 		return 1;
 	}else
@@ -540,7 +539,8 @@ int parse_tree(Node* p){
 		p->op_type = REAL_T;
 	}else if(!strcmp(p->type, "Id")){
 		if(parse_id(p)) return 1;
-		if(p->op_type == FUNCTION_T){
+		element_t* id = get_id(p);
+		if(p->op_type == FUNCTION_T || id->flag == RETURN_F){
 			p->op = (Node **) malloc(sizeof(Node *));
 			p->op[0] = new_node();
 			p->n_op = 1;

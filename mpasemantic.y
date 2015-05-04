@@ -226,15 +226,18 @@ Expr: SimpleExpr '<' SimpleExpr 										{$$ = make_node("Lt",  1, 2, $1, $3); 
 	| SimpleExpr GEQ SimpleExpr 										{$$ = make_node("Geq", 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| SimpleExpr 														{$$ = $1; }
 ;
+
 SimpleExpr: AddOp														{$$ = $1;}
 	| Term 																{$$ = $1;}
 ;
+
 AddOp: SimpleExpr '+' Term												{$$ = make_node("Add", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| SimpleExpr '-' Term												{$$ = make_node("Sub", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| SimpleExpr OR Term 												{$$ = make_node("Or", 	 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| '+' Term															{$$ = make_node("Plus",  1, 1, $2); $$->loc = @1; $$->token = $1;}
 	| '-' Term															{$$ = make_node("Minus", 1, 1, $2); $$->loc = @1; $$->token = $1;}
 ;
+
 Term: Factor															{$$ = $1;}
 	| Term '*' Factor													{$$ = make_node("Mul", 	   1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
 	| Term '/' Factor  													{$$ = make_node("RealDiv", 1, 2, $1, $3); $$->loc = @2; $$->token = $2;}
@@ -325,3 +328,4 @@ int main(int argc, char **argv){
 int yyerror(char *s){
 	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
 }
+

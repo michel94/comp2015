@@ -9,17 +9,10 @@ function integer(a, b, c: integer; var f2, g, h : boolean) : integer;
 		integer := 2
 	end;
 
-function ola : integer;
-	begin
-	end;
-
-function asdasd : ola;
-	begin
-	end;
 
 begin
- A := integer(1, 2, 3, a, b, c) - PARAMCOunt;
- x := 2 * f and (-(- y) < 2);
+a := real = real;
+ x := 2 * 1 And (-(- y) < 2);
  a := not b aNd c;
  A := b MoD a and c	;
  y := 3 mod (3 mod (5 * 0.0));
