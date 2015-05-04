@@ -1,10 +1,22 @@
 program gcd(output);
-
 var x: INTEGER;
 	c: REAL;
+	d: boolean;
+	
+function AsD(var a: integer): real;
+	begin
+	end;
 
 begin
 
-x := (1 MOD 2) / 3;
-
+if d Or (x >= c) then
+if integer = integer then
+		c := c
+else
+	if true OR (c+4 >= 5) then
+		c := c
+	else
+c := d;
+	
 end.
+

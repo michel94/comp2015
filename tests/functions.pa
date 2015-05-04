@@ -8,18 +8,19 @@ function osd(a: integer): real;
 function f(a: boolean; var o: integer): integer;
 	var n:integer;
 	begin
+		f := f(a, o);
 	end;
 
-function   abc(a1   :  boolean)  :   rekt; FORWARD;
+function   abc(a1   :  boolean)  :   integer; FORWARD;
 function ABC;
 	var a , B: integer;
 	begin
-		
+		abc := abc(a1);
 	end;
 
 function aosd(a: integer): real;
 	begin
-		a := abc(true);
+a := abc(3=abc(2=abc(1=abc(1=abc(true)))));
 		a := abc(true);
 	end;
 

@@ -91,9 +91,10 @@ void print_variable_expected(Node* p){
 }
 
 void print_assign_error(Node *p){
-	printf("Line %d, col %d: Incompatible type in assignment to %s (got %s, expected %s)\n", 
-		p->loc.first_line, p->loc.first_column, p->op[0]->value2, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
+	printf("Line %d, col %d: Incompatible type in assigment to %s (got %s, expected %s)\n", 
+		p->op[1]->loc.first_line, p->op[1]->loc.first_column, p->op[0]->value2, type2string(p->op[1]->op_type), type2string(p->op[0]->op_type));
 }
+
 
 void print_valparam_error(Node *p, type_t type1, type_t type2){
 	printf("Line %d, col %d: Incompatible type in val-paramstr statement (got %s, expected %s)\n",
@@ -419,6 +420,7 @@ int parse_call(Node* p){
 			p->loc.first_line, p->loc.first_column, p->op[0]->value2, p->n_op-1, n_args_def);
 		return 1;
 	}
+
 	for(i=0; i<n_args_def; i++){
 		type_t t1, t2;
 		t1 = types[i];
@@ -525,6 +527,7 @@ int parse_tree(Node* p){
 			p->op[0] = new_node();
 			p->n_op = 1;
 			p->op[0]->value = (char*) strdup(p->value);
+			p->op[0]->value2 = (char*) strdup(p->value2);
 			p->op[0]->type = (char*) strdup("Id");
 
 			p->type = (char*) strdup("Call");
