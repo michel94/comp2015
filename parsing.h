@@ -434,14 +434,13 @@ int parse_call(Node* p){
 		t2 = p->op[i+1]->op_type;
 		if(f1 == PARAM_F){
 			if( t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 == BOOLEAN_T){
-				printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
+				printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n",
 					p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value2, type2string(t2), type2string(t1));
 				return 1;
 			}
 		}else{
 			if( strcmp(p->op[i+1]->type, "Id") || get_id(p->op[i+1])->flag == CONSTANT_F || t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 != REAL_T){
-				printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
-					p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value2, type2string(t2), type2string(t1));
+				print_variable_expected(p->op[i+1]);
 				return 1;
 			}
 			

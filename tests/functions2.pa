@@ -1,8 +1,9 @@
 program gcd(output);
 var a, b: integer;
 	abc: real;
+	c : boolean;
 
-function asd(a1: boolean; as: integer): integer;
+function asd(var a1: boolean; as: integer): integer;
 	begin
 		a1 := asd = 1;
 	end;
@@ -13,10 +14,9 @@ function Asd2;
 	begin
 	end;
 
-
 function osd(a: integer): real;
 	begin
-		a := asd(true, 1);
+a := asd(c, 1);
 	end;
 
 begin
