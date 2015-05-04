@@ -14,7 +14,6 @@
 	extern char* yytext;
 
 	void create_outer_st(hashtable_t* h){
-
 		element_t* el = store(h, "boolean", TYPE_T);
 		el->flag = CONSTANT_F;
 		el->value = BOOLEAN_V;
@@ -38,7 +37,6 @@
 		el = store(h, "paramcount", FUNCTION_T);
 		
 		el = store(h, "program", PROGRAM_T);
-		
 	}
 
 	void create_useless_tables(){
@@ -261,7 +259,7 @@ ExprList: ExprList ',' Expr 											{$$ = make_node("ExprList",  0, 2, $1, $3
 %%
 
 void print_hashtable(){
-	int i=0;
+	int i;
 	element_t **it;
 
 	for(i = 0; i < st_size; i++){
@@ -308,19 +306,17 @@ int main(int argc, char **argv){
 		argv++;
 	}
 
-	if(t_flag && !s_flag){
+	if(t_flag && !s_flag)
 		print_tree(tree, 0);
-	}else if(t_flag && s_flag){
+	else if(t_flag && s_flag){
 		print_tree(tree, 0);
 		if(parse_tree(tree)) return 0;
 		print_hashtable();
 	}else if(!t_flag && s_flag){
 		if(parse_tree(tree)) return 0;
 		print_hashtable();
-	}else{
+	}else
 		parse_tree(tree);
-	}
-	
 	
 	return 0;
 }

@@ -24,10 +24,6 @@ typedef struct node {
 	YYLTYPE loc;
 } Node;
 
-Node *new_node(){
-	return (Node *) malloc(sizeof(Node));
-}
-
 int vartype(char* s){
 	if(strcmp(s, "integer") == 0)
 		return INTEGER_T;
@@ -90,11 +86,19 @@ char* value2string(type_t type){
 	}
 }
 
-
 void to_lower(char *value){
 	char *s;
 	for(s = value; *s != '\0'; s++)
 		*s = tolower(*s);
 }
+
+int is_int(Node* p){ return p->op_type == INTEGER_T; }
+int is_real(Node* p){ return p->op_type == REAL_T; }
+int is_boolean(Node* p){ return p->op_type == BOOLEAN_T; }
+int is_type(Node* p){ return p->op_type == TYPE_T; }
+int is_string(Node* p){ return p->op_type == NONE_T; }
+int is_real_or_int(Node* p){ return p->op_type == REAL_T || p->op_type == INTEGER_T; }
+
+Node *new_node(){ return (Node *) malloc(sizeof(Node)); }
 
 #endif
