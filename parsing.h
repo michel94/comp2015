@@ -463,10 +463,15 @@ int parse_tree(Node* p){
 	}else if(strcmp(p->type, "FuncDef2") == 0){
 		
 		element_t* el = fetch(symbol_tables[PROGRAM_ST], p->op[0]->value);
-		if(el == NULL || el->flag != FUNCDECL_F){
+		if(el == NULL){
 			printf("Line %d, col %d: Function identifier expected\n", p->op[0]->loc.first_line, p->op[0]->loc.first_column);
 			return 1;
 		}
+		else if(el->flag != FUNCDECL_F){
+			print_already_def_error(p->op[0]);
+			return 1;
+		}
+
 		st_pointer = fetch_func(p->op[0]->value);
 		if(st_pointer == -1){
 			printf("Line %d, col %d: Function identifier expected\n", p->op[0]->loc.first_line, p->op[0]->loc.first_column);
