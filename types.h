@@ -6,7 +6,7 @@
 
 typedef enum {INTEGER_T, BOOLEAN_T, REAL_T, TYPE_T, FUNCTION_T, PROGRAM_T, NONE_T} type_t;
 typedef enum {CONSTANT_F, RETURN_F, PARAM_F, VARPARAM_F, NONE_F, FUNCDECL_F} flag_t;
-typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V} value_t;
+typedef enum {BOOLEAN_V, INTEGER_V, REAL_V, FALSE_V, TRUE_V, NONE_V} value_t;
 
 typedef struct node {
 	int to_use;

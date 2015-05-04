@@ -3,6 +3,7 @@ program vars(output);
 var x: integer;
 	y : real;
 	a, b : integer;
+	bb, bbb: boolean;
 
 function gcd(var A: integer; B: real; var C: boolean): real;
 	begin
@@ -12,7 +13,17 @@ function gcd(var A: integer; B: real; var C: boolean): real;
 			gcd := A
 	end;
 
+function paramcount(var x: integer): real;
+	begin
+
+	end;
+
+function p: integer;
+	begin
+	end;
+
 begin
-   y := 2   div      gcd(2, true, true);
+	y := paramcount(bb);
+	{y := gcd(x, y, bb or bbb);}
 end.
 

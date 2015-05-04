@@ -21,7 +21,7 @@ int fetch_func(char* s){
 	if(fetch(symbol_tables[PROGRAM_ST], s) == NULL && fetch(symbol_tables[OUTER_ST], s) == NULL){
 		return -1;
 	}
-	for(i=OUTER_ST; i<st_size; i++){
+	for(i=st_size-1; i>=OUTER_ST; i--){
 		if(strcmp(symbol_tables[i]->func, s) == 0){
 			return i;
 		}
@@ -290,6 +290,22 @@ int id_exists(Node* p){
 	return 1;
 }
 
+element_t* get_id(Node* p){
+	element_t * t = fetch(symbol_tables[st_pointer], p->value);
+	if(t != NULL){
+		return t;
+	}
+	t = fetch(symbol_tables[PROGRAM_ST], p->value);
+	if(t != NULL){
+		return t;
+	}
+	t = fetch(symbol_tables[OUTER_ST], p->value);
+	if(t != NULL){
+		return t;
+	}
+	return NULL;
+}
+
 int parse_intop(Node* p){
 	if(parse_tree(p->op[0])) return 1;
 	if(parse_tree(p->op[1])) return 1;
@@ -405,12 +421,15 @@ int parse_call(Node* p){
 	int n_args_def = 0;
 
 	type_t types[TABLE_SIZE];
+	flag_t flags[TABLE_SIZE];
 	element_t** el;
 	for(el = symbol_tables[f_st]->next+1; el != symbol_tables[f_st]->last; ++el){
 		flag_t flag = (*el)->flag;
 		if(flag != VARPARAM_F && flag != PARAM_F)
 			break;
 		types[n_args_def] = (*el)->type;
+		flags[n_args_def] = (*el)->flag;
+
 		n_args_def++;
 	}
 	//printf("%d %d\n", p->n_op-1, n_args_def); // do not remove, useful for debug 
@@ -423,11 +442,21 @@ int parse_call(Node* p){
 	for(i=0; i<n_args_def; i++){
 		type_t t1, t2;
 		t1 = types[i];
+		flag_t f1 = flags[i];
 		t2 = p->op[i+1]->op_type;
-		if(t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 == BOOLEAN_T){
-			printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
-				p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value2, type2string(t2), type2string(t1));
-			return 1;
+		if(f1 == PARAM_F){
+			if( t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 == BOOLEAN_T){
+				printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
+					p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value2, type2string(t2), type2string(t1));
+				return 1;
+			}
+		}else{
+			if( strcmp(p->op[i+1]->type, "Id") || get_id(p->op[i+1])->flag == CONSTANT_F || t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 != REAL_T){
+				printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", // NEEDS FIX FOR ARGUMENT COLUMN NUMBER
+					p->op[i+1]->loc.first_line, p->op[i+1]->loc.first_column, i+1, p->op[0]->value2, type2string(t2), type2string(t1));
+				return 1;
+			}
+			
 		}
 	}
 
