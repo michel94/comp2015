@@ -486,7 +486,7 @@ int parse_tree(Node* p){
 			return 1;
 		}
 		el->flag = NONE_F;
-		for(i = 0; i < p->n_op; i++)
+		for(i = 1; i < p->n_op; i++)
 			if(parse_tree(p->op[i])) return 1;
 		
 	}else if(strcmp(p->type, "FuncDecl") == 0){

@@ -2,7 +2,16 @@ program gcd(output);
 var a, b: integer;
 	abc: real;
 
-function asd(a1: boolean; asd: integer): int; FORWARD;
+function asd(a1: boolean; as: integer): integer;
+	begin
+		a1 := asd = 1;
+	end;
+
+function aSd2(a1: boolean; o: integer): real; FORWARD;
+
+function Asd2;
+	begin
+	end;
 
 
 function osd(a: integer): real;
