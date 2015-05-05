@@ -28,28 +28,7 @@ int fetch_func(char* s){
 	return -1;
 }
 
-element_t* parse_assign_arg1(Node* p){
-	element_t *el = fetch(symbol_tables[st_pointer], p->value);
-	if(el != NULL){
-		p->op_type = el->type;
-		return el;
-	}
-
-	el = fetch(symbol_tables[PROGRAM_ST], p->value);
-	if(el != NULL){
-		p->op_type = el->type;
-		return el;
-	}
-
-	el = fetch(symbol_tables[OUTER_ST], p->value);
-	if(el != NULL){
-		p->op_type = el->type;
-		return el;
-	}
-	return NULL;
-}
-
-element_t* get_id(Node* p){
+element_t* fetch_id(Node* p){
 	element_t *t = fetch(symbol_tables[st_pointer], p->value);
 	if(t != NULL)
 		return t;
@@ -61,17 +40,6 @@ element_t* get_id(Node* p){
 		return t;
 
 	return NULL;
-}
-
-int id_exists(Node* p){
-	if(fetch(symbol_tables[st_pointer], p->value) != NULL)
-		return 0;
-	if(fetch(symbol_tables[PROGRAM_ST], p->value) != NULL)
-		return 0;
-	if(fetch(symbol_tables[OUTER_ST],   p->value) != NULL)
-		return 0;
-
-	return 1;
 }
 
 void print_op_error(Node *p){
@@ -163,7 +131,9 @@ int parse_op(Node* p){ // +,-,*
 }
 
 int parse_assign(Node* p){
-	element_t* r = parse_assign_arg1(p->op[0]);
+	element_t* r = fetch_id(p->op[0]);
+	p->op[0]->op_type = r->type;
+
 	if(r == NULL){
 		printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->op[0]->value2);
 		return 1;
@@ -332,7 +302,7 @@ int parse_valparam(Node* p){
 
 int parse_decl(Node* p, flag_t flag){
 	if(!type_is_valid(p->op[p->n_op-1]->value)){
-		if(id_exists(p->op[p->n_op-1]))
+		if(fetch_id(p->op[p->n_op-1]) != NULL)
 			printf("Line %d, col %d: Symbol %s not defined\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column, p->op[p->n_op-1]->value2);
 		else 
 			printf("Line %d, col %d: Type identifier expected\n", p->op[p->n_op-1]->loc.first_line, p->op[p->n_op-1]->loc.first_column);
@@ -392,7 +362,7 @@ int parse_call(Node* p){
 				return 1;
 			}
 		}else{
-			if(strcmp(p->op[i+1]->type, "Id") || get_id(p->op[i+1])->flag == CONSTANT_F || t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 != REAL_T){
+			if(strcmp(p->op[i+1]->type, "Id") || fetch_id(p->op[i+1])->flag == CONSTANT_F || t1 == INTEGER_T && t2 != INTEGER_T || t1 == BOOLEAN_T && t2 != BOOLEAN_T || t1 == REAL_T && t2 != REAL_T){
 				print_variable_expected(p->op[i+1]);
 				return 1;
 			}
@@ -488,7 +458,7 @@ int parse_tree(Node* p){
 		p->op_type = REAL_T;
 	}else if(!strcmp(p->type, "Id")){
 		if(parse_id(p)) return 1;
-		element_t* id = get_id(p);
+		element_t* id = fetch_id(p);
 		if(p->op_type == FUNCTION_T || id->flag == RETURN_F){
 			p->op = (Node **) malloc(sizeof(Node *));
 			p->op[0] = new_node();

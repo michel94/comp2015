@@ -4,14 +4,14 @@ var x: integer;
 	y : real;
 	a, b, c : BOOLEAN;
 
-function integer(a, b, c: integer; var f2, g, h : boolean) : integer;
+function integer(a, b, c: integer; var f2, g, h : boolean) : real;
 	begin
 		integer := 2
 	end;
 
 
 begin
-a := real = real;
+x := x = x;
  x := 2 * 1 And (-(- y) < 2);
  a := not b aNd c;
  A := b MoD a and c	;
