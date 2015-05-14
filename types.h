@@ -52,6 +52,19 @@ char* type2string(type_t type){
 	}
 }
 
+char* type2llvm(type_t type){
+	switch(type){
+		case(INTEGER_T):
+			return "i32";
+		case(REAL_T):
+			return "double";
+		case(BOOLEAN_T):
+			return "i1";
+		default:
+			return "_undefined_";
+	}
+}
+
 char* flag2string(type_t type){
 	switch(type){
 		case(CONSTANT_F):

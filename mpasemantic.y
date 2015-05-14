@@ -7,6 +7,7 @@
 	#include <ctype.h>
 	#include "hashtable.h"
 	#include "parsing.h"
+	#include "code_gen.h"
 
 	Node *tree, *merge_nodes[2048];
 
@@ -317,6 +318,9 @@ int main(int argc, char **argv){
 		print_hashtable();
 	}else
 		parse_tree(tree);
+
+	
+	code_gen(tree);
 	
 	return 0;
 }

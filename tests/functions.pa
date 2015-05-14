@@ -8,7 +8,7 @@ function osd(a: integer): real;
 function f(a: boolean; var o: integer): integer;
 	var n:integer;
 	begin
-f := f;
+	f := f(a, b);
 	end;
 
 function   abc(a1   :  boolean)  :   integer; FORWARD;
@@ -20,7 +20,6 @@ function ABC;
 
 function aosd(a: integer): real;
 	begin
-a := abc(3=abc(2=abc(1=abc(1=abc(true)))));
 		a := abc(true);
 	end;
 
