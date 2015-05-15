@@ -67,14 +67,13 @@ void program_gen(Node* p){
 
 void function_gen(Node* p){
 	r_count = 1;
-	element_t** it;
-
 	int f_id = fetch_func(p->op[0]->value);
 	hashtable_t* h = symbol_tables[f_id];
 
-	type_t type = h->next[0]->type;
+	type_t type = (*h->next)->type;
 	printf2("define %s @%s(", type2llvm(type), p->op[0]->value);
-	for(it = h->next+1; it != h->last; ++it){
+	for(element_t** it = h->next+1; it != h->last; ++it){
+
 		if((*it)->flag == VARPARAM_F){
 			if(it != h->next+1) printf2(", ");
 			printf2("%s* %s", (*it)->name, type2llvm((*it)->type));
@@ -95,9 +94,7 @@ void function_gen(Node* p){
 	code_gen(p->op[0]);
 	printf2("ret %s %%%d\n", type2llvm(type), p->op[0]->reg);
 
-	code_gen(p->op[3]);
 	printf2("}\n");
-	
 }
 
 const char OUTPUT_REAL[] = 		"@.prreal = private unnamed_addr constant [3 x i8] c\"%lf\"";
