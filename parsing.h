@@ -42,6 +42,17 @@ element_t* fetch_id(Node* p){
 	return NULL;
 }
 
+int is_global(Node* p){
+	if(st_pointer == PROGRAM_ST || st_pointer == OUTER_ST)
+		return 1;
+	element_t *t = fetch(symbol_tables[st_pointer], p->value);
+	if(t != NULL)
+		return 0;
+	return 1;
+
+	return NULL;
+}
+
 void print_op_error(Node *p){
 	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", 
 		p->loc.first_line, p->loc.first_column, p->token, type2string(p->op[0]->op_type), type2string(p->op[1]->op_type) );

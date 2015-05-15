@@ -1,0 +1,14 @@
+program gcd(output);
+var a, b: integer;
+	c: boolean;
+	d: real;
+
+function test: integer;
+begin
+	a := a + 2
+end;
+
+begin
+	a := 3 * 3 - 2;
+	writeln(a, 'sd', 3, 4);
+end.

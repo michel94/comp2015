@@ -17,6 +17,8 @@ typedef struct node {
 	char *type;
 	char *token;
 
+	int reg;
+
 	type_t op_type;
 
 	struct node **op;
