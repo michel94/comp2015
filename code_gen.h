@@ -22,7 +22,17 @@ void print_function(type_t type, char* name, hashtable_t* h){
 }
 
 void print_decl(char* var_name, type_t type, int global){
-	printf2("%s%s = alloca %s\n", global ? "@" : "%%", var_name, type2llvm(type));
+	printf2("%s%s = %s %s %s\n", 
+		global ? "@" : "%",
+		var_name, 
+		global ? "global" : "alloca",
+		type2llvm(type),
+		global ? type == REAL_T ? "0.000000e+00" : "0" : "");
+}
+
+void writeln_init(){
+	printf("declare i32 @printf(i8*, ...)\n");
+	printf("@.newline = private unnamed_addr constant [2 x i8] c\"\\0A\\00\"\n");
 }
 
 void program_gen(Node* p){
@@ -45,22 +55,24 @@ void program_gen(Node* p){
 	
 	printf2("\tret i32 0\n}\n");
 
+	writeln_init();
 }
+
 void function_gen(Node* p){
+	element_t** it;
 
 	int f_id = fetch_func(p->op[0]->value);
 	hashtable_t* h = symbol_tables[f_id];
 
-	type_t type = (*h->next)->type;
+	type_t type = h->next[0]->type;
 	printf2("define %s @%s(", type2llvm(type), p->op[0]->value);
-	for(element_t** it = h->next+1; it != h->last; ++it){
-
+	for(it = h->next+1; it != h->last; ++it){
 		if((*it)->flag == VARPARAM_F){
 			if(it != h->next+1) printf(", ");
-			printf("%s* %s", (*it)->name, type2llvm((*it)->type));
+			printf("%s* %%%s", type2llvm((*it)->type), (*it)->name);
 		}else if((*it)->flag == PARAM_F){
 			if(it != h->next+1) printf(", ");
-			printf("%s %s", (*it)->name, type2llvm((*it)->type));
+			printf("%s %%%s", type2llvm((*it)->type), (*it)->name);
 		}else
 			break;
 
@@ -68,7 +80,22 @@ void function_gen(Node* p){
 
 	printf2(") {\n");
 
-	printf("}\n");
+	code_gen(p->op[3]);
+	
+	// TODO: LATER CHANGE RETURN VALUE TO ITS OWN VARIABLE
+	printf("ret %s 1\n}\n", type2llvm(type));
+}
+
+void ifelse_gen(Node *p){
+
+}
+
+void writeln_gen(Node *p){
+	if(!p->n_op)
+		printf2("\tcall i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.newline, i32 0, i32 0))\n");
+	else {
+		
+	}
 }
 
 void code_gen(Node* p){
@@ -86,6 +113,10 @@ void code_gen(Node* p){
 	}else if(strcmp(p->type, "FuncDef") == 0){
 		//print_function()
 		function_gen(p);
+	}else if(!strcmp(p->type, "IfElse")){
+		ifelse_gen(p);
+	}else if(!strcmp(p->type, "WriteLn")){
+		writeln_gen(p);
 	}else{
 		for(i = 0; i < p->n_op; i++)
 			code_gen(p->op[i]);

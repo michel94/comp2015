@@ -3,11 +3,14 @@ var a, b: integer;
 	c: boolean;
 	d: real;
 
-function func(a: real; var o: boolean) : integer;
+function func(a: real; var o: boolean) : boolean;
+	var e: boolean;
+	begin
+
+	end;
+
 begin
-
-end;
-
-begin
-
+	writeln;
+	writeln;
+	writeln;
 end.

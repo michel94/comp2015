@@ -320,6 +320,7 @@ int main(int argc, char **argv){
 		parse_tree(tree);
 
 	
+	printf("\n");
 	code_gen(tree);
 	
 	return 0;
