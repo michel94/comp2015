@@ -1,0 +1,17 @@
+program gcd(output);
+var a, b: integer;
+	c: boolean;
+	d: real;
+
+function test: integer;
+begin
+	a := a + 2
+end;
+
+begin
+	d := 3 * 3.0;
+	a := 3 + 1;
+	writeln(a);
+	d := a - d;
+	writeln(d);
+end.

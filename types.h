@@ -26,6 +26,12 @@ typedef struct node {
 	YYLTYPE loc;
 } Node;
 
+void to_lower(char *value){
+	char *s;
+	for(s = value; *s != '\0'; s++)
+		*s = tolower(*s);
+}
+
 int vartype(char* s){
 	if(strcmp(s, "integer") == 0)
 		return INTEGER_T;
@@ -63,8 +69,14 @@ char* type2llvm(type_t type){
 		case(BOOLEAN_T):
 			return "i1";
 		default:
-			return "_undefined_";
+			return "undefined";
 	}
+}
+
+char* op2llvm(char* orig){
+	char* f = strdup(orig);
+	to_lower(f);
+	return f;
 }
 
 char* flag2string(type_t type){
@@ -99,12 +111,6 @@ char* value2string(type_t type){
 		default:
 			return "undefined";
 	}
-}
-
-void to_lower(char *value){
-	char *s;
-	for(s = value; *s != '\0'; s++)
-		*s = tolower(*s);
 }
 
 int is_int(Node* p){ return p->op_type == INTEGER_T; }

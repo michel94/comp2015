@@ -176,6 +176,29 @@ void ifelse_gen(Node *p){
 
 }
 
+int real_cast(Node* p){
+	printf2("%%%d = sitofp %s %%%d to double\n", r_count, type2llvm(p->op_type), p->reg );
+	return r_count++;
+}
+
+void op_gen(Node* p){
+	code_gen(p->op[0]);
+	code_gen(p->op[1]);
+	int reg0 = p->op[0]->reg;
+	int reg1 = p->op[1]->reg;
+	
+	if(p->op_type == REAL_T){
+		if(p->op[0]->op_type == INTEGER_T)
+			reg0 = real_cast(p->op[0]);
+		if(p->op[1]->op_type == INTEGER_T)
+			reg1 = real_cast(p->op[1]);
+		printf2("%%%d = f%s %s %%%d, %%%d\n", r_count, op2llvm(p->type), type2llvm(REAL_T), reg0, reg1);
+	}else{
+		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type), type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
+	}
+	p->reg = r_count++;
+}
+
 void code_gen(Node* p){
 	int i;
 	if(p == NULL)
@@ -193,10 +216,7 @@ void code_gen(Node* p){
 		st_pointer = fetch_func(p->op[0]->value);
 		function_gen(p);
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") ){
-		code_gen(p->op[0]);
-		code_gen(p->op[1]);
-		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, "add", type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
-		p->reg = r_count++;
+		op_gen(p);
 	}else if(!strcmp(p->type, "Id")){
 		// TODO: FIX OP_TYPE FOR FUNCTION RETURN TYPE - HAS INTEGER/i32 (ALWAYS), EXPECTED OWN FUNCTION RETURN TYPE
 		// UNCOMMENT LINE 224 OF PARSING.H FILE AND TEST, GETTING: real _integer_ FOR EXAMPLE
@@ -207,7 +227,7 @@ void code_gen(Node* p){
 		printf2("%%%d = add i32 %s, 0\n", r_count, p->value);
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "RealLit")){
-		printf2("%%%d = add double %s, 0.0\n", r_count, p->value);
+		printf2("%%%d = fadd double %s, 0.0\n", r_count, p->value);
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "WriteLn")){
 		writeln_gen(p);

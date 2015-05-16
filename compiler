@@ -1,2 +1,5 @@
 ./mpasemantic $*<&0;
-lli out.ll
+if [ $? -eq 0 ]
+	then
+		lli out.ll
+fi

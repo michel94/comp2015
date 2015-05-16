@@ -311,13 +311,13 @@ int main(int argc, char **argv){
 		print_tree(tree, 0);
 	else if(t_flag && s_flag){
 		print_tree(tree, 0);
-		if(parse_tree(tree)) return 0;
+		if(parse_tree(tree)) return 1;
 		print_hashtable();
 	}else if(!t_flag && s_flag){
-		if(parse_tree(tree)) return 0;
+		if(parse_tree(tree)) return 1;
 		print_hashtable();
 	}else
-		parse_tree(tree);
+		if(parse_tree(tree)) return 1;
 
 	out_file = fopen("out.ll", "w");
 	st_pointer = PROGRAM_ST;
