@@ -196,9 +196,22 @@ void op_gen(Node* p){
 			reg1 = real_cast(p->op[1]);
 		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, REAL_T), type2llvm(REAL_T), reg0, reg1);
 	}else if(p->op_type == BOOLEAN_T){
-		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, BOOLEAN_T), type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
+		type_t type;
+
+		if(p->op[0]->op_type == REAL_T || p->op[1]->op_type == REAL_T){
+			if(p->op[0]->op_type == INTEGER_T)
+				reg0 = real_cast(p->op[0]);
+			if(p->op[1]->op_type == INTEGER_T)
+				reg1 = real_cast(p->op[1]);
+			type = REAL_T;
+		}else if(p->op[0]->op_type == BOOLEAN_T)
+			type = BOOLEAN_T;
+		else
+			type = INTEGER_T;
+		
+		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, type), type2llvm(type), reg0, reg1);
 	}else{
-		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, INTEGER_T), type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
+		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, INTEGER_T), type2llvm(p->op_type), reg0, reg1);
 	}
 	p->reg = r_count++;
 }

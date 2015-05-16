@@ -73,8 +73,41 @@ char* type2llvm(type_t type){
 	}
 }
 
-char* op2llvm(char* orig){
-	char* f = strdup(orig);
+char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only one, because its converted)
+	char s[64];
+
+	if(!strcmp(orig, "Div"))
+		return strdup("sdiv");
+	else if(!strcmp(orig, "RealDiv"))
+		return strdup("fdiv");
+	else if(!strcmp(orig, "Lt") || !strcmp(orig, "Gt") || !strcmp(orig, "Leq") || !strcmp(orig, "Geq") || !strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
+		if(type == REAL_T)
+			sprintf(s, "fcmp o");
+		else
+			sprintf(s, "icmp s");
+
+
+		if(!strcmp(orig, "Lt"))
+			sprintf(s, "%s%s", s, "lt");
+		else if(!strcmp(orig, "Gt"))
+			sprintf(s, "%s%s", s, "gt");
+		else if(!strcmp(orig, "Leq"))
+			sprintf(s, "%s%s", s, "le");
+		else if(!strcmp(orig, "Geq"))
+			sprintf(s, "%s%s", s, "ge");
+		else if(!strcmp(orig, "Eq"))
+			sprintf(s, "%s%s", s, "eq");
+		else if(!strcmp(orig, "Neq"))
+			sprintf(s, "%s%s", s, "ne");
+
+		return strdup(s);
+	}
+
+	if(type == REAL_T)
+		sprintf(s, "f%s", orig);
+	else
+		sprintf(s, "%s", orig);
+	char* f = strdup(s);
 	to_lower(f);
 	return f;
 }

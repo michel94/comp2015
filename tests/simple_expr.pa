@@ -11,6 +11,6 @@ begin
 	a := 2 * 1.2;
 	e := 15 div 4;
 	c := (a + b) * 2;
-	g := h and g or h;
+	g := e < c + a - c * e;
 	writeln(c);
 end.
