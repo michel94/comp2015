@@ -103,9 +103,9 @@ const char OUTPUT_REAL[] = 		"@.prreal = private unnamed_addr constant [3 x i8] 
 const char OUTPUT_STRING[] = 	"@.prstr = private unnamed_addr constant [3 x i8] c\"%s\\00\"";
 const char OUTPUT_INT[] = 		"@.print = private unnamed_addr constant [3 x i8] c\"%d\\00\"";
 
-char* const_strings[256] = {"\\0A\\00", " \\00"};
-int s_const_strings[256] = {2, 2};
-int n_const_strings = 2;
+char* const_strings[256] = {"\\0A\\00", " \\00", "TRUE", "FALSE"};
+int s_const_strings[256] = {2, 2, 4, 5};
+int n_const_strings = 4;
 
 
 void print_real(Node* p){
@@ -139,6 +139,8 @@ void writeln_gen(Node* p){
 			print_real(p->op[i]);
 		}else if(p->op[i]->op_type == INTEGER_T){
 			print_int(p->op[i]);
+		}else if(p->op[i]->op_type == BOOLEAN_T){
+			print_str(2);
 		}else{
 			add_const_string(p->op[i]->value);
 			print_str(n_const_strings-1);
@@ -192,9 +194,11 @@ void op_gen(Node* p){
 			reg0 = real_cast(p->op[0]);
 		if(p->op[1]->op_type == INTEGER_T)
 			reg1 = real_cast(p->op[1]);
-		printf2("%%%d = f%s %s %%%d, %%%d\n", r_count, op2llvm(p->type), type2llvm(REAL_T), reg0, reg1);
+		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, REAL_T), type2llvm(REAL_T), reg0, reg1);
+	}else if(p->op_type == BOOLEAN_T){
+		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, BOOLEAN_T), type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
 	}else{
-		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type), type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
+		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, INTEGER_T), type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
 	}
 	p->reg = r_count++;
 }
@@ -215,11 +219,14 @@ void code_gen(Node* p){
 	}else if(strcmp(p->type, "FuncDef") == 0){
 		st_pointer = fetch_func(p->op[0]->value);
 		function_gen(p);
-	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") ){
+	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "Or") || !strcmp(p->type, "And")
+		|| !strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Neq") 
+		|| !strcmp(p->type, "RealDiv") || !strcmp(p->type, "Div") || !strcmp(p->type, "Mod") ){
 		op_gen(p);
 	}else if(!strcmp(p->type, "Id")){
 		// TODO: FIX OP_TYPE FOR FUNCTION RETURN TYPE - HAS INTEGER/i32 (ALWAYS), EXPECTED OWN FUNCTION RETURN TYPE
 		// UNCOMMENT LINE 224 OF PARSING.H FILE AND TEST, GETTING: real _integer_ FOR EXAMPLE
+		// WTF?
 		printf2("%%%d = load %s* %s\n", r_count, type2llvm(p->op_type), get_var(p) );
 		
 		p->reg = r_count++;
@@ -233,7 +240,13 @@ void code_gen(Node* p){
 		writeln_gen(p);
 	}else if(!strcmp(p->type, "Assign")){
 		code_gen(p->op[1]);
-		printf2("store %s %%%d, %s* %s\n", type2llvm(p->op[1]->op_type), p->op[1]->reg, type2llvm(p->op[0]->op_type), get_var(p->op[0]));
+		int reg1 = p->op[1]->reg;
+		if(p->op[0]->op_type == REAL_T && p->op[1]->op_type == INTEGER_T){
+			reg1 = real_cast(p->op[1]);
+		}
+
+		printf2("store %s %%%d, %s* %s\n", type2llvm(p->op[0]->op_type), reg1, type2llvm(p->op[0]->op_type), get_var(p->op[0]));
+		
 	}else if(!strcmp(p->type, "IfElse")){
 		ifelse_gen(p);
 	}else{

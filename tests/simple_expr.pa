@@ -1,17 +1,16 @@
 program gcd(output);
-var a, b: integer;
-	c: boolean;
-	d: real;
-
+var a, b, c, d: real;
+	e, f: integer;
+	g, h: boolean;
 function test: integer;
 begin
 	a := a + 2
 end;
 
 begin
-	d := 3 * 3.0;
-	a := 3 + 1;
-	writeln(a);
-	d := a - d;
-	writeln(d);
+	a := 2 * 1.2;
+	e := 15 div 4;
+	c := (a + b) * 2;
+	g := h and g or h;
+	writeln(c);
 end.
