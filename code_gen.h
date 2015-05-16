@@ -99,34 +99,49 @@ void function_gen(Node* p){
 	printf2("}\n");
 }
 
-const char OUTPUT_REAL[] = 		"@.prreal = private unnamed_addr constant [3 x i8] c\"%lf\"";
-const char OUTPUT_STRING[] = 	"@.prstr = private unnamed_addr constant [3 x i8] c\"%s\\00\"";
-const char OUTPUT_INT[] = 		"@.print = private unnamed_addr constant [3 x i8] c\"%d\\00\"";
-
-char* const_strings[256] = {"\\0A\\00", " \\00", "TRUE", "FALSE"};
-int s_const_strings[256] = {2, 2, 4, 5};
+char* const_strings[256] = {"\\0A", " ", "%lf", "%d", "%s" "TRUE", "FALSE"};
+int s_const_strings[256] = {1, 1, 3, 2, 2, 4, 5};
 int n_const_strings = 4;
 
+const int PRINT_REAL = 2;
+const int PRINT_INT = 3;
+const int PRINT_STR = 4;
+const int PRINT_TRUE = 5;
 
-void print_real(Node* p){
-	printf2("%%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([3 x i8]* @.prreal, i32 0, i32 0), double %%%d)\n", r_count, p->reg );
-	r_count++;
-}
-
-void print_int(Node* p){
-	printf2("%%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([3 x i8]* @.print, i32 0, i32 0), i32 %%%d)\n", r_count, p->reg );
-	r_count++;
-}
-
-void print_str(int str_id){
-	printf2("%%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str_%d, i32 0, i32 0))\n", r_count, s_const_strings[str_id], str_id);
+void printf_call(int str_id, Node* p){
+	printf2("%%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str_%d, i32 0, i32 0)", r_count, s_const_strings[str_id]+1, str_id);
+	if(p != NULL){
+		printf2(", %s %%%d\n", type2llvm(p->op_type), p->reg);
+	}
+	printf2(")\n");
 	r_count++;
 }
 
 void add_const_string(char * s){
-	const_strings[n_const_strings] = strdup(s+1);
-	const_strings[n_const_strings][strlen(const_strings[n_const_strings])-1] = 0;
-	s_const_strings[n_const_strings] = strlen(const_strings[n_const_strings]);
+	char s2[64];
+	strcpy(s2, s+1);
+	int l = strlen(s2);
+	s2[l-1] = '\0';
+	l--;
+
+	int i, o;
+	for(i=0, o=0; i<l; i++, o++){
+		if(s2[i] == '\\'){
+			if(s2[i+1] == 'n'){
+				s2[o] = '\n';
+				i++;
+			}
+			if(s2[i+1] == '\\'){
+				s2[o] = '\\';
+				i++;
+			}
+		}
+	}
+	s2[o] = 0;
+	l = o;
+	
+	const_strings[n_const_strings] = strdup(s2);
+	s_const_strings[n_const_strings] = strlen(s2);
 	n_const_strings++;
 }
 
@@ -134,19 +149,18 @@ void writeln_gen(Node* p){
 	int i;
 	for(i=0; i<p->n_op; i++){
 		code_gen(p->op[i]);
-
 		if(p->op[i]->op_type == REAL_T){
-			print_real(p->op[i]);
+			printf_call(PRINT_REAL, p->op[i]);
 		}else if(p->op[i]->op_type == INTEGER_T){
-			print_int(p->op[i]);
+			printf_call(PRINT_INT, p->op[i]);
 		}else if(p->op[i]->op_type == BOOLEAN_T){
-			print_str(2);
+			printf_call(PRINT_TRUE, NULL);
 		}else{
 			add_const_string(p->op[i]->value);
-			print_str(n_const_strings-1);
+			printf_call(n_const_strings-1, NULL);
 		}
 	}
-	print_str(0);
+	
 }
 
 char *get_var(Node* p){
@@ -160,14 +174,10 @@ char *get_var(Node* p){
 }
 
 void print_consts(){
-	printf2("%s\n", OUTPUT_INT);
-	printf2("%s\n", OUTPUT_STRING);
-	printf2("%s\n", OUTPUT_REAL);
-	printf2("\n");
 
 	int i;
 	for(i=0; i<n_const_strings; i++){
-		printf2("@.str_%d = private unnamed_addr constant [%d x i8] c\"%s\"\n", i, s_const_strings[i], const_strings[i]);
+		printf2("@.str_%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", i, s_const_strings[i]+1, const_strings[i]);
 	}
 	printf2("\n");
 

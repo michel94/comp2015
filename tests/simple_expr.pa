@@ -12,5 +12,5 @@ begin
 	e := 15 div 4;
 	c := (a + b) * 2;
 	g := e < c + a - c * e;
-	writeln(c);
+	writeln(c, '\n');
 end.
