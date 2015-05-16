@@ -35,7 +35,7 @@ void print_decl(char* var_name, type_t type, int global){
 	if(!global)
 		printf2("%%_%s = alloca %s\n", var_name, type2llvm(type));
 	else
-		printf2("@_%s = common global %s %s\n", var_name, type2llvm(type), type == REAL_T ? "0.0" : "0");
+		printf2("@_%s = common global %s %s\n", var_name, type2llvm(type), type == REAL_T ? "0.000000e+00" : "0");
 }
 
 
@@ -67,19 +67,21 @@ void program_gen(Node* p){
 
 void function_gen(Node* p){
 	r_count = 1;
+	element_t** it;
+
 	int f_id = fetch_func(p->op[0]->value);
 	hashtable_t* h = symbol_tables[f_id];
 
-	type_t type = (*h->next)->type;
+	type_t type = h->next[0]->type;
 	printf2("define %s @%s(", type2llvm(type), p->op[0]->value);
-	for(element_t** it = h->next+1; it != h->last; ++it){
+	for(it = h->next+1; it != h->last; ++it){
 
 		if((*it)->flag == VARPARAM_F){
 			if(it != h->next+1) printf2(", ");
-			printf2("%s* %s", (*it)->name, type2llvm((*it)->type));
+			printf2("%s* %%_%s", type2llvm((*it)->type), (*it)->name);
 		}else if((*it)->flag == PARAM_F){
 			if(it != h->next+1) printf2(", ");
-			printf2("%s %s", (*it)->name, type2llvm((*it)->type));
+			printf2("%s %%_%s", type2llvm((*it)->type), (*it)->name);
 		}else
 			break;
 
@@ -188,7 +190,6 @@ void code_gen(Node* p){
 			print_decl(p->op[i]->value, type, 0);
 		}
 	}else if(strcmp(p->type, "FuncDef") == 0){
-		//print_function()
 		st_pointer = fetch_func(p->op[0]->value);
 		function_gen(p);
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") ){
@@ -197,6 +198,8 @@ void code_gen(Node* p){
 		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, "add", type2llvm(p->op_type), p->op[0]->reg, p->op[1]->reg);
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "Id")){
+		// TODO: FIX OP_TYPE FOR FUNCTION RETURN TYPE - HAS INTEGER/i32 (ALWAYS), EXPECTED OWN FUNCTION RETURN TYPE
+		// UNCOMMENT LINE 224 OF PARSING.H FILE AND TEST, GETTING: real _integer_ FOR EXAMPLE
 		printf2("%%%d = load %s* %s\n", r_count, type2llvm(p->op_type), get_var(p) );
 		
 		p->reg = r_count++;

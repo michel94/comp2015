@@ -49,8 +49,6 @@ int is_global(Node* p){
 	if(t != NULL)
 		return 0;
 	return 1;
-
-	return NULL;
 }
 
 void print_op_error(Node *p){
@@ -223,6 +221,7 @@ int parse_id(Node* p){
 	}
 	t = fetch(symbol_tables[OUTER_ST], p->value);
 	if(t != NULL){
+		//printf("\n\n%s %s\n\n", p->value, type2string(p->op_type));
 		p->op_type = t->type;
 		return 0;
 	}
