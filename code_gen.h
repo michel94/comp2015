@@ -122,23 +122,6 @@ void add_const_string(char * s){
 	strcpy(s2, s+1);
 	int l = strlen(s2);
 	s2[l-1] = '\0';
-	l--;
-
-	int i, o;
-	for(i=0, o=0; i<l; i++, o++){
-		if(s2[i] == '\\'){
-			if(s2[i+1] == 'n'){
-				s2[o] = '\n';
-				i++;
-			}
-			if(s2[i+1] == '\\'){
-				s2[o] = '\\';
-				i++;
-			}
-		}
-	}
-	s2[o] = 0;
-	l = o;
 	
 	const_strings[n_const_strings] = strdup(s2);
 	s_const_strings[n_const_strings] = strlen(s2);
@@ -160,7 +143,7 @@ void writeln_gen(Node* p){
 			printf_call(n_const_strings-1, NULL);
 		}
 	}
-	
+	printf_call(0, NULL);
 }
 
 char *get_var(Node* p){
