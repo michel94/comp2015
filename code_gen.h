@@ -112,7 +112,7 @@ const int PRINT_TRUE = 5;
 void printf_call(int str_id, Node* p){
 	printf2("%%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str_%d, i32 0, i32 0)", r_count, s_const_strings[str_id]+1, str_id);
 	if(p != NULL){
-		printf2(", %s %%%d\n", type2llvm(p->op_type), p->reg);
+		printf2(", %s %%%d", type2llvm(p->op_type), p->reg);
 	}
 	printf2(")\n");
 	r_count++;
@@ -227,6 +227,25 @@ void op_gen(Node* p){
 	p->reg = r_count++;
 }
 
+void while_gen(Node *p){
+	printf2("br label %%label_%d\n", l_count);
+	printf2("\nlabel_%d:\n", l_count);
+	
+	int cmp_label = l_count, inside_label = l_count+1, ret_label = l_count+2;
+	code_gen(p->op[0]);
+
+	cmp_label = l_count++;
+	inside_label = l_count++;
+	ret_label = l_count++;
+	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n", p->op[0]->reg, inside_label, ret_label);
+
+	printf2("\nlabel_%d:\n", inside_label);
+	code_gen(p->op[1]);
+	printf2("br label %%label_%d\n", cmp_label);
+
+	printf2("\nlabel_%d:\n", ret_label);
+}
+
 void code_gen(Node* p){
 	int i;
 	if(p == NULL)
@@ -273,6 +292,8 @@ void code_gen(Node* p){
 		
 	}else if(!strcmp(p->type, "IfElse")){
 		ifelse_gen(p);
+	}else if(!strcmp(p->type, "While")){
+		while_gen(p);
 	}else{
 		for(i = 0; i < p->n_op; i++)
 			code_gen(p->op[i]);
