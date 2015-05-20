@@ -4,6 +4,7 @@ void code_gen(Node* p);
 
 int tabs = 0;
 int r_count = 1;
+int l_count = 1;
 
 FILE* out_file;
 
@@ -139,7 +140,7 @@ void writeln_gen(Node* p){
 		}else if(p->op[i]->op_type == BOOLEAN_T){
 			printf_call(PRINT_TRUE, NULL);
 		}else{
-			add_const_string(p->op[i]->value);
+			add_const_string(p->op[i]->value2);
 			printf_call(n_const_strings-1, NULL);
 		}
 	}
@@ -168,7 +169,24 @@ void print_consts(){
 }
 
 void ifelse_gen(Node *p){
+	code_gen(p->op[0]);
+	int if_label = l_count, else_label = l_count+1, ret_label = l_count+2;
 
+	if_label = l_count++;
+	else_label = l_count++;
+	ret_label = l_count++;
+	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n\n", p->op[0]->reg, if_label, else_label);
+
+	printf2("label_%d:\n", if_label);
+	code_gen(p->op[1]);
+	printf2("br label %%label_%d\n", ret_label);
+	
+	printf2("\nlabel_%d:\n", else_label);
+	
+	code_gen(p->op[2]);
+	printf2("br label %%label_%d\n", ret_label);
+
+	printf2("\nlabel_%d:\n", ret_label);	
 }
 
 int real_cast(Node* p){
