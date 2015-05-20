@@ -1,0 +1,12 @@
+program gcd(output);
+var a, b : integer;
+
+begin
+	a := 5;
+
+	repeat
+		writeln(a);
+		a := a - 2;
+			
+	until a > 0;
+end.

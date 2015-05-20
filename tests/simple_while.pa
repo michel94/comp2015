@@ -1,0 +1,14 @@
+program gcd(output);
+var a, b : integer;
+begin
+	b := 13;
+
+	while b > 0 do
+		begin
+			while b > 5 do 
+				b := b - 2;
+				
+			b := b - 1;
+			writeln(b);
+		end;
+end.

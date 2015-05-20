@@ -1,0 +1,21 @@
+program gcd(output);
+var a: integer;
+	b: boolean;
+	c: real;
+
+begin
+	a := 4;
+	if a > 0 then
+		if a > 2 then
+			if a > 3 then
+				writeln('INT_MAX')
+			else
+				writeln('3.0')
+		else
+			writeln(1.0,' ', 2.0)
+	else
+		if a < 0 then
+			writeln('negative')
+		else
+			writeln(0);
+end.
