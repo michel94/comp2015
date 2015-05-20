@@ -91,7 +91,6 @@ void function_gen(Node* p){
 	print_decl( p->op[0]->value, fetch(h, p->op[0]->value)->type, 0);
 
 	for(it = h->next+1; it != h->last; ++it){
-		printf("param\n");
 		if((*it)->flag == VARPARAM_F){
 			printf2("%%%d = alloca %s*\n", r_count, type2llvm((*it)->type) );
 			printf2("store %s* %%_%s, %s** %%%d\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), r_count++);
