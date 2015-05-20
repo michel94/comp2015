@@ -246,6 +246,26 @@ void while_gen(Node *p){
 	printf2("\nlabel_%d:\n", ret_label);
 }
 
+void repeat_gen(Node *p){
+	int inside_label = l_count, cmp_label = l_count+1, ret_label = l_count+2;
+
+	printf2("br label %%label_%d\n", inside_label);
+	printf2("\nlabel_%d:\n", inside_label);
+
+	inside_label = l_count++;
+	cmp_label = l_count++;
+	ret_label = l_count++;
+	
+	code_gen(p->op[0]);
+	printf2("br label %%label_%d\n", cmp_label);
+
+	printf2("\nlabel_%d:\n", cmp_label);
+	code_gen(p->op[1]);
+	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n", p->op[1]->reg, inside_label, ret_label);
+
+	printf2("\nlabel_%d:\n", ret_label);
+}
+
 void code_gen(Node* p){
 	int i;
 	if(p == NULL)
@@ -294,6 +314,8 @@ void code_gen(Node* p){
 		ifelse_gen(p);
 	}else if(!strcmp(p->type, "While")){
 		while_gen(p);
+	}else if(!strcmp(p->type, "Repeat")){
+		repeat_gen(p);
 	}else{
 		for(i = 0; i < p->n_op; i++)
 			code_gen(p->op[i]);
