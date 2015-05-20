@@ -84,21 +84,21 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 		if(type == REAL_T)
 			sprintf(s, "fcmp o");
 		else
-			sprintf(s, "icmp s");
+			sprintf(s, "icmp ");
 
 
 		if(!strcmp(orig, "Lt"))
-			sprintf(s, "%s%s", s, "lt");
+			sprintf(s, "%s s%s", s, "lt");
 		else if(!strcmp(orig, "Gt"))
-			sprintf(s, "%s%s", s, "gt");
+			sprintf(s, "%s s%s", s, "gt");
 		else if(!strcmp(orig, "Leq"))
-			sprintf(s, "%s%s", s, "le");
+			sprintf(s, "%s s%s", s, "le");
 		else if(!strcmp(orig, "Geq"))
-			sprintf(s, "%s%s", s, "ge");
+			sprintf(s, "%s s%s", s, "ge");
 		else if(!strcmp(orig, "Eq"))
-			sprintf(s, "%s%s", s, "eq");
+			sprintf(s, "%s %s", s, "eq");
 		else if(!strcmp(orig, "Neq"))
-			sprintf(s, "%s%s", s, "ne");
+			sprintf(s, "%s %s", s, "ne");
 
 		return strdup(s);
 	}
