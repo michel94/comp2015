@@ -1,0 +1,14 @@
+program test(output);
+var d, e: real;
+	i: integer;
+
+function func(var a: real; var o: integer) : real;
+	begin
+		a := 3;
+		o := 2;
+	end;
+
+begin
+	e := func(d, i);
+	writeln(d, ' ', i);
+end.

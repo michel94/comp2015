@@ -118,6 +118,8 @@ int parse_funchead(Node* p, int n_args, Node** args, Node* ret){
 	el->flag = RETURN_F;
 	store(symbol_tables[PROGRAM_ST], name, FUNCTION_T);
 
+	parse_id(p->op[0]);
+
 	for(i = 0; i < n_args; i++)
 		if(parse_tree(args[i])) return 1;
 
@@ -221,7 +223,6 @@ int parse_id(Node* p){
 	}
 	t = fetch(symbol_tables[OUTER_ST], p->value);
 	if(t != NULL){
-		//printf("\n\n%s %s\n\n", p->value, type2string(p->op_type));
 		p->op_type = t->type;
 		return 0;
 	}

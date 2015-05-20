@@ -75,13 +75,12 @@ void function_gen(Node* p){
 	type_t type = h->next[0]->type;
 	printf2("define %s @%s(", type2llvm(type), p->op[0]->value);
 	for(it = h->next+1; it != h->last; ++it){
-
 		if((*it)->flag == VARPARAM_F){
 			if(it != h->next+1) printf2(", ");
-			printf2("%s* %%_%s", type2llvm((*it)->type), (*it)->name);
+			printf2("%s* dereferenceable(8) %%_%s", type2llvm((*it)->type), (*it)->name);
 		}else if((*it)->flag == PARAM_F){
 			if(it != h->next+1) printf2(", ");
-			printf2("%s %%_%s", type2llvm((*it)->type), (*it)->name);
+			printf2("%s %%__%s", type2llvm((*it)->type), (*it)->name);
 		}else
 			break;
 
@@ -90,6 +89,22 @@ void function_gen(Node* p){
 
 	print_decl( p->op[0]->value, fetch(h, p->op[0]->value)->type, 0);
 
+	for(it = h->next+1; it != h->last; ++it){
+		printf("param\n");
+		if((*it)->flag == VARPARAM_F){
+			printf2("%%%d = alloca %s*\n", r_count, type2llvm((*it)->type) );
+			printf2("store %s* %%_%s, %s** %%%d\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), r_count++);
+			/*%1 = alloca double*
+  			store double* %a, double** %1*/
+		}else if((*it)->flag == PARAM_F){
+			printf2("%%_%s = alloca %s\n", (*it)->name, type2llvm((*it)->type));
+			printf2("store %s %%__%s, %s* %%_%s\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), (*it)->name);
+		}else
+			break;
+
+	}
+
+	
 	code_gen(p->op[p->n_op-2]);
 	code_gen(p->op[p->n_op-1]);
 
@@ -209,6 +224,13 @@ void op_gen(Node* p){
 	p->reg = r_count++;
 }
 
+void vardecl_gen(Node* p){
+	type_t type = vartype(p->op[p->n_op-1]->value);
+	for(int i = 0; i < p->n_op-1; i++){
+		print_decl(p->op[i]->value, type, 0);
+	}
+}
+
 void code_gen(Node* p){
 	int i;
 	if(p == NULL)
@@ -218,10 +240,7 @@ void code_gen(Node* p){
 		program_gen(p);
 		print_consts();
 	}else if(strcmp(p->type, "VarDecl") == 0){
-		type_t type = vartype(p->op[p->n_op-1]->value);
-		for(i = 0; i < p->n_op-1; i++){
-			print_decl(p->op[i]->value, type, 0);
-		}
+		vardecl_gen(p);
 	}else if(strcmp(p->type, "FuncDef") == 0){
 		st_pointer = fetch_func(p->op[0]->value);
 		function_gen(p);
@@ -230,9 +249,6 @@ void code_gen(Node* p){
 		|| !strcmp(p->type, "RealDiv") || !strcmp(p->type, "Div") || !strcmp(p->type, "Mod") ){
 		op_gen(p);
 	}else if(!strcmp(p->type, "Id")){
-		// TODO: FIX OP_TYPE FOR FUNCTION RETURN TYPE - HAS INTEGER/i32 (ALWAYS), EXPECTED OWN FUNCTION RETURN TYPE
-		// UNCOMMENT LINE 224 OF PARSING.H FILE AND TEST, GETTING: real _integer_ FOR EXAMPLE
-		// WTF?
 		printf2("%%%d = load %s* %s\n", r_count, type2llvm(p->op_type), get_var(p) );
 		
 		p->reg = r_count++;
@@ -255,6 +271,29 @@ void code_gen(Node* p){
 		
 	}else if(!strcmp(p->type, "IfElse")){
 		ifelse_gen(p);
+	}else if(!strcmp(p->type, "Call")){
+		for(i=1; i<p->n_op; i++)
+			code_gen(p->op[i]);
+
+		int f_id = fetch_func(p->op[0]->value);
+		hashtable_t* h = symbol_tables[f_id];
+		element_t** it;
+
+		printf2("%%%d = call %s @%s(", r_count, type2llvm(p->op_type), p->op[0]->value);
+		for(it = h->next+1, i=1; it != h->last; ++it, ++i){
+			if((*it)->flag == VARPARAM_F){
+				if(it != h->next+1) printf2(", ");
+				printf2("%s* dereferenceable(8) %s", type2llvm(p->op[i]->op_type), get_var(p->op[i]));
+			}else if((*it)->flag == PARAM_F){
+				if(it != h->next+1) printf2(", ");
+				printf2("%s %%%d", type2llvm(p->op[i]->op_type), p->op[i]->reg);
+			}else
+				break;
+		}
+		printf2(")\n");
+
+		p->reg = r_count++;
+
 	}else{
 		for(i = 0; i < p->n_op; i++)
 			code_gen(p->op[i]);
