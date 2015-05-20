@@ -183,12 +183,12 @@ void print_consts(){
 }
 
 void ifelse_gen(Node *p){
+	int if_label, else_label, ret_label;
 	code_gen(p->op[0]);
-	int if_label = l_count, else_label = l_count+1, ret_label = l_count+2;
 
-	if_label = l_count++;
+	if_label   = l_count++;
 	else_label = l_count++;
-	ret_label = l_count++;
+	ret_label  = l_count++;
 	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n\n", p->op[0]->reg, if_label, else_label);
 
 	printf2("label_%d:\n", if_label);
@@ -196,7 +196,6 @@ void ifelse_gen(Node *p){
 	printf2("br label %%label_%d\n", ret_label);
 	
 	printf2("\nlabel_%d:\n", else_label);
-	
 	code_gen(p->op[2]);
 	printf2("br label %%label_%d\n", ret_label);
 
@@ -242,22 +241,23 @@ void op_gen(Node* p){
 }
 
 void vardecl_gen(Node* p){
+	int i;
 	type_t type = vartype(p->op[p->n_op-1]->value);
-	for(int i = 0; i < p->n_op-1; i++){
+	for(i = 0; i < p->n_op-1; i++){
 		print_decl(p->op[i]->value, type, 0);
 	}
 }
 
 void while_gen(Node *p){
-	printf2("br label %%label_%d\n", l_count);
-	printf2("\nlabel_%d:\n", l_count);
-	
-	int cmp_label = l_count, inside_label = l_count+1, ret_label = l_count+2;
-	code_gen(p->op[0]);
+	int cmp_label, inside_label, ret_label;
 
-	cmp_label = l_count++;
+	cmp_label    = l_count++;
 	inside_label = l_count++;
-	ret_label = l_count++;
+	ret_label    = l_count++;
+	printf2("br label %%label_%d\n", cmp_label);
+	printf2("\nlabel_%d:\n", cmp_label);
+	
+	code_gen(p->op[0]);
 	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n", p->op[0]->reg, inside_label, ret_label);
 
 	printf2("\nlabel_%d:\n", inside_label);
@@ -268,14 +268,13 @@ void while_gen(Node *p){
 }
 
 void repeat_gen(Node *p){
-	int inside_label = l_count, cmp_label = l_count+1, ret_label = l_count+2;
-
-	printf2("br label %%label_%d\n", inside_label);
-	printf2("\nlabel_%d:\n", inside_label);
+	int inside_label, cmp_label, ret_label;
 
 	inside_label = l_count++;
-	cmp_label = l_count++;
-	ret_label = l_count++;
+	cmp_label    = l_count++;
+	ret_label    = l_count++;
+	printf2("br label %%label_%d\n", inside_label);
+	printf2("\nlabel_%d:\n", inside_label);
 	
 	code_gen(p->op[0]);
 	printf2("br label %%label_%d\n", cmp_label);
