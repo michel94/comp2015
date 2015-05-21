@@ -99,8 +99,6 @@ void function_gen(Node* p){
 		if((*it)->flag == VARPARAM_F){
 			printf2("%%%d = alloca %s*\n", r_count, type2llvm((*it)->type) );
 			printf2("store %s* %%_%s, %s** %%%d\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), r_count++);
-			/*%1 = alloca double*
-			store double* %a, double** %1*/
 		}else if((*it)->flag == PARAM_F){
 			printf2("%%_%s = alloca %s\n", (*it)->name, type2llvm((*it)->type));
 			printf2("store %s %%__%s, %s* %%_%s\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), (*it)->name);
@@ -338,8 +336,7 @@ void code_gen(Node* p){
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not")){
 		unary_gen(p);
 	}else if(!strcmp(p->type, "Id")){
-		printf2("%%%d = load %s* %s\n", r_count, type2llvm(p->op_type), get_var(p) );
-		
+		printf2("%%%d = load %s* %s\n", r_count, type2llvm(p->op_type), get_var(p));
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "IntLit")){
 		printf2("%%%d = add i32 %s, 0\n", r_count, p->value);
@@ -352,12 +349,10 @@ void code_gen(Node* p){
 	}else if(!strcmp(p->type, "Assign")){
 		code_gen(p->op[1]);
 		int reg1 = p->op[1]->reg;
-		if(p->op[0]->op_type == REAL_T && p->op[1]->op_type == INTEGER_T){
+		if(p->op[0]->op_type == REAL_T && p->op[1]->op_type == INTEGER_T)
 			reg1 = real_cast(p->op[1]);
-		}
 
 		printf2("store %s %%%d, %s* %s\n", type2llvm(p->op[0]->op_type), reg1, type2llvm(p->op[0]->op_type), get_var(p->op[0]));
-		
 	}else if(!strcmp(p->type, "IfElse")){
 		ifelse_gen(p);
 	}else if(!strcmp(p->type, "Call")){
@@ -382,10 +377,9 @@ void code_gen(Node* p){
 			}else
 				break;
 		}
+		
 		printf2(")\n");
-
 		p->reg = r_count++;
-
 	}else if(!strcmp(p->type, "While")){
 		while_gen(p);
 	}else if(!strcmp(p->type, "Repeat")){
