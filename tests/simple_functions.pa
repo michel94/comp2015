@@ -2,7 +2,9 @@ program test(output);
 var d, e: real;
 	i: integer;
 
-function func(var a: real; var o: integer) : real;
+function func(var a: real; var o: integer) : real; FORWARD;
+
+function func;
 	begin
 		a := 3;
 		o := 2;

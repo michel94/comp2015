@@ -438,6 +438,7 @@ int parse_tree(Node* p){
 			return 1;
 		}
 		el->flag = NONE_F;
+		parse_id(p->op[0]);
 		for(i = 1; i < p->n_op; i++)
 			if(parse_tree(p->op[i])) return 1;
 		

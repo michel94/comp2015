@@ -105,7 +105,7 @@ void function_gen(Node* p){
 
 	code_gen(p->op[p->n_op-2]);
 	code_gen(p->op[p->n_op-1]);
-
+	
 	code_gen(p->op[0]);
 	printf2("ret %s %%%d\n", type2llvm(type), p->op[0]->reg);
 
@@ -151,7 +151,6 @@ void writeln_gen(Node* p){
 			printf_call(PRINT_INT, p->op[i]);
 		}else if(p->op[i]->op_type == BOOLEAN_T){
 			printf2("call void @print_boolean(i1 %%%d)\n", p->op[i]->reg);
-			//printf_call(PRINT_TRUE, NULL);
 		}else{
 			add_const_string(p->op[i]->value2);
 			printf_call(n_const_strings-1, NULL);
@@ -322,7 +321,7 @@ void code_gen(Node* p){
 		print_consts();
 	}else if(strcmp(p->type, "VarDecl") == 0){
 		vardecl_gen(p);
-	}else if(strcmp(p->type, "FuncDef") == 0){
+	}else if(strcmp(p->type, "FuncDef") == 0 || strcmp(p->type, "FuncDef2") == 0){
 		st_pointer = fetch_func(p->op[0]->value);
 		function_gen(p);
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "Or") || !strcmp(p->type, "And")
@@ -369,7 +368,10 @@ void code_gen(Node* p){
 				printf2("%s* dereferenceable(8) %s", type2llvm(p->op[i]->op_type), get_var(p->op[i]));
 			}else if((*it)->flag == PARAM_F){
 				if(it != h->next+1) printf2(", ");
-				printf2("%s %%%d", type2llvm(p->op[i]->op_type), p->op[i]->reg);
+				int reg = p->op[i]->reg;
+				if(p->op[i]->op_type == INTEGER_T && (*it)->type == REAL_T )
+					reg = real_cast(p->op[i]);
+				printf2("%s %%%d", type2llvm(p->op[i]->op_type), reg);
 			}else
 				break;
 		}
@@ -383,6 +385,8 @@ void code_gen(Node* p){
 		repeat_gen(p);
 	}else if(!strcmp(p->type, "ValParam")){
 		valparam_gen(p);
+	}else if(!strcmp(p->type, "FuncDecl")){
+		;
 	}else{
 		for(i = 0; i < p->n_op; i++)
 			code_gen(p->op[i]);

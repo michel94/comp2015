@@ -4,7 +4,7 @@ var a : integer;
 
 function asd(b : integer) : integer;
 	begin
-		val(paramstr(50), c);
+		val(paramstr(3), c);
 	end;
 
 begin
