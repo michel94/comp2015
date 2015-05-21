@@ -81,20 +81,24 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 	else if(!strcmp(orig, "RealDiv"))
 		return strdup("fdiv");
 	else if(!strcmp(orig, "Lt") || !strcmp(orig, "Gt") || !strcmp(orig, "Leq") || !strcmp(orig, "Geq") || !strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
-		if(type == REAL_T)
-			sprintf(s, "fcmp o");
-		else
+		char pref[64];
+		if(type == REAL_T){
+			sprintf(s, "fcmp ");
+			strcpy(pref, "o");
+		}else{
 			sprintf(s, "icmp ");
+			strcpy(pref, "s");
+		}
 
 
 		if(!strcmp(orig, "Lt"))
-			sprintf(s, "%s s%s", s, "lt");
+			sprintf(s, "%s %s%s", s, pref, "lt");
 		else if(!strcmp(orig, "Gt"))
-			sprintf(s, "%s s%s", s, "gt");
+			sprintf(s, "%s %s%s", s, pref, "gt");
 		else if(!strcmp(orig, "Leq"))
-			sprintf(s, "%s s%s", s, "le");
+			sprintf(s, "%s %s%s", s, pref, "le");
 		else if(!strcmp(orig, "Geq"))
-			sprintf(s, "%s s%s", s, "ge");
+			sprintf(s, "%s %s%s", s, pref, "ge");
 		else if(!strcmp(orig, "Eq"))
 			sprintf(s, "%s %s", s, "eq");
 		else if(!strcmp(orig, "Neq"))

@@ -8,9 +8,14 @@ begin
 end;
 
 begin
-	a := 2 * 1.2;
+	a := -2 * 1.2;
 	e := 15 div 4;
 	c := (a + b) * 2;
 	g := e < c + a - c * e;
-	writeln(c, '\n');
+	g := not h;
+	if g then
+		writeln('TRUE')
+	else
+		writeln('FALSE');
+	writeln(c, '\n', g);
 end.

@@ -152,7 +152,8 @@ void writeln_gen(Node* p){
 		}else if(p->op[i]->op_type == INTEGER_T){
 			printf_call(PRINT_INT, p->op[i]);
 		}else if(p->op[i]->op_type == BOOLEAN_T){
-			printf_call(PRINT_TRUE, NULL);
+			printf2("call void @print_boolean(i1 %%%d)\n", p->op[i]->reg);
+			//printf_call(PRINT_TRUE, NULL);
 		}else{
 			add_const_string(p->op[i]->value2);
 			printf_call(n_const_strings-1, NULL);
@@ -180,6 +181,8 @@ void print_consts(){
 	printf2("\n");
 
 	printf2("declare i32 @printf(i8*, ...)\n");
+
+	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_4, i32 0, i32 0))\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.str_0, i32 0, i32 0))\nbr label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_5, i32 0, i32 0))\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.str_0, i32 0, i32 0))\nbr label %%end_bool\nend_bool: ret void\n}\n");
 }
 
 void ifelse_gen(Node *p){
@@ -239,6 +242,20 @@ void op_gen(Node* p){
 		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, INTEGER_T), type2llvm(p->op_type), reg0, reg1);
 	}
 	p->reg = r_count++;
+}
+
+void unary_gen(Node* p){
+	code_gen(p->op[0]);
+	int reg0 = p->op[0]->reg;
+	if(p->op_type == BOOLEAN_T){
+		printf2("%%%d = add i1 %%%d, 1\n", r_count, reg0);
+		p->reg = r_count++;
+	}else if(!strcmp(p->type, "Minus")){
+		printf2("%%%d = %s, %%%d\n", r_count, p->op[0]->op_type == REAL_T ? "fsub double 0.0" : "sub i32 0", reg0);
+		p->reg = r_count++;
+	}else{
+		p->reg = reg0;
+	}
 }
 
 void vardecl_gen(Node* p){
@@ -304,6 +321,8 @@ void code_gen(Node* p){
 		|| !strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Neq") 
 		|| !strcmp(p->type, "RealDiv") || !strcmp(p->type, "Div") || !strcmp(p->type, "Mod") ){
 		op_gen(p);
+	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not")){
+		unary_gen(p);
 	}else if(!strcmp(p->type, "Id")){
 		printf2("%%%d = load %s* %s\n", r_count, type2llvm(p->op_type), get_var(p) );
 		
