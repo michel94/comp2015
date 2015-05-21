@@ -4,7 +4,12 @@ var a : integer;
 
 function asd(b : integer) : integer;
 	begin
-		val(paramstr(50), c);
+		val(paramstr(5), c);
+	end;
+	
+function paramcount : real;
+	begin
+		paramcount := 5.0;
 	end;
 
 begin
@@ -12,7 +17,7 @@ begin
 	
 	a := 3;
 	
-	writeln(c, ' ' , a);
+	writeln(c, ' ' , a, ' ',  paramcount);
 
 end.
 
