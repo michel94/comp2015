@@ -1,0 +1,14 @@
+program gcd(output);
+var a: integer;
+	b: boolean;
+	c, d, e: real;
+
+begin
+	c := 3.5e-3;
+	d := 2.213e+5;
+	e := c * d*d;
+	
+	writeln(e);
+	
+	writeln;
+end.

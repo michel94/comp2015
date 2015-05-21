@@ -24,13 +24,6 @@ void printf2(char* str, ...){
 	va_end(vl);
 }
 
-void print_function(type_t type, char* name, hashtable_t* h){
-	printf2("define %s @%s(", type2llvm(type), name);
-	
-	printf2(") {\n");
-
-}
-
 void print_decl(char* var_name, type_t type, int global){
 
 	if(!global)
@@ -38,8 +31,6 @@ void print_decl(char* var_name, type_t type, int global){
 	else
 		printf2("@_%s = common global %s %s\n", var_name, type2llvm(type), type == REAL_T ? "0.000000e+00" : "0");
 }
-
-
 
 void program_gen(Node* p){
 
@@ -52,18 +43,24 @@ void program_gen(Node* p){
 		for(i = 0; i < var_decl->n_op-1; i++){
 			print_decl(var_decl->op[i]->value, type, 1);
 		}
-		
 	}
+
+	printf2("@argc_ = common global i32 0\n");
+	printf2("@argv_ = common global i8** null\n");
 
 	code_gen(p->op[2]);
 
-	print_function(INTEGER_T, "main", NULL);
 	r_count = 1;
+	printf2("define %s @main(i32 %%argc, i8** %%argv) {\n", type2llvm(INTEGER_T));
+	printf2("%%%d = alloca i32\n", r_count++);
+	printf2("%%%d = alloca i8**\n", r_count++);
+	printf2("store i32 %%argc, i32* @argc_\n");
+	printf2("store i8** %%argv, i8*** @argv_\n");
+
 	st_pointer = PROGRAM_ST;
 	code_gen(p->op[3]);
 	
 	printf2("ret i32 0\n}\n");
-
 }
 
 void function_gen(Node* p){
@@ -95,16 +92,14 @@ void function_gen(Node* p){
 			printf2("%%%d = alloca %s*\n", r_count, type2llvm((*it)->type) );
 			printf2("store %s* %%_%s, %s** %%%d\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), r_count++);
 			/*%1 = alloca double*
-  			store double* %a, double** %1*/
+			store double* %a, double** %1*/
 		}else if((*it)->flag == PARAM_F){
 			printf2("%%_%s = alloca %s\n", (*it)->name, type2llvm((*it)->type));
 			printf2("store %s %%__%s, %s* %%_%s\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), (*it)->name);
 		}else
 			break;
-
 	}
 
-	
 	code_gen(p->op[p->n_op-2]);
 	code_gen(p->op[p->n_op-1]);
 
@@ -180,6 +175,9 @@ void print_consts(){
 	printf2("\n");
 
 	printf2("declare i32 @printf(i8*, ...)\n");
+
+	printf2("define i32 @valparam(i32 %%pos){\n%%1 = alloca i32\nstore i32 %%pos, i32* %%1\n%%2 = load i32* %%1\n%%3 = sext i32 %%2 to i64\n%%4 = load i8*** @argv_\n%%5 = getelementptr inbounds i8** %%4, i64 %%3\n%%6 = load i8** %%5\n%%7 = call i32 @atoi(i8* %%6)\nret i32 %%7\n}\n");
+	printf2("declare i32 @atoi(i8*)");
 }
 
 void ifelse_gen(Node *p){
@@ -286,6 +284,14 @@ void repeat_gen(Node *p){
 	printf2("\nlabel_%d:\n", ret_label);
 }
 
+void valparam_gen(Node *p){
+	code_gen(p->op[0]);
+	code_gen(p->op[1]);
+
+	printf2("%%%d = call i32 @valparam(i32 %%%d)\n", r_count, p->op[0]->reg);
+	printf2("store i32 %%%d, i32* %s\n", r_count++, get_var(p->op[1]));
+}
+
 void code_gen(Node* p){
 	int i;
 	if(p == NULL)
@@ -353,6 +359,8 @@ void code_gen(Node* p){
 		while_gen(p);
 	}else if(!strcmp(p->type, "Repeat")){
 		repeat_gen(p);
+	}else if(!strcmp(p->type, "ValParam")){
+		valparam_gen(p);
 	}else{
 		for(i = 0; i < p->n_op; i++)
 			code_gen(p->op[i]);
