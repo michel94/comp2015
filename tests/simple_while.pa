@@ -5,8 +5,11 @@ begin
 
 	while b > 0 do
 		begin
-			while b > 5 do 
-				b := b - 2;
+			while b > 5 do
+				begin
+					b := b - 2;
+					writeln(b);
+				end;
 				
 			b := b - 1;
 			writeln(b);
