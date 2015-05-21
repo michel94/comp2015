@@ -46,6 +46,9 @@ void program_gen(Node* p){
 	Node* var_decl = p->op[1];
 	int decl, i;
 
+	printf2("@_false = common global i1 0\n");
+	printf2("@_true = common global i1 1\n");
+
 	for(decl = 0; decl < p->op[1]->n_op; decl++){
 		var_decl = p->op[1]->op[decl];
 		type_t type = vartype(var_decl->op[var_decl->n_op-1]->value);
@@ -114,9 +117,9 @@ void function_gen(Node* p){
 	printf2("}\n");
 }
 
-char* const_strings[256] = {"\\0A", " ", "%lf", "%d", "%s" "TRUE", "FALSE"};
+char* const_strings[256] = {"\\0A", " ", "%lf", "%d", "%s", "TRUE", "FALSE"};
 int s_const_strings[256] = {1, 1, 3, 2, 2, 4, 5};
-int n_const_strings = 4;
+int n_const_strings = 7;
 
 const int PRINT_REAL = 2;
 const int PRINT_INT = 3;
@@ -182,7 +185,7 @@ void print_consts(){
 
 	printf2("declare i32 @printf(i8*, ...)\n");
 
-	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_4, i32 0, i32 0))\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.str_0, i32 0, i32 0))\nbr label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_5, i32 0, i32 0))\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.str_0, i32 0, i32 0))\nbr label %%end_bool\nend_bool: ret void\n}\n");
+	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_5, i32 0, i32 0))\n br label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_6, i32 0, i32 0))\n br label %%end_bool\nend_bool: ret void\n}\n");
 }
 
 void ifelse_gen(Node *p){
