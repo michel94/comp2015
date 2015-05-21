@@ -55,10 +55,15 @@ void program_gen(Node* p){
 
 	r_count = 1;
 	printf2("define %s @main(i32 %%argc, i8** %%argv) {\n", type2llvm(INTEGER_T));
-	printf2("%%%d = alloca i32\n", r_count++);
-	printf2("%%%d = alloca i8**\n", r_count++);
-	printf2("store i32 %%argc, i32* @argc_\n");
-	printf2("store i8** %%argv, i8*** @argv_\n");
+	printf2("%%1 = alloca i32\n");
+	printf2("%%2 = alloca i8**\n");
+	printf2("store i32 %%argc, i32* %%1\n");
+	printf2("store i8** %%argv, i8*** %%2\n");
+	printf2("%%3 = load i32* %%1\n");
+	printf2("store i32 %%3, i32* @argc_\n");
+	printf2("%%4 = load i8*** %%2\n");
+	printf2("store i8** %%4, i8*** @argv_\n\n");
+	r_count = 5;
 
 	st_pointer = PROGRAM_ST;
 	code_gen(p->op[3]);
@@ -177,12 +182,14 @@ void print_consts(){
 	}
 	printf2("\n");
 
+	printf2("declare i32 @atoi(i8*)");
 	printf2("declare i32 @printf(i8*, ...)\n");
 
 	printf2("define i32 @valparam(i32 %%pos){\n%%1 = alloca i32\nstore i32 %%pos, i32* %%1\n%%2 = load i32* %%1\n%%3 = sext i32 %%2 to i64\n%%4 = load i8*** @argv_\n%%5 = getelementptr inbounds i8** %%4, i64 %%3\n%%6 = load i8** %%5\n%%7 = call i32 @atoi(i8* %%6)\nret i32 %%7\n}\n");
-	printf2("declare i32 @atoi(i8*)");
-
 	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_5, i32 0, i32 0))\n br label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_6, i32 0, i32 0))\n br label %%end_bool\nend_bool: ret void\n}\n");
+	
+	if(!fetch(symbol_tables[PROGRAM_ST], "paramcount"))
+		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\nret i32 %%1\n}\n");
 }
 
 void ifelse_gen(Node *p){
