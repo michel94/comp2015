@@ -37,6 +37,9 @@ void program_gen(Node* p){
 	Node* var_decl = p->op[1];
 	int decl, i;
 
+	printf2("@_false = common global i1 0\n");
+	printf2("@_true = common global i1 1\n");
+
 	for(decl = 0; decl < p->op[1]->n_op; decl++){
 		var_decl = p->op[1]->op[decl];
 		type_t type = vartype(var_decl->op[var_decl->n_op-1]->value);
@@ -109,9 +112,9 @@ void function_gen(Node* p){
 	printf2("}\n");
 }
 
-char* const_strings[256] = {"\\0A", " ", "%lf", "%d", "%s" "TRUE", "FALSE"};
+char* const_strings[256] = {"\\0A", " ", "%lf", "%d", "%s", "TRUE", "FALSE"};
 int s_const_strings[256] = {1, 1, 3, 2, 2, 4, 5};
-int n_const_strings = 4;
+int n_const_strings = 7;
 
 const int PRINT_REAL = 2;
 const int PRINT_INT = 3;
@@ -147,7 +150,8 @@ void writeln_gen(Node* p){
 		}else if(p->op[i]->op_type == INTEGER_T){
 			printf_call(PRINT_INT, p->op[i]);
 		}else if(p->op[i]->op_type == BOOLEAN_T){
-			printf_call(PRINT_TRUE, NULL);
+			printf2("call void @print_boolean(i1 %%%d)\n", p->op[i]->reg);
+			//printf_call(PRINT_TRUE, NULL);
 		}else{
 			add_const_string(p->op[i]->value2);
 			printf_call(n_const_strings-1, NULL);
@@ -178,6 +182,8 @@ void print_consts(){
 
 	printf2("define i32 @valparam(i32 %%pos){\n%%1 = alloca i32\nstore i32 %%pos, i32* %%1\n%%2 = load i32* %%1\n%%3 = sext i32 %%2 to i64\n%%4 = load i8*** @argv_\n%%5 = getelementptr inbounds i8** %%4, i64 %%3\n%%6 = load i8** %%5\n%%7 = call i32 @atoi(i8* %%6)\nret i32 %%7\n}\n");
 	printf2("declare i32 @atoi(i8*)");
+
+	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_5, i32 0, i32 0))\n br label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_6, i32 0, i32 0))\n br label %%end_bool\nend_bool: ret void\n}\n");
 }
 
 void ifelse_gen(Node *p){
@@ -236,6 +242,20 @@ void op_gen(Node* p){
 		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, INTEGER_T), type2llvm(p->op_type), reg0, reg1);
 	}
 	p->reg = r_count++;
+}
+
+void unary_gen(Node* p){
+	code_gen(p->op[0]);
+	int reg0 = p->op[0]->reg;
+	if(p->op_type == BOOLEAN_T){
+		printf2("%%%d = add i1 %%%d, 1\n", r_count, reg0);
+		p->reg = r_count++;
+	}else if(!strcmp(p->type, "Minus")){
+		printf2("%%%d = %s, %%%d\n", r_count, p->op[0]->op_type == REAL_T ? "fsub double 0.0" : "sub i32 0", reg0);
+		p->reg = r_count++;
+	}else{
+		p->reg = reg0;
+	}
 }
 
 void vardecl_gen(Node* p){
@@ -309,6 +329,8 @@ void code_gen(Node* p){
 		|| !strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Neq") 
 		|| !strcmp(p->type, "RealDiv") || !strcmp(p->type, "Div") || !strcmp(p->type, "Mod") ){
 		op_gen(p);
+	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not")){
+		unary_gen(p);
 	}else if(!strcmp(p->type, "Id")){
 		printf2("%%%d = load %s* %s\n", r_count, type2llvm(p->op_type), get_var(p) );
 		

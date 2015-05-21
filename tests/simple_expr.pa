@@ -2,15 +2,15 @@ program gcd(output);
 var a, b, c, d: real;
 	e, f: integer;
 	g, h: boolean;
-function test: integer;
-begin
-	a := a + 2
-end;
 
 begin
-	a := 2 * 1.2;
+	a := -2 * 1.2;
 	e := 15 div 4;
 	c := (a + b) * 2;
 	g := e < c + a - c * e;
-	writeln(c, '\n');
+	g := true;
+	h := not g;
+	h := h or true;
+
+	writeln(c, ' ', h);
 end.
