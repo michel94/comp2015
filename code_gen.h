@@ -180,7 +180,7 @@ void print_consts(){
 	}
 	printf2("\n");
 
-	printf2("declare i32 @atoi(i8*)");
+	printf2("declare i32 @atoi(i8*)\n");
 	printf2("declare i32 @printf(i8*, ...)\n");
 
 	printf2("define i32 @valparam(i32 %%pos){\n%%1 = alloca i32\nstore i32 %%pos, i32* %%1\n%%2 = load i32* %%1\n%%3 = sext i32 %%2 to i64\n%%4 = load i8*** @argv_\n%%5 = getelementptr inbounds i8** %%4, i64 %%3\n%%6 = load i8** %%5\n%%7 = call i32 @atoi(i8* %%6)\nret i32 %%7\n}\n");
