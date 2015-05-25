@@ -1,0 +1,42 @@
+program manlytest(output);
+var a, b, i: integer;
+	c: boolean;
+	d: real;
+
+function fact(n: integer) : integer; FORWARD;
+
+function pow(v : real; n: integer): real;
+var i: integer;
+	r: real;
+begin
+	i := 0;
+	r := 1.0;
+	while(i < n) do
+		begin
+			r := r * v;
+			i := i + 1;
+		end;
+	pow := r
+end;
+
+function fact;
+	var r: integer;
+	begin
+		r := 1;
+		i := 1;
+		while(i <= n) do
+			begin
+				r := r * i;
+				i := i + 1;
+			end;
+		fact := r
+	end;
+
+begin
+	i := 0;
+	while(i < 20) do
+		begin
+			writeln(i, ': ', pow(2.1, i), ' ', fact(i));
+		end;
+
+end.
