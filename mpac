@@ -1,0 +1,6 @@
+./mpacompiler $*<&0 > out.ll;
+if [ $? -eq 0 ]
+	then
+		llc out.ll $*<&0
+		cc -o a.out out.s
+fi

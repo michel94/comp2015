@@ -319,7 +319,7 @@ int main(int argc, char **argv){
 	}else
 		if(parse_tree(tree)) return 1;
 
-	out_file = fopen("out.ll", "w");
+	out_file = stdout; //fopen("out.ll", "w");
 	st_pointer = PROGRAM_ST;
 	code_gen(tree);
 	

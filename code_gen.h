@@ -29,7 +29,7 @@ void print_decl(char* var_name, type_t type, int global){
 	if(!global)
 		printf2("%%_%s = alloca %s\n", var_name, type2llvm(type));
 	else
-		printf2("@_%s = common global %s %s\n", var_name, type2llvm(type), type == REAL_T ? "0.000000e+00" : "0");
+		printf2("@_%s = global %s %s\n", var_name, type2llvm(type), type == REAL_T ? "0.000000e+00" : "0");
 }
 
 void program_gen(Node* p){
@@ -37,8 +37,8 @@ void program_gen(Node* p){
 	Node* var_decl = p->op[1];
 	int decl, i;
 
-	printf2("@_false = common global i1 0\n");
-	printf2("@_true = common global i1 1\n");
+	printf2("@_false = global i1 0\n");
+	printf2("@_true = global i1 1\n");
 
 	for(decl = 0; decl < p->op[1]->n_op; decl++){
 		var_decl = p->op[1]->op[decl];
@@ -48,8 +48,8 @@ void program_gen(Node* p){
 		}
 	}
 
-	printf2("@argc_ = common global i32 0\n");
-	printf2("@argv_ = common global i8** null\n");
+	printf2("@argc_ = global i32 0\n");
+	printf2("@argv_ = global i8** null\n");
 
 	code_gen(p->op[2]);
 
@@ -368,6 +368,16 @@ void code_gen(Node* p){
 		hashtable_t* h = symbol_tables[f_id];
 		element_t** it;
 
+
+		for(it = h->next+1, i=1; it != h->last; ++it, ++i){
+			if((*it)->flag == VARPARAM_F){
+			}else if((*it)->flag == PARAM_F){
+				if(p->op[i]->op_type == INTEGER_T && (*it)->type == REAL_T )
+					p->op[i]->reg = real_cast(p->op[i]);
+			}else
+				break;
+		}
+
 		printf2("%%%d = call %s @%s(", r_count, type2llvm(p->op_type), p->op[0]->value);
 		for(it = h->next+1, i=1; it != h->last; ++it, ++i){
 			if((*it)->flag == VARPARAM_F){
@@ -375,10 +385,7 @@ void code_gen(Node* p){
 				printf2("%s* dereferenceable(8) %s", type2llvm(p->op[i]->op_type), get_var(p->op[i]));
 			}else if((*it)->flag == PARAM_F){
 				if(it != h->next+1) printf2(", ");
-				int reg = p->op[i]->reg;
-				if(p->op[i]->op_type == INTEGER_T && (*it)->type == REAL_T )
-					reg = real_cast(p->op[i]);
-				printf2("%s %%%d", type2llvm(p->op[i]->op_type), reg);
+				printf2("%s %%%d", type2llvm((*it)->type), p->op[i]->reg);
 			}else
 				break;
 		}

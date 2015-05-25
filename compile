@@ -1,6 +1,6 @@
-lex mpasemantic.l
-yacc -d mpasemantic.y $1
-gcc -o mpasemantic y.tab.c lex.yy.c -ly -g -Wno-implicit-function-declaration
+lex mpacompiler.l
+yacc -d mpacompiler.y $1
+gcc -o mpacompiler y.tab.c lex.yy.c -ly -g -Wno-implicit-function-declaration
 
-rm mpasemantic.zip;
-zip mpasemantic.zip mpasemantic.l mpasemantic.y hashtable.h parsing.h types.h code_gen.h;
+rm mpacompiler.zip;
+zip mpacompiler.zip mpacompiler.l mpacompiler.y hashtable.h parsing.h types.h code_gen.h;
