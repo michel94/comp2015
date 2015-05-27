@@ -187,7 +187,7 @@ void print_consts(){
 	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_5, i32 0, i32 0))\n br label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_6, i32 0, i32 0))\n br label %%end_bool\nend_bool: ret void\n}\n");
 	
 	if(!fetch(symbol_tables[PROGRAM_ST], "paramcount"))
-		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\nret i32 %%1\n}\n");
+		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
 }
 
 void ifelse_gen(Node *p){

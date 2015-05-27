@@ -4,14 +4,9 @@ var a : integer;
 
 function asd(b : integer) : integer;
 	begin
-		val(paramstr(5), c);
+		val(paramstr(2), c);
 	end;
 	
-function paramcount : real;
-	begin
-		paramcount := 5.0;
-	end;
-
 begin
 	a := asd(3);
 	
