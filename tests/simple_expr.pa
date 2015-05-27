@@ -4,13 +4,14 @@ var a, b, c, d: real;
 	g, h: boolean;
 
 begin
-	a := -2 * 1.2;
+	{a := -2 * 12345e-03;
 	e := 15 div 4;
 	c := (a + b) * 2;
 	g := e < c + a - c * e;
 	g := true;
 	h := not g;
-	h := h or true;
+	h := h or true;}
+	c := 12345e-03 + 0.0;
 
 	writeln(c, ' ', h);
 end.

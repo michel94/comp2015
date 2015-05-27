@@ -127,7 +127,6 @@
 %}
 
 %union{
-	int val;
 	char *str;
 	struct node *node;
 }
@@ -135,13 +134,11 @@
 %token <str> ID STRING REALLIT INTLIT
 %token <str> '+' '-' OR '<' '>' '=' NEQ LEQ GEQ '*' '/' DIV MOD AND ASSIGN NOT
 
-%token IF THEN ELSE BEG END
-%token DO REPEAT UNTIL WHILE
+%token IF THEN ELSE BEG END DO REPEAT UNTIL WHILE
 %token VAR VAL FORWARD FUNCTION OUTPUT PARAMSTR PROGRAM WRITELN RESERVED
 
 %right THEN
 %right ELSE
-%right ASSIGN
 
 %type <node> Prog ProgHeading ProgBlock VarPart VarDeclarationList VarDeclaration 
 FuncPart StatPart IdList IdListLoop IdProd FuncDeclaration FuncDeclarationList FuncIdent FuncHeading FuncBlock NullFormalParam FormalParamsList FormalParams 

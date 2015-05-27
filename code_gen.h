@@ -115,8 +115,8 @@ void function_gen(Node* p){
 	printf2("}\n");
 }
 
-char* const_strings[256] = {"\\0A", " ", "%lf", "%d", "%s", "TRUE", "FALSE"};
-int s_const_strings[256] = {1, 1, 3, 2, 2, 4, 5};
+char* const_strings[256] = {"\\0A", " ", "%.12F", "%d", "%s", "TRUE", "FALSE"};
+int s_const_strings[256] = {1, 1, 5, 2, 2, 4, 5};
 int n_const_strings = 7;
 
 const int PRINT_REAL = 2;
@@ -342,7 +342,19 @@ void code_gen(Node* p){
 		printf2("%%%d = add i32 %s, 0\n", r_count, p->value);
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "RealLit")){
-		printf2("%%%d = fadd double %s, 0.0\n", r_count, p->value);
+		printf2("%%%d = fadd double ", r_count);
+
+		char intp[20], *s, g[20], c;
+		int t = sscanf(p->value, "%[^.].%c", intp, &c);
+		sscanf(p->value, "%c", intp, c);
+		s = p->value;
+		if(t < 2){
+			sscanf(p->value, "%d%s", &t, g);
+			printf2("%d.0", t);
+			s = g;
+		}
+		printf2("%s, 0.0\n", s);
+
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "WriteLn")){
 		writeln_gen(p);
