@@ -346,7 +346,6 @@ void code_gen(Node* p){
 
 		char intp[20], *s, g[20], c;
 		int t = sscanf(p->value, "%[^.].%c", intp, &c);
-		sscanf(p->value, "%c", intp, c);
 		s = p->value;
 		if(t < 2){
 			sscanf(p->value, "%d%s", &t, g);
