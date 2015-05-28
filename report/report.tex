@@ -90,9 +90,9 @@ We enabled \'caseless\' and \'yylineno\'. Caseless is used to match both lower c
 
 We defined a YY\_USER\_ACTION, that runs code for each token read. It's used to increment the current column variable and to update yylloc and yyval lex/yacc shared variables. The default yylloc struct was used, with the properties first\_line and first\_column. We found this a easy way to access the column and the line of each token, which is useful in later phases, for example in semantic analysis. We also store the string of the token in the yyval.str.\\
 
-\subsection{Comment State Machine}
+\subsection{Comment Start States}
 
-TODO
+The case of comments parsing is a bit more complicated. Because of that we used a start state that works similar to a state a machine. Basically we define different states and when something is matched we jump to other states or we do some updates like updating column number. For Pascal comments when \'{\' or \'(*\' is parsed we define a begin state and until we read \'}\' or \'*)\' we do nothing but control column number. 
 
 \subsection{Basic Tokens}
 
@@ -101,7 +101,7 @@ The tokens are parsed in a straight forward way. If the regular expression match
 \subsection{Errors}
 
 Unterminated string error is caught by reading a specific regular expression right after the terminated string r.e. So, if the string is not read as terminated, it will be read as unterminated, at end of the line, because the \textbackslash n character is not a valid one.\\
-Unterminated comment error is caugnt when eof is read inside the comment state machine.\\
+Unterminated comment error is caugnt when eof is read inside the comment start state.\\
 Error handling is parsed by printing the invalid character and the respective column and line (using our column variable and yylineno).\\
 
 \newpage
