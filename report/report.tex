@@ -106,6 +106,25 @@ Error handling is parsed by printing the invalid character and the respective co
 
 \newpage
 
+\section{Syntax Analysis}
+
+\subsection{Token Types}
+
+We define two types of yacc token: str (char*) and node (struct node*). \\
+The tokens id, string, reallit and intlit where declared with type str, the reserved names without type and the operation symbols with type str (to be used later in semantic errors).\\
+
+\subsection{Parsing Tree Nodes}
+
+The nodes of the parsing tree contain multiple variables. ``value" and ``value2" contain the token string for terminal nodes, in lower case and as read in the file, respectively.\\
+The variable ``op" and ``n\_op" are used to store child nodes and number of child nodes, respectively. ``to\_use" is used to identify a node as a list-node i.e., as a superfluous one, to be removed in the bottom-up parsing.\\
+
+\subsection{Parsing}
+
+Parsing is made using two functions: ``make\_node" and ``terminal". \\
+``terminal" generates the node for the terminal symbols (id, intlit, realit and string). Obviously, those nodes are non-superfluous. Also, the value of the node is stored in lower case to be used later in id lookups.\\
+The ``make\_node" function creates each other type of node, receiving the node type and the ``to\_use" variable in its arguments. The node arguments are parsed and add to this node children. If any of those children is a list-node, those child's children (grandchildren of the new node) are appended to the new node children.\\
+
+
 \section{Some \LaTeX{} Examples}
 \label{sec:examples}
 
