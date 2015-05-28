@@ -1,5 +1,6 @@
 program test(output);
 
 begin
-	writeln(3.0, ' ', 2, ' ', 1, '\n')
+	writeln('''''''', '''''');
+	writeln(3.0, ' ', 2, ' antes''''depois ', 1, '\n')
 end.

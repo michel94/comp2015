@@ -115,7 +115,7 @@ void function_gen(Node* p){
 	printf2("}\n");
 }
 
-char* const_strings[256] = {"\\0A", " ", "%.12F", "%d", "%s", "TRUE", "FALSE"};
+char* const_strings[256] = {"\\0A", " ", "%.12E", "%d", "%s", "TRUE", "FALSE"};
 int s_const_strings[256] = {1, 1, 5, 2, 2, 4, 5};
 int n_const_strings = 7;
 
@@ -134,13 +134,22 @@ void printf_call(int str_id, Node* p){
 }
 
 void add_const_string(char * s){
-	char s2[64];
+	char s2[64], s3[64], *c = s3;
 	strcpy(s2, s+1);
 	int l = strlen(s2);
 	s2[l-1] = '\0';
+
+	l--;
+	int i;
+	for(i = 0; i <= l; i++){
+		if(s2[i] != '\'')
+			*c++ = s2[i];
+		else
+			*c++ = s2[i++];
+	}
 	
-	const_strings[n_const_strings] = strdup(s2);
-	s_const_strings[n_const_strings] = strlen(s2);
+	const_strings[n_const_strings] = strdup(s3);
+	s_const_strings[n_const_strings] = strlen(s3);
 	n_const_strings++;
 }
 
@@ -148,6 +157,7 @@ void writeln_gen(Node* p){
 	int i;
 	for(i=0; i<p->n_op; i++){
 		code_gen(p->op[i]);
+		
 		if(p->op[i]->op_type == REAL_T){
 			printf_call(PRINT_REAL, p->op[i]);
 		}else if(p->op[i]->op_type == INTEGER_T){
@@ -159,6 +169,7 @@ void writeln_gen(Node* p){
 			printf_call(n_const_strings-1, NULL);
 		}
 	}
+	
 	printf_call(0, NULL);
 }
 
@@ -187,7 +198,7 @@ void print_consts(){
 	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_5, i32 0, i32 0))\n br label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_6, i32 0, i32 0))\n br label %%end_bool\nend_bool: ret void\n}\n");
 	
 	if(!fetch(symbol_tables[PROGRAM_ST], "paramcount"))
-		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\nret i32 %%1\n}\n");
+		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
 }
 
 void ifelse_gen(Node *p){
