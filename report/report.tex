@@ -66,15 +66,14 @@ Miguel Duarte
 \end{titlepage}
 
 
-\begin{abstract}
-Your abstract. REKT
-\end{abstract}
-
 \section{Introduction}
 
-Your introduction goes here! Some examples of commonly used commands and features are listed below, to help you get started.
+This report concerns the implementation of a mili-pascal compiler and is a project for the Compilers course.
 
-If you have a question, please use the support box in the bottom right of the screen to get in touch. 
+\subsection{Code organization}
+
+Multiple code files were used for this project. mpacompiler.l has the lex code, for lexical analysis. mpacompiler.y has the yacc code and some code for parsing tree generation, used when yyparse runs. parsing.h has basically the code for semantic analysis. Includes parsing of the generated tree and creation of symbol tables.\\
+The other two files have some support code. types.h define all data types, including the node struct, and provide functions for convertion between types, for example string to type, type to string, type to llvm type, etc. hashtable.f implement a hashtable, used to implement the symbol tables used.\\
 
 \newpage
 
@@ -142,15 +141,7 @@ Comments can be added to the margins of the document using the \todo{Here's a co
 
 \subsection{Tables and Figures}
 
-Use the table and tabular commands for basic tables --- see Table~\ref{tab:widgets}, for example. You can upload a figure (JPEG, PNG or PDF) using the files menu. To include it in your document, use the includegraphics command as in the code for Figure~\ref{fig:frog} below.
-
 % Commands to include a figure:
-\begin{figure}
-\centering
-\includegraphics[width=0.5\textwidth]{frog.jpg}
-\caption{\label{fig:frog}This is a figure caption.}
-\end{figure}
-
 \begin{table}
 \centering
 \begin{tabular}{l|r}
@@ -181,7 +172,5 @@ You can make lists with automatic numbering \dots
 \item Like this,
 \item and like this.
 \end{itemize}
-
-We hope you find write\LaTeX\ useful, and please let us know if you have any feedback using the help menu above.
 
 \end{document}
