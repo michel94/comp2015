@@ -131,12 +131,18 @@ After finising the translation of the given grammar in the project report from e
 The expressions were fixed by replacing their productions with the ones from the grammar provided by ISO-7185:1990. The famous dangling else conflict was resolved by giving right precedence to both `then' and `else', but giving greater precedence to the else token. \\
 So, reducing a ``if then else" expression has greater precedence than reducing a ``if then" one. \\
 
+
 \section{Semantic Analysis}
 
 \subsection{Top-Down Parsing}
 
-The parsing is done in a top-down way. The parse\_tree function parses each node recursively. It starts by identifying the node type and calling the specific function to parse that node. Each of those specific functions will then parse the children nodes and if no error is found in any of them, parses the argument node itself. The parsing of each children node is done by calling the parse\_tree function for each of them. That way, identifying the type of node is done only on parse\_tree function, allowing a cleaner code.
+The parsing is done in a top-down way. The parse\_tree function parses each node recursively. It starts by identifying the node type and calling the specific function to parse that node. Each of those specific functions will then parse the children nodes and if no error is found in any of them, parses the argument node itself. The parsing of each children node is done by calling the parse\_tree function for each of them. That way, identifying the type of node is done only on parse\_tree function, allowing a cleaner code.\\
 
+\subsection{Expressions}
+
+The expressions are parsed accordingly to its type. Some of them use the same parse function. Those groups of expressions are: Add, Sub and Mul (parse\_op function); Boolean operations (Lt, Gt, Eq, etc) (parse\_eq function); Or and And (parse\_bool function); Unary operations (parse\_unary function); RealDiv; Div and Mod.\\
+Another common thing to expressions parsing is that all of them store in the respective node the result type after parsing the two children (in the variable ``op\_type"). For example, Add and the similar group of operations set the result type to integer if both parameters returned are integers. If they are both real or one of them is integer and the other is integer, then the result is real. Otherwise, there is an error that will be reported. The parsing functions will return 1 until we reach the top node of the program.\\
+To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.\\
 
 
 \section{Some \LaTeX{} Examples}
