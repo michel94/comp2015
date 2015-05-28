@@ -94,7 +94,7 @@ We defined a YY\_USER\_ACTION, that runs code for each token read. It's used to 
 
 The case of comments parsing is a bit more complicated. Because of that we used a start state that works similar to a state a machine.\\
 Basically we define different states and when something is matched we jump to other states or we do some updates like updating column number.\\
-For Pascal comments when \'{\' or \'(*\' is parsed we define a begin state and until we read \'}\' or \'*)\' we do nothing but control column number.\\
+For Pascal comments when `{' or `(*' is parsed we define a begin state and until we read `}' or `*)' we do nothing but control column number.\\
 
 \subsection{Basic Tokens}
 
