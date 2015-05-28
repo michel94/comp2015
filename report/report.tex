@@ -131,6 +131,23 @@ After finising the translation of the given grammar in the project report from e
 The expressions were fixed by replacing their productions with the ones from the grammar provided by ISO-7185:1990. The famous dangling else conflict was resolved by giving right precedence to both `then' and `else', but giving greater precedence to the else token. \\
 So, reducing a ``if then else" expression has greater precedence than reducing a ``if then" one. \\
 
+
+
+
+
+
+\subsection{Functions}
+There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to check before creating a table if it already exists in the PROGRAM symbol table so we can generate the corresponding error. After that we need to check his return type. If it's invalid, we generate an error too. \\
+FuncDef2 is used to define a function previously declared has forward. Within FuncDef2 there are two cases that need to be considerated for error generation. We must detect if we try to define a function with FuncDef2 that hasnt been declared yet as forward, and if we're trying to define a function with FuncDef2 that as already been defined with the same definition. In both cases we generate the right error.
+
+\subsection{Statements}
+
+\subsection{Expressions}
+
+
+
+
+
 \section{Some \LaTeX{} Examples}
 \label{sec:examples}
 
