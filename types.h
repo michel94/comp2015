@@ -75,19 +75,24 @@ char* type2llvm(type_t type){
 
 char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only one, because its converted)
 	char s[64];
-
+	
 	if(!strcmp(orig, "Div"))
 		return strdup("sdiv");
 	else if(!strcmp(orig, "RealDiv"))
 		return strdup("fdiv");
+	else if(!strcmp(orig, "Mod"))
+		return strdup("srem");
 	else if(!strcmp(orig, "Lt") || !strcmp(orig, "Gt") || !strcmp(orig, "Leq") || !strcmp(orig, "Geq") || !strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
 		char pref[64];
 		if(type == REAL_T){
 			sprintf(s, "fcmp ");
 			strcpy(pref, "o");
-		}else{
+		}else if(type == INTEGER_T){
 			sprintf(s, "icmp ");
 			strcpy(pref, "s");
+		}else{
+			sprintf(s, "icmp ");
+			strcpy(pref, "u");
 		}
 
 
