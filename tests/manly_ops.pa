@@ -1,0 +1,22 @@
+program ops(output);
+var a : integer;
+	d : boolean;
+	r: real;
+
+function setr(var r:real) : integer;
+	begin
+		r := 5;
+		setr := 1;
+		writeln(r)
+	end;
+
+begin
+	d := false or false or not (false <= true) or (true <> false) and (false < true);
+	d := false or false or false or false and true or true;
+	a := -3;
+	d := (a > r) or not d;
+	
+	writeln(d, ' ', a + 0.003);
+
+end.
+
