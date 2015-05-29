@@ -77,11 +77,11 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 	char s[64];
 	
 	if(!strcmp(orig, "Div"))
-		return strdup("sdiv");
+		return strdup("udiv");
 	else if(!strcmp(orig, "RealDiv"))
 		return strdup("fdiv");
 	else if(!strcmp(orig, "Mod"))
-		return strdup("srem");
+		return strdup("urem");
 	else if(!strcmp(orig, "Lt") || !strcmp(orig, "Gt") || !strcmp(orig, "Leq") || !strcmp(orig, "Geq") || !strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
 		char pref[64];
 		if(type == REAL_T){
@@ -95,7 +95,6 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 			strcpy(pref, "u");
 		}
 
-
 		if(!strcmp(orig, "Lt"))
 			sprintf(s, "%s %s%s", s, pref, "lt");
 		else if(!strcmp(orig, "Gt"))
@@ -105,7 +104,7 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 		else if(!strcmp(orig, "Geq"))
 			sprintf(s, "%s %s%s", s, pref, "ge");
 		else if(!strcmp(orig, "Eq"))
-			sprintf(s, "%s %s", s, "eq");
+			sprintf(s, "%s %s%s", s, pref, "eq");
 		else if(!strcmp(orig, "Neq"))
 			sprintf(s, "%s %s", s, "ne");
 

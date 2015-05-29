@@ -15,6 +15,7 @@ begin
 	d := false or false or false or false and true or true;
 	a := -3;
 	d := (a > r) or not d;
+	d := r <> r;
 	
 	writeln(d, ' ', a + 0.003);
 
