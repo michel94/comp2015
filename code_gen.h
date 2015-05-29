@@ -24,6 +24,21 @@ void printf2(char* str, ...){
 	va_end(vl);
 }
 
+void load_function(char* file) {
+	FILE* f = fopen(file, "r");
+	fseek(f, 0, SEEK_END);
+	long fsize = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	
+	char *string = malloc(fsize + 1);
+	fread(string, fsize, 1, f);
+	fclose(f);
+
+	string[fsize] = 0;
+	printf2("%s", string);
+	
+}
+
 void print_decl(char* var_name, type_t type, int global){
 
 	if(!global)
@@ -199,6 +214,9 @@ void print_consts(){
 	
 	if(!fetch(symbol_tables[PROGRAM_ST], "paramcount"))
 		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
+
+	//load_function("abs.ll");
+	printf2("define i32 @abs(i32 %%a){\n%%1 = icmp slt i32 %%a, 0\nbr i1 %%1, label %%la, label %%lb\nla:\n%%2 = sub i32 0, %%a\nret i32 %%2\nlb:\nret i32 %%a\n}");
 }
 
 void ifelse_gen(Node *p){
@@ -342,8 +360,12 @@ void code_gen(Node* p){
 		function_gen(p);
 	}else if(!strcmp(p->type, "Add") || !strcmp(p->type, "Sub") || !strcmp(p->type, "Mul") || !strcmp(p->type, "Or") || !strcmp(p->type, "And")
 		|| !strcmp(p->type, "Lt") || !strcmp(p->type, "Gt") || !strcmp(p->type, "Leq") || !strcmp(p->type, "Geq") || !strcmp(p->type, "Eq") || !strcmp(p->type, "Neq") 
-		|| !strcmp(p->type, "RealDiv") || !strcmp(p->type, "Div") || !strcmp(p->type, "Mod") ){
+		|| !strcmp(p->type, "RealDiv") || !strcmp(p->type, "Div") ){
 		op_gen(p);
+	}else if(!strcmp(p->type, "Mod")){
+		op_gen(p);
+		printf("%%%d = call i32 @abs(i32 %%%d)\n", r_count, p->reg);
+		p->reg = r_count++;
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not")){
 		unary_gen(p);
 	}else if(!strcmp(p->type, "Id")){

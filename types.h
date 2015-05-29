@@ -77,11 +77,11 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 	char s[64];
 	
 	if(!strcmp(orig, "Div"))
-		return strdup("udiv");
+		return strdup("sdiv");
 	else if(!strcmp(orig, "RealDiv"))
 		return strdup("fdiv");
 	else if(!strcmp(orig, "Mod"))
-		return strdup("urem");
+		return strdup("srem");
 	else if(!strcmp(orig, "Lt") || !strcmp(orig, "Gt") || !strcmp(orig, "Leq") || !strcmp(orig, "Geq") ){
 		char pref[64];
 		if(type == REAL_T){

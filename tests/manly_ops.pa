@@ -1,14 +1,11 @@
 program ops(output);
-var a : integer;
-	d : boolean;
+var a, b, c, d : integer;
 	r: real;
 
 begin
-	a := (-3) div 2;
+	d := (-9999999) mod 3000;
 
-	writeln(a);
-	
-	
+	writeln(a, ' ', b, ' ', c, ' ', d);
 
 end.
 
