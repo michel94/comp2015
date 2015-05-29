@@ -323,15 +323,11 @@ void repeat_gen(Node *p){
 	int inside_label, cmp_label, ret_label;
 
 	inside_label = l_count++;
-	cmp_label    = l_count++;
 	ret_label    = l_count++;
 	printf2("br label %%label_%d\n", inside_label);
 	printf2("\nlabel_%d:\n", inside_label);
 	
 	code_gen(p->op[0]);
-	printf2("br label %%label_%d\n", cmp_label);
-
-	printf2("\nlabel_%d:\n", cmp_label);
 	code_gen(p->op[1]);
 	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n", p->op[1]->reg, inside_label, ret_label);
 
