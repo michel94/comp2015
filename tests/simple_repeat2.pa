@@ -1,0 +1,18 @@
+program gcd(output);
+var i, j : integer;
+
+begin
+	i := 5;
+	j := 0;
+
+	repeat
+		repeat
+			j := j + 2;
+			writeln('j = ', j);
+		until j < 10;
+		
+		writeln('i = ', i);
+		i := i - 1;
+		j := j - 5;
+	until i > 0;
+end.
