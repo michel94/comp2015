@@ -3,7 +3,7 @@ var a, b, c, d : integer;
 	r: real;
 
 begin
-	d := (-9999999) mod 3000;
+	d := (-28) mod 6;
 
 	writeln(a, ' ', b, ' ', c, ' ', d);
 

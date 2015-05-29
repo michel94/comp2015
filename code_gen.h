@@ -217,6 +217,7 @@ void print_consts(){
 
 	//load_function("abs.ll");
 	printf2("define i32 @abs(i32 %%a){\n%%1 = icmp slt i32 %%a, 0\nbr i1 %%1, label %%la, label %%lb\nla:\n%%2 = sub i32 0, %%a\nret i32 %%2\nlb:\nret i32 %%a\n}");
+	printf2("define i32 @modi(i32 %%a, i32 %%c){\n	%%1 = icmp slt i32 %%a, 0\n	br i1 %%1, label %%la, label %%lb\n	la:\n %%2 = add i32 %%a, %%c\n ret i32 %%2\nlb: \n ret i32 %%a\n}");
 }
 
 void ifelse_gen(Node *p){
@@ -364,7 +365,7 @@ void code_gen(Node* p){
 		op_gen(p);
 	}else if(!strcmp(p->type, "Mod")){
 		op_gen(p);
-		printf("%%%d = call i32 @abs(i32 %%%d)\n", r_count, p->reg);
+		printf("%%%d = call i32 @modi(i32 %%%d, i32 %%%d)\n", r_count, p->reg, p->op[1]->reg);
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "Minus") || !strcmp(p->type, "Plus") || !strcmp(p->type, "Not")){
 		unary_gen(p);
