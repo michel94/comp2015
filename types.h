@@ -82,7 +82,7 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 		return strdup("fdiv");
 	else if(!strcmp(orig, "Mod"))
 		return strdup("urem");
-	else if(!strcmp(orig, "Lt") || !strcmp(orig, "Gt") || !strcmp(orig, "Leq") || !strcmp(orig, "Geq") || !strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
+	else if(!strcmp(orig, "Lt") || !strcmp(orig, "Gt") || !strcmp(orig, "Leq") || !strcmp(orig, "Geq") ){
 		char pref[64];
 		if(type == REAL_T){
 			sprintf(s, "fcmp ");
@@ -103,11 +103,27 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 			sprintf(s, "%s %s%s", s, pref, "le");
 		else if(!strcmp(orig, "Geq"))
 			sprintf(s, "%s %s%s", s, pref, "ge");
-		else if(!strcmp(orig, "Eq"))
-			sprintf(s, "%s %s%s", s, pref, "eq");
-		else if(!strcmp(orig, "Neq"))
-			sprintf(s, "%s %s", s, "ne");
 
+
+		return strdup(s);
+	}else if( !strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
+		if(!strcmp(orig, "Eq")){
+			if(type == REAL_T)
+				sprintf(s, "fcmp %s", "oeq");
+			else if(type == INTEGER_T)
+				sprintf(s, "icmp %s", "eq");
+			else if(type == BOOLEAN_T)
+				sprintf(s, "icmp %s", "eq");
+		}else if(!strcmp(orig, "Neq")){
+			if(type == REAL_T)
+				sprintf(s, "fcmp %s", "one");
+			else if(type == INTEGER_T)
+				sprintf(s, "icmp %s", "ne");
+			else if(type == BOOLEAN_T)
+				sprintf(s, "icmp %s", "ne");
+			
+		}
+		
 		return strdup(s);
 	}
 
