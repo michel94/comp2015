@@ -216,8 +216,8 @@ void print_consts(){
 		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
 
 	//load_function("abs.ll");
-	printf2("define i32 @abs(i32 %%a){\n%%1 = icmp slt i32 %%a, 0\nbr i1 %%1, label %%la, label %%lb\nla:\n%%2 = sub i32 0, %%a\nret i32 %%2\nlb:\nret i32 %%a\n}");
-	printf2("define i32 @modi(i32 %%a, i32 %%c){\n	%%1 = icmp slt i32 %%a, 0\n	br i1 %%1, label %%la, label %%lb\n	la:\n %%2 = add i32 %%a, %%c\n ret i32 %%2\nlb: \n ret i32 %%a\n}");
+	printf2("define i32 @abs(i32 %%a){\n%%1 = icmp slt i32 %%a, 0\nbr i1 %%1, label %%la, label %%lb\nla:\n%%2 = sub i32 0, %%a\nret i32 %%2\nlb:\nret i32 %%a\n}\n");
+	printf2("define i32 @modi(i32 %%a, i32 %%c){\n	%%1 = icmp slt i32 %%a, 0\n	br i1 %%1, label %%la, label %%lb\n	la:\n %%2 = add i32 %%a, %%c\n ret i32 %%2\nlb: \n ret i32 %%a\n}\n");
 }
 
 void ifelse_gen(Node *p){
@@ -320,7 +320,7 @@ void while_gen(Node *p){
 }
 
 void repeat_gen(Node *p){
-	int inside_label, cmp_label, ret_label;
+	int inside_label, ret_label;
 
 	inside_label = l_count++;
 	ret_label    = l_count++;
