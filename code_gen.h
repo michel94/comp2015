@@ -94,7 +94,7 @@ void function_gen(Node* p){
 	hashtable_t* h = symbol_tables[f_id];
 
 	type_t type = h->next[0]->type;
-	printf2("define %s @%s(", type2llvm(type), p->op[0]->value);
+	printf2("define %s @%s_(", type2llvm(type), p->op[0]->value);
 	for(it = h->next+1; it != h->last; ++it){
 		if((*it)->flag == VARPARAM_F){
 			if(it != h->next+1) printf2(", ");
@@ -414,7 +414,7 @@ void code_gen(Node* p){
 				break;
 		}
 
-		printf2("%%%d = call %s @%s(", r_count, type2llvm(p->op_type), p->op[0]->value);
+		printf2("%%%d = call %s @%s__(", r_count, type2llvm(p->op_type), p->op[0]->value);
 		for(it = h->next+1, i=1; it != h->last; ++it, ++i){
 			if((*it)->flag == VARPARAM_F){
 				if(it != h->next+1) printf2(", ");
