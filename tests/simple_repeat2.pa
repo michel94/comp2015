@@ -1,18 +1,29 @@
 program gcd(output);
 var i, j : integer;
+	tmp1 : integer;
+	tmp2 : integer;
 
 begin
-	i := 5;
-	j := 0;
 
+	val(paramstr(1), i);
+	val(paramstr(2), j);
+	
 	repeat
+		tmp1 := 0;
+		tmp2 := 0;
+		
+		val(paramstr(3), tmp1);
+		val(paramstr(4), tmp2);
+	
 		repeat
-			j := j + 2;
+			j := j + tmp1;
 			writeln('j = ', j);
 		until j < 10;
 		
 		writeln('i = ', i);
-		i := i - 1;
+		i := i - tmp2;
 		j := j - 5;
 	until i > 0;
+	
+	
 end.
