@@ -145,8 +145,8 @@ Another common thing to expressions parsing is that all of them store in the res
 To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.\\
 
 \subsection{Functions}
-There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to check before creating a table if it already exists in the PROGRAM symbol table so we can generate the corresponding error. After that we need to check his return type. If it's invalid, we generate an error too. \\
-FuncDef2 is used to define a function previously declared has forward. Within FuncDef2 there are two cases that need to be considerated for error generation. We must detect if we try to define a function with FuncDef2 that hasnt been declared yet as forward, and if we're trying to define a function with FuncDef2 that as already been defined with the same definition. In both cases we generate the right error.
+There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to check before creating a table. If it already exists in the PROGRAM symbol table we generate the corresponding error. After that we need to check its return type. If it's invalid, we generate an error too. \\
+FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considerated for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error.
 
 \subsection{Statements}
 

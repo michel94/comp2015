@@ -329,7 +329,7 @@ void repeat_gen(Node *p){
 	
 	code_gen(p->op[0]);
 	code_gen(p->op[1]);
-	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n", p->op[1]->reg, inside_label, ret_label);
+	printf2("br i1 %%%d, label %%label_%d, label %%label_%d\n", p->op[1]->reg, ret_label, inside_label);
 
 	printf2("\nlabel_%d:\n", ret_label);
 }
