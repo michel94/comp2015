@@ -6,6 +6,8 @@ int tabs = 0;
 int r_count = 1;
 int l_count = 1;
 
+int paramcount_defined = 0;
+
 FILE* out_file;
 
 void printf2(char* str, ...){
@@ -66,6 +68,9 @@ void program_gen(Node* p){
 	printf2("@argc_ = global i32 0\n");
 	printf2("@argv_ = global i8** null\n");
 
+	// inserir paramcount
+	printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
+
 	code_gen(p->op[2]);
 
 	r_count = 1;
@@ -90,11 +95,14 @@ void function_gen(Node* p){
 	r_count = 1;
 	element_t** it;
 
+	if(strcmp(p->op[0]->value, "paramcount") == 0)
+		paramcount_defined = 1;
+
 	int f_id = fetch_func(p->op[0]->value);
 	hashtable_t* h = symbol_tables[f_id];
 
 	type_t type = h->next[0]->type;
-	printf2("define %s @%s_(", type2llvm(type), p->op[0]->value);
+	printf2("define %s @%s_f(", type2llvm(type), p->op[0]->value);
 	for(it = h->next+1; it != h->last; ++it){
 		if((*it)->flag == VARPARAM_F){
 			if(it != h->next+1) printf2(", ");
@@ -212,8 +220,8 @@ void print_consts(){
 	printf2("define i32 @valparam(i32 %%pos){\n%%1 = alloca i32\nstore i32 %%pos, i32* %%1\n%%2 = load i32* %%1\n%%3 = sext i32 %%2 to i64\n%%4 = load i8*** @argv_\n%%5 = getelementptr inbounds i8** %%4, i64 %%3\n%%6 = load i8** %%5\n%%7 = call i32 @atoi(i8* %%6)\nret i32 %%7\n}\n");
 	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_5, i32 0, i32 0))\n br label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_6, i32 0, i32 0))\n br label %%end_bool\nend_bool: ret void\n}\n");
 	
-	if(!fetch(symbol_tables[PROGRAM_ST], "paramcount"))
-		printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
+	//if(!fetch(symbol_tables[PROGRAM_ST], "paramcount"))
+	//	printf2("define i32 @paramcount_f(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
 
 	//load_function("abs.ll");
 	printf2("define i32 @abs(i32 %%a){\n%%1 = icmp slt i32 %%a, 0\nbr i1 %%1, label %%la, label %%lb\nla:\n%%2 = sub i32 0, %%a\nret i32 %%2\nlb:\nret i32 %%a\n}\n");
@@ -414,7 +422,11 @@ void code_gen(Node* p){
 				break;
 		}
 
-		printf2("%%%d = call %s @%s__(", r_count, type2llvm(p->op_type), p->op[0]->value);
+		if(strcmp(p->op[0]->value, "paramcount") == 0 && paramcount_defined == 0)
+			printf2("%%%d = call %s @paramcount(", r_count, type2llvm(p->op_type), p->op[0]->value);
+		else{
+			printf2("%%%d = call %s @%s_f(", r_count, type2llvm(p->op_type), p->op[0]->value);
+		}
 		for(it = h->next+1, i=1; it != h->last; ++it, ++i){
 			if((*it)->flag == VARPARAM_F){
 				if(it != h->next+1) printf2(", ");
@@ -425,6 +437,7 @@ void code_gen(Node* p){
 			}else
 				break;
 		}
+
 		
 		printf2(")\n");
 		p->reg = r_count++;
@@ -442,3 +455,5 @@ void code_gen(Node* p){
 	}
 
 }
+
+
