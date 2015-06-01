@@ -7,6 +7,7 @@
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{fullpage}
 
 \begin{document}
 
@@ -156,24 +157,32 @@ The statements are parsed considering their operands. Statements operands are pr
 
 \subsection{Errors}
 
-
-\begin{tabularx} {\textwidth} {|X|X|X|} 
+\begin{tabularx} {\textwidth} {|l|X|X|} 
  \textbf{Node Type} 	& \textbf{Problem} & \textbf{Error Message} \\ \hline
 	Add, Mul, Sub 		& One of the operands is boolean or has undefined type (\_type\_) & Operator cannot be applied to types \\ \hline
 	Or, And 			& One of the operands isn't boolean & Operator cannot be applied to types \\ \hline
-	Lt, Gt, Leq, Geq, Eq, Neq &		One of the operands has undefined type (\_type\_) or operands are from incompatible types & Operator cannot be applied to types \\ \hline
+	Lt, Gt, Leq, \\ Geq, Eq, Neq &		One of the operands has undefined type (\_type\_) or operands are from incompatible types & Operator cannot be applied to types \\ \hline
 	Minus, Plus 		& Operand isn't real or integer & Operator cannot be applied to type \\ \hline
 	Not 				& Operand isn't boolean & Operator cannot be applied to type \\ \hline
 	Div, Mod 			& One of the operands isn't integer & Operator cannot be applied to types \\ \hline
-	If, While, Repeat Until & Operand isn't boolean & Incompatible type in statement got, expected \\ \hline
+	If, While, \\Repeat Until & Operand isn't boolean & Incompatible type in statement got, expected \\ \hline
 	ValParam 			& One of the operands isn't integer & Incompatible type in statement got, expected \\ \hline
-	Assign 				& Operands are from incompatible types & Incompatible type in assigment to got, expected \\ \hline
-	Assign 				& Left operand has undefined type(\_type\_) or is a constant & Variable identifier expected \\ \hline
-	Assign 				& Variable not previously declared i.e not present in any scope & Symbol not defined \\ \hline
+	\multirow{3}{*}{Assign} & Operands are from incompatible types & Incompatible type in assignment to got, expected \\ \cline{2-3}
+							& Left operand has undefined type(\_type\_) or is a constant & Variable identifier expected \\ \cline{2-3}
+							& Variable not previously declared i.e not present in any scope & Symbol not defined \\ \hline
 	Writeln 			& One of the operands has undefined type (\_type\_) & Cannot write values of type \\ \hline
 	Call 				& Different number of arguments in call compared to the ones of the function declaration & Wrong number of arguments in call to function got, expected \\ \hline
 \end{tabularx}
 
+
+\subsection{Expression types}
+
+In the next table, we show the type of the result of each expression, considering the types of the operands. \\
+
+\begin{tabularx} {\textwidth} {|X|X|X|} 
+ \textbf{Operation Type} 	& \textbf{Operands} & \textbf{Expression type} \\ \hline
+	
+\end{tabularx}
 
 \section{Some \LaTeX{} Examples}
 \label{sec:examples}
