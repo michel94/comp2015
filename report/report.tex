@@ -5,6 +5,8 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
+\usepackage{multirow}
+\usepackage{tabularx}
 
 \begin{document}
 
@@ -147,11 +149,24 @@ To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.\\
 
 \subsection{Functions}
 There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to check before creating a table. If it already exists in the PROGRAM symbol table we generate the corresponding error. After that we need to check its return type. If it's invalid, we generate an error too. \\
-FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considerated for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error.
+FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error.
 
 \subsection{Statements}
 
 
+\subsection{Errors}
+
+
+\begin{tabularx} {\textwidth} {|X|X|X|} 
+ \textbf{Date} & \textbf{Task} & \textbf{Hours} \\ \hline
+  04/11/2014 & Project Plan & 24 \\ \hline
+  14/11/2014    & Architecture and Design & 36  \\ \hline
+  21/11/2014    &  Quality Plan & 29  \\ \hline
+  28/11/2014     & Development  &  55 \\ \hline
+  05/12/2014      & Acceptance Tests  & 36  \\ \hline
+  12/12/2014      & Defect Fixing  &  36 \\ \hline
+  18/12/2014          &  Final presentation/Demo  & 24  \\ \hline
+\end{tabularx}
 
 
 \section{Some \LaTeX{} Examples}
