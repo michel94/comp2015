@@ -172,6 +172,8 @@ The statements are parsed considering their operands. Statements operands are pr
 	Assign 				& Variable not previously declared i.e not present in any scope & Symbol not defined \\ \hline
 	Writeln 			& One of the operands has undefined type (\_type\_) & Cannot write values of type \\ \hline
 	Call 				& Different number of arguments in call compared to the ones of the function declaration & Wrong number of arguments in call to function got, expected \\ \hline
+	Call 				& Arguments have incompatible types (conversion from integer to non integer, boolean to non boolean and real to boolean are invalid) & Incompatible type for argument in call to function  \\ \hline
+	Call 				& Constants or id's that are passed to var arguments and argument types that don't match & Variable identifier expected  \\ \hline
 \end{tabularx}
 
 
