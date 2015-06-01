@@ -8,6 +8,7 @@
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{fullpage}
+\usepackage{longtable}
 
 \begin{document}
 
@@ -157,7 +158,8 @@ The statements are parsed considering their operands. Statements operands are pr
 
 \subsection{Errors}
 
-\begin{tabularx} {\textwidth} {|l|X|X|} 
+
+\begin{longtable} {|p{3.0cm} | p{8cm} | p{4.0cm}|} 
  \textbf{Node Type} 	& \textbf{Problem} & \textbf{Error Message} \\ \hline
 	Add, Mul, Sub 		& One of the operands is boolean or has undefined type (\_type\_) & Operator cannot be applied to types \\ \hline
 	Or, And 			& One of the operands isn't boolean & Operator cannot be applied to types \\ \hline
@@ -171,12 +173,12 @@ The statements are parsed considering their operands. Statements operands are pr
 							& Left operand has undefined type(\_type\_) or is a constant & Variable identifier expected \\ \cline{2-3}
 							& Variable not previously declared i.e not present in any scope & Symbol not defined \\ \hline
 	Writeln 			& One of the operands has undefined type (\_type\_) & Cannot write values of type \\ \hline
-	Call 				& Different number of arguments in call compared to the ones of the function declaration & Wrong number of arguments in call to function got, expected \\ \hline
-	Call 				& Arguments have incompatible types (conversion from integer to non integer, boolean to non boolean and real to boolean are invalid) & Incompatible type for argument in call to function  \\ \hline
-	Call 				& Constants or id's that are passed to var arguments and argument types that don't match & Variable identifier expected  \\ \hline
-	Id 				& Id is not present in the current scope, or program and outer scopes by this order & Symbol not defined  \\ \hline
+	\multirow{3}{*}{Call} 	& Different number of arguments in call compared to the ones of the function declaration & Wrong number of arguments in call to function got, expected \\ \cline{2-3}
+	 					& Arguments have incompatible types (conversion from integer to non integer, boolean to non boolean and real to boolean are invalid) & Incompatible type for argument in call to function  \\ \cline{2-3}
+						& Constants or id's that are passed to var arguments and argument types that don't match & Variable identifier expected  \\ \hline
+	Id 					& Id is not present in the current scope, or program and outer scopes by this order & Symbol not defined  \\ \hline
 
-\end{tabularx}
+\end{longtable}
 
 
 \subsection{Expression types}
@@ -185,10 +187,10 @@ In the next table, we show the type of the result of each expression, considerin
 
 \begin{tabularx} {\textwidth} {|X|X|X|} 
  \textbf{Operation Type} 	& \textbf{Operands} & \textbf{Expression type} \\ \hline
-	\multirow{2}{*}{Add, Mul, Sub} 	& Integer & Integer \\ \hline
+	\multirow{2}{*}{Add, Mul, Sub} 	& Integer & Integer \\ 
 									& At least one of them is real & Real \\ \hline
-	\multirow{3}{*}{Lt, Gt, Leq, Geq, Eq, Neq} 	& Integer & Integer \\ \hline
-												& Boolean & Boolean \\ \hline
+	\multirow{3}{*}{Lt, Gt, Leq, Geq, Eq, Neq} 	& Integer & Integer \\
+												& Boolean & Boolean \\
 												& At least one of them is Real & Real \\ \hline
 
 
