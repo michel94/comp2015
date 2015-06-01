@@ -1,0 +1,13 @@
+program test(output);
+var a: integer;
+	g: real;
+	c: integer;
+
+function main(a: real) : integer;
+	begin
+		c := 1;
+	end;
+
+begin
+	
+end.

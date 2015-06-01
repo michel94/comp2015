@@ -130,7 +130,7 @@ The ``make\_node" function creates each other type of node, receiving the node t
 \subsection{Shift/Reduce Conflicts}
 
 After finising the translation of the given grammar in the project report from ebnf to bnf and write it to yacc we got some shift/reduce conflicts as expected, since the grammar is ambiguous. The problems were in the if/else and in the majority of the expressions. \\
-The expressions were fixed by replacing their productions with the ones from the grammar provided by ISO-7185:1990. We add to use that grammar with some modifications, to make it left recursive. We needed those productions to be left recursive because we use bottom-up parsing and the left expressions have greater priority.\\
+The expressions were fixed by replacing their productions with the ones from the grammar provided by ISO-7185:1990 since this grammar is unambiguous. We add to use that grammar with some modifications, to make it left recursive. We needed those productions to be left recursive because we use bottom-up parsing and the left expressions have greater priority.\\
 The famous dangling else conflict was resolved by giving right precedence to both `then' and `else', but giving greater precedence to the else token. \\
 So, reducing a ``if then else" expression has greater precedence than reducing a ``if then" one. \\
 
@@ -152,20 +152,26 @@ There are three types of nodes that need to be parsed for semantic analysis. Tho
 FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error.
 
 \subsection{Statements}
-
+The statements are parsed considering their operands. Statements operands are previously parsed so we can compare their types to raise an error when an incompatibility is found.\\
 
 \subsection{Errors}
 
 
 \begin{tabularx} {\textwidth} {|X|X|X|} 
- \textbf{Date} & \textbf{Task} & \textbf{Hours} \\ \hline
-  04/11/2014 & Project Plan & 24 \\ \hline
-  14/11/2014    & Architecture and Design & 36  \\ \hline
-  21/11/2014    &  Quality Plan & 29  \\ \hline
-  28/11/2014     & Development  &  55 \\ \hline
-  05/12/2014      & Acceptance Tests  & 36  \\ \hline
-  12/12/2014      & Defect Fixing  &  36 \\ \hline
-  18/12/2014          &  Final presentation/Demo  & 24  \\ \hline
+ \textbf{Node Type} 	& \textbf{Problem} & \textbf{Error Message} \\ \hline
+	Add, Mul, Sub 		& One of the operands is boolean or has undefined type (\_type\_) & Operator cannot be applied to types \\ \hline
+	Or, And 			& One of the operands isn't boolean & Operator cannot be applied to types \\ \hline
+	Lt, Gt, Leq, Geq, Eq, Neq &		One of the operands has undefined type (\_type\_) or operands are from incompatible types & Operator cannot be applied to types \\ \hline
+	Minus, Plus 		& Operand isn't real or integer & Operator cannot be applied to type \\ \hline
+	Not 				& Operand isn't boolean & Operator cannot be applied to type \\ \hline
+	Div, Mod 			& One of the operands isn't integer & Operator cannot be applied to types \\ \hline
+	If, While, Repeat Until & Operand isn't boolean & Incompatible type in statement got, expected \\ \hline
+	ValParam 			& One of the operands isn't integer & Incompatible type in statement got, expected \\ \hline
+	Assign 				& Operands are from incompatible types & Incompatible type in assigment to got, expected \\ \hline
+	Assign 				& Left operand has undefined type(\_type\_) or is a constant & Variable identifier expected \\ \hline
+	Assign 				& Variable not previously declared i.e not present in any scope & Symbol not defined \\ \hline
+	Writeln 			& One of the operands has undefined type (\_type\_) & Cannot write values of type \\ \hline
+	Call 				& Different number of arguments in call compared to the ones of the function declaration & Wrong number of arguments in call to function got, expected \\ \hline
 \end{tabularx}
 
 
