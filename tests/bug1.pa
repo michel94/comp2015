@@ -1,0 +1,18 @@
+program test(output);
+var d, e: integer;
+	i: integer;
+		
+function f(a: integer; var main: integer): integer;
+	begin
+		f := 5;
+	end;
+	
+function main(a: integer; var o: integer): integer;
+	begin
+		asdasdasd := 5;
+	end;
+
+begin
+	e := 4 + main(i, i) + 3;
+	writeln(e, ' ', main(1, i));
+end.
