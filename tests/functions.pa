@@ -2,21 +2,33 @@ program test(output);
 var d, e: real;
 	i: integer;
 
+function true: boolean;
+	begin
+		true := not false;
+	end;
+
+function false: boolean;
+	begin
+		false := not true;
+	end;
+
 function main(var a: real) : integer;
 	begin
 		main := paramcount;
 	end;
 
-function paramcount: integer;
-	begin
-		paramcount := 10
-	end;
 
 function main2 : integer;
 	begin
 		main2 := paramcount
 	end;
 
+function paramcount(i : integer): integer;
+	begin
+		paramcount := 10
+	end;
+
 begin
-	writeln(main(d), ' ', main2);
+	i := paramcount(12);
+	writeln(main(d), ' ', main2, ' ', i, ' ', true, ';', false);
 end.

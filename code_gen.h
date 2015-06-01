@@ -54,16 +54,25 @@ void program_gen(Node* p){
 	Node* var_decl = p->op[1];
 	int decl, i;
 
-	printf2("@_false = global i1 0\n");
-	printf2("@_true = global i1 1\n");
+
+	int false_def=0, true_def=0;
 
 	for(decl = 0; decl < p->op[1]->n_op; decl++){
 		var_decl = p->op[1]->op[decl];
 		type_t type = vartype(var_decl->op[var_decl->n_op-1]->value);
 		for(i = 0; i < var_decl->n_op-1; i++){
 			print_decl(var_decl->op[i]->value, type, 1);
+			if(!strcmp(var_decl->op[i]->value, "true"))
+				true_def = 1;
+			else if(!strcmp(var_decl->op[i]->value, "false"))
+				false_def = 1;
 		}
+		
 	}
+	if(!true_def)
+		printf2("@_true = global i1 1\n");
+	if(!false_def)
+		printf2("@_false = global i1 0\n");
 
 	printf2("@argc_ = global i32 0\n");
 	printf2("@argv_ = global i8** null\n");
@@ -408,34 +417,37 @@ void code_gen(Node* p){
 		for(i=1; i<p->n_op; i++)
 			code_gen(p->op[i]);
 
-		int f_id = fetch_func(p->op[0]->value);
-		hashtable_t* h = symbol_tables[f_id];
-		element_t** it;
-
-
-		for(it = h->next+1, i=1; it != h->last; ++it, ++i){
-			if((*it)->flag == VARPARAM_F){
-			}else if((*it)->flag == PARAM_F){
-				if(p->op[i]->op_type == INTEGER_T && (*it)->type == REAL_T )
-					p->op[i]->reg = real_cast(p->op[i]);
-			}else
-				break;
-		}
-
-		if(strcmp(p->op[0]->value, "paramcount") == 0 && paramcount_defined == 0)
+		//printf("paramcount %d\n", paramcount_defined);
+		if(strcmp(p->op[0]->value, "paramcount") == 0 && paramcount_defined == 0){
 			printf2("%%%d = call %s @paramcount(", r_count, type2llvm(p->op_type), p->op[0]->value);
-		else{
+		}else{
+			int f_id = fetch_func(p->op[0]->value);
+			hashtable_t* h = symbol_tables[f_id];
+			element_t** it;
+
+
+			for(it = h->next+1, i=1; it != h->last; ++it, ++i){
+				if((*it)->flag == VARPARAM_F){
+				}else if((*it)->flag == PARAM_F){
+					if(p->op[i]->op_type == INTEGER_T && (*it)->type == REAL_T )
+						p->op[i]->reg = real_cast(p->op[i]);
+				}else
+					break;
+			}
+			
 			printf2("%%%d = call %s @%s_f(", r_count, type2llvm(p->op_type), p->op[0]->value);
-		}
-		for(it = h->next+1, i=1; it != h->last; ++it, ++i){
-			if((*it)->flag == VARPARAM_F){
-				if(it != h->next+1) printf2(", ");
-				printf2("%s* dereferenceable(8) %s", type2llvm(p->op[i]->op_type), get_var(p->op[i]));
-			}else if((*it)->flag == PARAM_F){
-				if(it != h->next+1) printf2(", ");
-				printf2("%s %%%d", type2llvm((*it)->type), p->op[i]->reg);
-			}else
-				break;
+			
+			for(it = h->next+1, i=1; it != h->last; ++it, ++i){
+				if((*it)->flag == VARPARAM_F){
+					if(it != h->next+1) printf2(", ");
+					printf2("%s* dereferenceable(8) %s", type2llvm(p->op[i]->op_type), get_var(p->op[i]));
+				}else if((*it)->flag == PARAM_F){
+					if(it != h->next+1) printf2(", ");
+					printf2("%s %%%d", type2llvm((*it)->type), p->op[i]->reg);
+				}else
+					break;
+			}
+
 		}
 
 		
