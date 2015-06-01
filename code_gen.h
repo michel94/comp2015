@@ -21,20 +21,6 @@ void printf2(char* str, ...){
 	va_end(vl);
 }
 
-void load_function(char* file) {
-	FILE* f = fopen(file, "r");
-	fseek(f, 0, SEEK_END);
-	long fsize = ftell(f);
-	fseek(f, 0, SEEK_SET);
-	
-	char *string = malloc(fsize + 1);
-	fread(string, fsize, 1, f);
-	fclose(f);
-
-	string[fsize] = 0;
-	printf2("%s", string);
-}
-
 void print_decl(char* var_name, type_t type, int global){
 	if(!global)
 		printf2("%%_%s = alloca %s\n", var_name, type2llvm(type));
