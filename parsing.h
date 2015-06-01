@@ -143,12 +143,13 @@ int parse_op(Node* p){ // +,-,*
 
 int parse_assign(Node* p){
 	element_t* r = fetch_id(p->op[0]);
-	p->op[0]->op_type = r->type;
 
 	if(r == NULL){
 		printf("Line %d, col %d: Symbol %s not defined\n", p->loc.first_line, p->loc.first_column, p->op[0]->value2);
 		return 1;
 	}
+	p->op[0]->op_type = r->type;
+	
 	if((!is_int(p->op[0]) && !is_real(p->op[0]) && !is_boolean(p->op[0])) || r->flag == CONSTANT_F){
 		print_variable_expected(p);
 		return 1;
