@@ -104,9 +104,8 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 		else if(!strcmp(orig, "Geq"))
 			sprintf(s, "%s %s%s", s, pref, "ge");
 
-
 		return strdup(s);
-	}else if( !strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
+	}else if(!strcmp(orig, "Eq") || !strcmp(orig, "Neq")){
 		if(!strcmp(orig, "Eq")){
 			if(type == REAL_T)
 				sprintf(s, "fcmp %s", "oeq");
@@ -121,7 +120,6 @@ char* op2llvm(char* orig, type_t type){ // args: tree op, type of operands (only
 				sprintf(s, "icmp %s", "ne");
 			else if(type == BOOLEAN_T)
 				sprintf(s, "icmp %s", "ne");
-			
 		}
 		
 		return strdup(s);

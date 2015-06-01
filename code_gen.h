@@ -5,16 +5,11 @@ void code_gen(Node* p);
 int tabs = 0;
 int r_count = 1;
 int l_count = 1;
-
 int paramcount_defined = 0;
 
 FILE* out_file;
 
 void printf2(char* str, ...){
-	int i;
-	for(i=0; i<tabs; i++)
-		putchar('\t');
-
 	va_list vl;
 	va_start(vl, str);
 	vfprintf(out_file, str, vl);
@@ -38,11 +33,9 @@ void load_function(char* file) {
 
 	string[fsize] = 0;
 	printf2("%s", string);
-	
 }
 
 void print_decl(char* var_name, type_t type, int global){
-
 	if(!global)
 		printf2("%%_%s = alloca %s\n", var_name, type2llvm(type));
 	else
@@ -50,12 +43,8 @@ void print_decl(char* var_name, type_t type, int global){
 }
 
 void program_gen(Node* p){
-
 	Node* var_decl = p->op[1];
-	int decl, i;
-
-
-	int false_def=0, true_def=0;
+	int i, decl, false_def=0, true_def=0;
 
 	for(decl = 0; decl < p->op[1]->n_op; decl++){
 		var_decl = p->op[1]->op[decl];
@@ -77,7 +66,6 @@ void program_gen(Node* p){
 	printf2("@argc_ = global i32 0\n");
 	printf2("@argv_ = global i8** null\n");
 
-	// inserir paramcount
 	printf2("define i32 @paramcount(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
 
 	code_gen(p->op[2]);
@@ -124,7 +112,6 @@ void function_gen(Node* p){
 
 	}
 	printf2(") {\n");
-
 	print_decl( p->op[0]->value, fetch(h, p->op[0]->value)->type, 0);
 
 	for(it = h->next+1; it != h->last; ++it){
@@ -142,9 +129,7 @@ void function_gen(Node* p){
 	code_gen(p->op[p->n_op-1]);
 	
 	code_gen(p->op[0]);
-	printf2("ret %s %%%d\n", type2llvm(type), p->op[0]->reg);
-
-	printf2("}\n");
+	printf2("ret %s %%%d\n}\n", type2llvm(type), p->op[0]->reg);
 }
 
 char* const_strings[256] = {"\\0A", " ", "%.12E", "%d", "%s", "TRUE", "FALSE"};
@@ -158,9 +143,8 @@ const int PRINT_TRUE = 5;
 
 void printf_call(int str_id, Node* p){
 	printf2("%%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str_%d, i32 0, i32 0)", r_count, s_const_strings[str_id]+1, str_id);
-	if(p != NULL){
+	if(p != NULL)
 		printf2(", %s %%%d", type2llvm(p->op_type), p->reg);
-	}
 	printf2(")\n");
 	r_count++;
 }
@@ -190,13 +174,13 @@ void writeln_gen(Node* p){
 	for(i=0; i<p->n_op; i++){
 		code_gen(p->op[i]);
 		
-		if(p->op[i]->op_type == REAL_T){
+		if(p->op[i]->op_type == REAL_T)
 			printf_call(PRINT_REAL, p->op[i]);
-		}else if(p->op[i]->op_type == INTEGER_T){
+		else if(p->op[i]->op_type == INTEGER_T)
 			printf_call(PRINT_INT, p->op[i]);
-		}else if(p->op[i]->op_type == BOOLEAN_T){
+		else if(p->op[i]->op_type == BOOLEAN_T)
 			printf2("call void @print_boolean(i1 %%%d)\n", p->op[i]->reg);
-		}else{
+		else{
 			add_const_string(p->op[i]->value2);
 			printf_call(n_const_strings-1, NULL);
 		}
@@ -207,20 +191,18 @@ void writeln_gen(Node* p){
 
 char *get_var(Node* p){
 	char s[64];
-	if(is_global(p)){
+	if(is_global(p))
 		sprintf(s, "@_%s", p->value);
-	}else{
+	else
 		sprintf(s, "%%_%s", p->value);
-	}
+
 	return strdup(s);
 }
 
 void print_consts(){
-
 	int i;
-	for(i=0; i<n_const_strings; i++){
+	for(i=0; i<n_const_strings; i++)
 		printf2("@.str_%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", i, s_const_strings[i]+1, const_strings[i]);
-	}
 	printf2("\n");
 
 	printf2("declare i32 @atoi(i8*)\n");
@@ -229,10 +211,6 @@ void print_consts(){
 	printf2("define i32 @valparam(i32 %%pos){\n%%1 = alloca i32\nstore i32 %%pos, i32* %%1\n%%2 = load i32* %%1\n%%3 = sext i32 %%2 to i64\n%%4 = load i8*** @argv_\n%%5 = getelementptr inbounds i8** %%4, i64 %%3\n%%6 = load i8** %%5\n%%7 = call i32 @atoi(i8* %%6)\nret i32 %%7\n}\n");
 	printf2("define void @print_boolean(i1 %%_b){\nbr i1 %%_b, label %%if_bool, label %%else_bool\nif_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([5 x i8]* @.str_5, i32 0, i32 0))\n br label %%end_bool\nelse_bool:\n call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.str_6, i32 0, i32 0))\n br label %%end_bool\nend_bool: ret void\n}\n");
 	
-	//if(!fetch(symbol_tables[PROGRAM_ST], "paramcount"))
-	//	printf2("define i32 @paramcount_f(){\n %%1 = load i32* @argc_\n %%2 = sub i32 %%1, 1\nret i32 %%2\n}\n");
-
-	//load_function("abs.ll");
 	printf2("define i32 @abs(i32 %%a){\n%%1 = icmp slt i32 %%a, 0\nbr i1 %%1, label %%la, label %%lb\nla:\n%%2 = sub i32 0, %%a\nret i32 %%2\nlb:\nret i32 %%a\n}\n");
 	printf2("define i32 @modi(i32 %%a, i32 %%c){\n	%%1 = icmp slt i32 %%a, 0\n	br i1 %%1, label %%la, label %%lb\n	la:\n %%2 = add i32 %%a, %%c\n ret i32 %%2\nlb: \n ret i32 %%a\n}\n");
 }
@@ -289,9 +267,8 @@ void op_gen(Node* p){
 			type = INTEGER_T;
 		
 		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, type), type2llvm(type), reg0, reg1);
-	}else{
+	}else
 		printf2("%%%d = %s %s %%%d, %%%d\n", r_count, op2llvm(p->type, INTEGER_T), type2llvm(p->op_type), reg0, reg1);
-	}
 	p->reg = r_count++;
 }
 
@@ -304,17 +281,15 @@ void unary_gen(Node* p){
 	}else if(!strcmp(p->type, "Minus")){
 		printf2("%%%d = %s, %%%d\n", r_count, p->op[0]->op_type == REAL_T ? "fsub double 0.0" : "sub i32 0", reg0);
 		p->reg = r_count++;
-	}else{
+	}else
 		p->reg = reg0;
-	}
 }
 
 void vardecl_gen(Node* p){
 	int i;
 	type_t type = vartype(p->op[p->n_op-1]->value);
-	for(i = 0; i < p->n_op-1; i++){
+	for(i = 0; i < p->n_op-1; i++)
 		print_decl(p->op[i]->value, type, 0);
-	}
 }
 
 void while_gen(Node *p){
@@ -417,14 +392,12 @@ void code_gen(Node* p){
 		for(i=1; i<p->n_op; i++)
 			code_gen(p->op[i]);
 
-		//printf("paramcount %d\n", paramcount_defined);
 		if(strcmp(p->op[0]->value, "paramcount") == 0 && paramcount_defined == 0){
 			printf2("%%%d = call %s @paramcount(", r_count, type2llvm(p->op_type), p->op[0]->value);
 		}else{
 			int f_id = fetch_func(p->op[0]->value);
 			hashtable_t* h = symbol_tables[f_id];
 			element_t** it;
-
 
 			for(it = h->next+1, i=1; it != h->last; ++it, ++i){
 				if((*it)->flag == VARPARAM_F){
@@ -447,10 +420,8 @@ void code_gen(Node* p){
 				}else
 					break;
 			}
-
 		}
 
-		
 		printf2(")\n");
 		p->reg = r_count++;
 	}else if(!strcmp(p->type, "While")){
@@ -465,7 +436,4 @@ void code_gen(Node* p){
 		for(i = 0; i < p->n_op; i++)
 			code_gen(p->op[i]);
 	}
-
 }
-
-

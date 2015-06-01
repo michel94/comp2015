@@ -1,5 +1,4 @@
 %{
-
 	#include <stdio.h>
 	#include <stdarg.h>
 	#include <stdlib.h>
@@ -285,7 +284,6 @@ void print_hashtable(){
 }
 
 int main(int argc, char **argv){
-
 	if(yyparse())
 		return 0;
 
@@ -326,4 +324,3 @@ int main(int argc, char **argv){
 int yyerror(char *s){
 	printf("Line %d, col %d: %s: %s\n", yylineno, col - (int)yyleng, s, yytext);
 }
-
