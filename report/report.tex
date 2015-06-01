@@ -128,7 +128,7 @@ The ``make\_node" function creates each other type of node, receiving the node t
 \subsection{Shift/Reduce Conflicts}
 
 After finising the translation of the given grammar in the project report from ebnf to bnf and write it to yacc we got some shift/reduce conflicts as expected, since the grammar is ambiguous. The problems were in the if/else and in the majority of the expressions. \\
-The expressions were fixed by replacing their productions with the ones from the grammar provided by ISO-7185:1990. We add to use that grammar with some modifications, to make it left recursive. We needed those productions to be left recursive because we use bottom-up parsing and the left expressions have greater priority.\\
+The expressions were fixed by replacing their productions with the ones from the grammar provided by ISO-7185:1990 since this grammar is unambiguous. We add to use that grammar with some modifications, to make it left recursive. We needed those productions to be left recursive because we use bottom-up parsing and the left expressions have greater priority.\\
 The famous dangling else conflict was resolved by giving right precedence to both `then' and `else', but giving greater precedence to the else token. \\
 So, reducing a ``if then else" expression has greater precedence than reducing a ``if then" one. \\
 
