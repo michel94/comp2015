@@ -247,13 +247,14 @@ ExprList -> ExprList , Expr
 
 \subsection{Top-Down Parsing}
 
-The parsing is done in a top-down way. The parse\_tree function parses each node recursively. It starts by identifying the node type and calling the specific function to parse that node. Each of those specific functions will then parse the children nodes and if no error is found in any of them, parses the argument node itself. The parsing of each children node is done by calling the parse\_tree function for each of them. That way, identifying the type of node is done only on parse\_tree function, allowing a cleaner code.\\
+The parsing is done in a top-down way. The ``parse\_tree" function parses each node recursively. It starts by identifying the node type and calling the specific function to parse that node. Each of those specific functions will then parse the children nodes and if no error is found in any of them, parses the argument node itself. The parsing of each children node is done by calling the ``parse\_tree" function for each of them. That way, identifying the type of node is done only in one function, allowing a cleaner code.\\
 
 \subsection{Internal format of Symbol Table}
 
-A sequence of Hash Tables was the chosen data structure to represent the internal format of the symbol table. \\
+The hashtable was the chosen data structure to represent the internal format of the symbol table. \\
 We picked this structure because of it's efficiency and because it's the most common implementation in todays compilers. This critical structure has two main functions. The first one, store, is used to place a symbol in the hash table. The other function, fetch, is used to lookup the hash table for a symbol. This two functions use in common another function, hash\_fnv1a, that is responsible to produce a value from a string, value that is later used as a position in the table or not if there are collisions. \\
 By maintaining an array of pointers that is updated when a store is called, and by pointing it to the new symbol, we guarantee order in the found sequence symbols. \\
+
 
 \subsection{Ids}
 
@@ -275,7 +276,6 @@ FuncDef2 is used to define a function previously declared as forward. Within Fun
 The statements are parsed considering their operands. Statement operands are previously parsed so we can compare their types to raise an error when an incompatibility is found.\\
 
 \subsection{Errors}
-
 
 \begin{longtable} {|p{3.0cm} | p{8cm} | p{4.0cm}|} 
  \textbf{Node Type} 	& \textbf{Problem} & \textbf{Error Message} \\ \hline
@@ -306,7 +306,7 @@ The statements are parsed considering their operands. Statement operands are pre
 
 \subsection{Expression types}
 
-In the next table, we show the type of the result of each expression, considering the types of the operands that are valid. \\
+In the next table, we show the type of the result of each expression, considering valid types of operands. \\
 
 \begin{tabularx} {\textwidth} {|X|X|X|} 
  \textbf{Operation Type} 	& \textbf{Operands} & \textbf{Expression type} \\ \hline
