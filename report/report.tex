@@ -148,7 +148,7 @@ The parsing is done in a top-down way. The parse\_tree function parses each node
 
 A sequence of Hash Tables was the chosen data structure to represent the internal format of the symbol table. \\
 We picked this structure because of it's efficiency and because it's the most common implementation in todays compilers. This critical structure has two main functions. The first one, store, is used to place a symbol in the hash table. The other function, fetch, is used to lookup the hash table for a symbol. This two functions use in common another function, hash\_fnv1a, that is responsible to produce a value from a string, value that is later used as a position in the table or not if there are colisions. \\
-By maintining a pointer that is updated always a store is called, and by point it to the new symbol, we guarantee order in the found sequence symbols. \\
+By maintining a pointer that is updated always a store is called, and by pointing it to the new symbol, we guarantee order in the found sequence symbols. \\
 
 \subsection{Expressions}
 
@@ -157,7 +157,7 @@ Another common thing to expressions parsing is that all of them store in the res
 To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.\\
 
 \subsection{Functions}
-There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to check before creating a table. If it already exists in the PROGRAM symbol table we generate the corresponding error. After that we need to check its return type. If it's invalid, we generate an error too. \\
+There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to do some checks before creating a table. If it already exists in the PROGRAM symbol table we generate the an error. After that we need to check its return type. If it's invalid, we generate an error too. \\
 FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error.
 
 \subsection{Statements}
