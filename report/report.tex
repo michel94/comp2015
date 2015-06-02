@@ -129,13 +129,119 @@ Parsing is made using two functions: ``make\_node" and ``terminal". \\
 ``terminal" generates the node for the terminal symbols (id, intlit, realit and string). Obviously, those nodes are non-superfluous. Also, the value of the node is stored in lower case to be used later in id lookups.\\
 The ``make\_node" function creates each other type of node, receiving the node type and the ``to\_use" variable in its arguments. The node arguments are parsed and add to this node children. If any of those children is a list-node, those child's children (grandchildren of the new node) are appended to the new node children.\\
 
-\subsection{Grammar}
+\subsection{Grammar Considerations}
 
 After finising the translation of the given grammar in the project report from ebnf to bnf and write it to yacc we got some shift/reduce conflicts as expected, since the grammar is ambiguous. The problems were in the if/else and in the majority of the expressions. \\
 The expressions were fixed by replacing their productions with the ones from the grammar provided by ISO-7185:1990 since this grammar is unambiguous. We used that grammar with some modifications, to make it left recursive and implementable by yacc. We needed those productions to be left recursive because we will later use top-down parsing and the left expressions will have greater priority, i.e., will be deeper in the parsing tree. \\
 The famous dangling else conflict was solved by giving right precedence to both `then' and `else', but giving greater precedence to the else token. \\
 So, reducing a ``if then else" expression has greater precedence than reducing a ``if then" one. \\
 
+\subsection{Final Grammar}
+
+\begin{verbatim}
+Prog -> ProgHeading ; ProgBlock . 				
+ProgHeading -> PROGRAM IdProd ( OUTPUT ) 			
+ProgBlock -> VarPart FuncPart StatPart 				
+VarPart -> VAR VarDeclaration ; VarDeclarationList 	
+      | empty 				
+
+VarDeclarationList -> VarDeclarationList VarDeclaration
+      | empty				
+
+VarDeclaration -> IdList : IdProd					
+IdList -> IdProd IdListLoop	
+IdListLoop -> IdListLoop , IdProd					
+      | empty				
+
+IdProd -> ID 					
+
+FuncPart -> FuncDeclarationList 
+FuncDeclarationList -> FuncDeclarationList FuncDeclaration 
+      | empty				
+FuncDeclaration -> FuncHeading ; FORWARD			
+      | FuncIdent ; FuncBlock 
+      | FuncHeading ; FuncBlock
+
+FuncHeading -> FUNCTION IdProd NullFormalParam : IdProd 
+FuncIdent -> FUNCTION IdProd	
+FuncBlock -> VarPart StatPart	
+
+NullFormalParam -> FuncParams 
+      | empty				
+
+FuncParams -> ( FormalParamsList ) 				
+FormalParamsList -> FormalParamsList ; FormalParams 
+      | FormalParams			
+
+FormalParams -> VarParams 	
+      | Params 		
+
+VarParams -> VAR IdList : IdProd 					
+Params -> IdList : IdProd 	
+
+StatPart -> CompStat 			
+StatList -> Stat StatListLoop	
+StatListLoop -> StatListLoop ; Stat 				
+      | empty				
+
+CompStat -> BEG StatList END	 
+Stat -> CompStat				
+      | IF Expr THEN Stat 	
+      | IF Expr THEN Stat ELSE Stat 					
+      | WHILE Expr DO Stat 	
+      | REPEAT StatList UNTIL Expr 					
+      | VAL ( PARAMSTR ( Expr ) , IdProd )	
+      | WRITELN WriteList  	
+      | WRITELN 				
+      | IdProd ASSIGN Expr 	
+      | empty				
+
+WriteList -> ( ExprString ExprStringList ) 		
+ExprStringList -> ExprStringList , ExprString 		
+      | empty				
+
+ExprString -> Expr 			
+      | STRING 				
+
+Expr -> SimpleExpr < SimpleExpr 
+      | SimpleExpr > SimpleExpr
+      | SimpleExpr = SimpleExpr 
+      | SimpleExpr NEQ SimpleExpr 		
+      | SimpleExpr LEQ SimpleExpr 	
+      | SimpleExpr GEQ SimpleExpr 					
+      | SimpleExpr 			
+
+
+SimpleExpr -> AddOp			
+      | Term 					
+
+AddOp -> SimpleExpr + Term	
+      | SimpleExpr - Term	
+      | SimpleExpr OR Term 	
+      | + Term	
+      | - Term	
+
+Term -> Factor	
+      | Term * Factor		
+      | Term / Factor  	
+      | Term DIV Factor  		
+      | Term MOD Factor  		
+      | Term AND Factor  		
+
+Factor ->	( Expr ) 		
+      | INTLIT 				
+      | REALLIT 				
+      | ID 					
+      | NOT Factor 			
+      | IdProd ParamList 		
+
+
+ParamList -> ( Expr ExprList )					
+ExprList -> ExprList , Expr 
+      | empty				
+\end{verbatim}
+
+\newpage
 
 \section{Semantic Analysis}
 
