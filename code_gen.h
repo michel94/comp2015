@@ -102,8 +102,6 @@ void function_gen(Node* p){
 
 	for(it = h->next+1; it != h->last; ++it){
 		if((*it)->flag == VARPARAM_F){
-			printf2("%%%d = alloca %s*\n", r_count, type2llvm((*it)->type) );
-			printf2("store %s* %%_%s, %s** %%%d\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), r_count++);
 		}else if((*it)->flag == PARAM_F){
 			printf2("%%_%s = alloca %s\n", (*it)->name, type2llvm((*it)->type));
 			printf2("store %s %%__%s, %s* %%_%s\n", type2llvm((*it)->type), (*it)->name, type2llvm((*it)->type), (*it)->name);
