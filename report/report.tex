@@ -153,7 +153,7 @@ By maintaining an array of pointers that is updated when a store is called, and 
 \subsection{Ids}
 
 We keep the outer symbol table, the program symbol table and a symbol table for each function. \\
-If a id is used inside an expression, we search the function scope (if we are inside a function), the program scope and the outer scope, until we find this id. If it's found, we get its type and store it in the node, to be used by the parent node.
+If a id is used inside an expression, we search the function scope (if we are inside a function), the program scope and the outer scope, until we find this id. If it's found, we get its type and store it in the node, to be used by the parent node. In the special case that the id found is a function without arguments, then we convert the id node into a call node. \\
 If the id is declared as a function argument or declared in the beginning of the program or in the beginning of a function, they are added to the symbol table in the correspondent scope. In the function arguments, we also store the specific flag (``varparam" or ``param").
 
 \subsection{Expressions}
@@ -164,7 +164,7 @@ To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.\\
 
 \subsection{Functions}
 There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to do some checks before creating a table. If it already exists in the PROGRAM symbol table we generate an error. After that we need to check its return type. If it's invalid, we generate an error too. \\
-FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error.
+FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error. \\
 
 \subsection{Statements}
 The statements are parsed considering their operands. Statements operands are previously parsed so we can compare their types to raise an error when an incompatibility is found.\\
@@ -221,8 +221,12 @@ In the next table, we show the type of the result of each expression, considerin
 \section{Code generation}
 
 \subsection{Parsing}
-
 Code generation is done by traversing of the parse tree, using a recursive function, in a top-down way. 
+
+\subsection{Ids}
+Variable Ids can be used in two ways: to declare variables or to fetch values of existing ones. \\
+To declare variables (``VarDecl"), we simply have to consider the current context and use ``alloca" for local ones, inside functions, and ``global", for program ones. \\
+To fetch values of variables, we have to find the llvm variable to fetch, according to the name and the context. We find if the variable is global or local and, according to it, we write the specific prefix.
 
 \subsection{Expressions}
 
@@ -234,20 +238,27 @@ Code for expressions is generated recursively, using the code\_gen function. Tha
 	\item obtains the register index in which the value of the two operands is stored;
 	\item performs any casting needed on those operands, updating the registers of the operands to use, calling the ``real\_cast" function;
 	\item generates the operation code, using those registers and a new one.
-\end{enumerate}
+\end{itemize}
 
 To keep record of the next register index to use, a global counter is incremented. \\
-To generate the proper expression, we use the function op2llvm, that receives the expression name, as is stored in the parse tree, and returns the exact llvm code to be used.\\
+To generate the proper expression, we use the function ``op2llvm", that receives the expression name, as is stored in the parse tree, and returns the exact llvm code to be used.\\
 
 \subsection{Functions}
 
+Functions are generated for the nodes ``Funcdef" and ``Funcdef2" of the parse tree. ``Funcdecl" nodes can be ignored, as we explain later. \\
+For ``Funcdef"/``Funcdef2" we generate llvm functions with the same name plus ``_f" in the end, to avoid name conflicts. The arguments types are simple: integer is i32, real is double and boolean is i1. Varparams are passed as pointers, and can be used inside the function as variables. So, we simply add an ``\_" in the beginning in the argument name. Params are passed only with value. So we store them temporarily in a variable with ``\_\_" in the beginning and, after the function header, we allocate those variables locally and store these values in them. \\
+Also, we set the current scope to the one corresponding to the current function, such that in the recursive parsing, we know where to fetch the ids of the variables.
+
+\subsection{Calls}
+
+Calls follow what was specified in the functions. In the case of the ``Param", we simply parse the expression and get the register to be passed as parameter. If needed, we cast the value to real. For ``VarParam", we fetch the variable to be passed, given its name, and pass it to the function too.
 
 \subsection{Statements}
 
-Generate code for statements is a bit more complex. Most statements, like if, while and repeat need to be generated using labels. This is important so we can later use an expression to jump to those labels, for example to simulate loops. \\ 
+Generating code for statements is a bit more complex. Most statements, like if, while and repeat need to be generated using labels. This is important so we can later use an expression to jump to those labels, for example to simulate loops. \\ 
 Besides register count we also need a label count to keep track of the labels. This is also important because when we want to request a new label we just need to increment the counter and store it's value. For if statement we use 3 labels, a then label, a else label and a return label. For while we also use 3 labels. Those are compare, inside and return. For repeat until we only need two because the comparison in the until part can be done in the inside label. \\
 The statement ``valparam str" can be easily generated because it's static. We just need to request a new register and call a llvm valparam function, implemented by us, to get the console argument. The same technique is done for ``paramcount". This function is inserted in the end of the generated code. If the user defines a paramcount function, we called that one. Otherwise, we call our one paramcount function.\\
-To generate code for the ``writeln" statement, we use the printf function. To print strings, we have to keep them in a list, and in the end, we defined them as global (because parsing order doesn't matter in llvm). To print integers and reals, we call printf with a specific argument string, and the register to print. To print booleans, we implemented our own function, that evaluates the boolean value and chooses which one of two strings will print. \\
+To generate code for the ``writeln" statement, we use the printf function. To print strings, we have to keep them in a list, and in the end, we define them as global (because parsing order doesn't matter in llvm). To print integers and reals, we call printf with a specific argument string, and the register to print. To print booleans, we implemented our own function, that evaluates the boolean value and chooses which one of two strings will print. \\
 
 
 \end{document}
