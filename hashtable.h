@@ -94,7 +94,7 @@ element_t *fetch(hashtable_t* hashtable, char *s){
 	register int i;
 	for(i=(ind+1)%size; i!=ind; i=(i+1)%size){
 		it = table + i;
-		if(strlen(el->name) == 0)
+		if(strlen(it->name) == 0)
 			return NULL;
 		if(strcmp(it->name, s) == 0)
 			return it;
