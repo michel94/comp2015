@@ -255,11 +255,10 @@ The hashtable was the chosen data structure to represent the internal format of 
 We picked this structure because of it's efficiency and because it's the most common implementation in todays compilers. This critical structure has two main functions. The first one, store, is used to place a symbol in the hash table. The other function, fetch, is used to lookup the hash table for a symbol. This two functions use in common another function, hash\_fnv1a, that is responsible to produce a value from a string, value that is later used as a position in the table or not if there are collisions. \\
 By maintaining an array of pointers that is updated when a store is called, and by pointing it to the new symbol, we guarantee order in the found sequence symbols. \\
 
-
 \subsection{Ids}
 
 We keep the outer symbol table, the program symbol table and a symbol table for each function. \\
-If a id is used inside an expression, we search the function scope (if we are inside a function), the program scope and the outer scope, until we find this id. If it's found, we get its type and store it in the node, to be used by the parent node. In the special case that the id found is a function without arguments, then we convert the id node into a call node. \\
+If an id is used inside an expression, we search the function scope (if we are inside a function), the program scope and the outer scope, until we find this id. If it's found, we get its type and store it in the node, to be used by the parent node. In the special case that the id found is a function without arguments, then we convert the id node into a call node. \\
 If the id is declared as a function argument or declared in the beginning of the program or in the beginning of a function, they are added to the symbol table in the correspondent scope. In the function arguments, we also store the specific flag (``varparam" or ``param").
 
 \subsection{Expressions}
@@ -273,7 +272,7 @@ There are three types of nodes that need to be parsed for semantic analysis. Tho
 FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error. \\
 
 \subsection{Statements}
-The statements are parsed considering their operands. Statement operands are previously parsed so we can compare their types to raise an error when an incompatibility is found.\\
+The statements are parsed considering their operands. Statement operands are previously parsed so we can check their types to raise an error when an incompatibility is found.\\
 
 \subsection{Errors}
 
@@ -298,7 +297,7 @@ The statements are parsed considering their operands. Statement operands are pre
 	Id 					& Id is not present in the current scope, or program and outer scopes by this order & Symbol not defined  \\ \hline
 	FuncDef			& Invalid return type & Type identifier expected \\ \hline
 	\multirow{2}{*}{FuncDef2} & Function has not been declared before & Function identifier expected \\ \cline{2-3}
-					& Function as already been defined & Symbol already defined \\ \hline
+					& Function has already been defined & Symbol already defined \\ \hline
 
 \end{longtable}
 
@@ -330,27 +329,28 @@ In the next table, we show the type of the result of each expression, considerin
 \section{Code generation}
 
 \subsection{Parsing}
-Code generation is done by traversing of the parse tree, using a recursive function, in a top-down way. 
+Code generation is done by traversing of the parse tree, using a recursive function, in a top-down way. \\
+The ``code\_gen" function parses each node recursively. It starts by identifying the node type and calling the specific function to parse that node. Each of those specific functions will then generate code for the children nodes. The parent will only generate code after its children have generated their one.
 
 \subsection{Ids}
 Variable Ids can be used in two ways: to declare variables or to fetch values of existing ones. \\
 To declare variables (``VarDecl"), we simply have to consider the current context and use ``alloca" for local ones, inside functions, and ``global", for program ones. \\
-To fetch values of variables, we have to find the llvm variable to fetch, according to the name and the context. We find if the variable is global or local and, according to it, we write the specific prefix.
+To fetch values of variables, we have to find the llvm variable to fetch, according to the name and the context. We find out if the variable is global or local and, according to it, we write the specific prefix.
 
 \subsection{Expressions}
 
-The parse tree can be easily translated to 3 address code or, in this, llvm-ir. \\
-Code for expressions is generated recursively, using the code\_gen function. That function proceeds in the following way:
+The parse tree can be easily translated to 3 address code or, in this case, llvm-ir. \\
+Code for expressions is generated recursively, using the ``code\_gen" function. That function proceeds in the following way:
 \begin{itemize}
-	\item calls the code\_gen function for the left operand;
-	\item calls the code\_gen function for the right operand;
+	\item calls the ``code\_gen" function for the left operand;
+	\item calls the ``code\_gen" function for the right operand;
 	\item obtains the register index in which the value of the two operands is stored;
 	\item performs any casting needed on those operands, updating the registers of the operands to use, calling the ``real\_cast" function;
 	\item generates the operation code, using those registers and a new one.
 \end{itemize}
 
 To keep record of the next register index to use, a global counter is incremented. \\
-To generate the proper expression, we use the function ``op2llvm", that receives the expression name, as is stored in the parse tree, and returns the exact llvm code to be used.\\
+To generate the proper expression, we use the function ``op2llvm", that receives the expression name and the type of return, as is stored in the parse tree, and returns the exact llvm code to be used. The return type is enough to generate the llvm operator.\\
 
 \subsection{Functions}
 
