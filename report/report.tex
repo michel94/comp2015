@@ -254,7 +254,7 @@ The parsing is done in a top-down way. The ``parse\_tree" function parses each n
 The hashtable was the chosen data structure to represent the internal format of the symbol table. \\
 We picked this structure because of it's efficiency and because it's the most common implementation in todays compilers. This critical structure has two main functions. The first one, store, is used to place a symbol in the hash table. The other function, fetch, is used to lookup the hash table for a symbol. This two functions use in common another function, hash\_fnv1a, that is responsible to produce a value from a string, value that is later used as a position in the table or not if there are collisions. \\
 By maintaining an array of pointers that is updated when a store is called, and by pointing it to the new symbol, we guarantee order in the found sequence symbols. \\
-The symbols of the hash table are characterized by a name, a type to distinguish for example a number from integer to real, a flag which identifies symbols as parameters or constants, as well as a value which corresponds to the parsed token, for hash table store and lookup and error printing purposes. \\
+The symbols of the hash table have the following fields: a name, a type (to distinguish, for example, a number from integer or real), a flag which identifies symbols as parameters or constants, as well as a value for symbols of the outer symbol table. \\
 
 \subsection{Ids}
 
