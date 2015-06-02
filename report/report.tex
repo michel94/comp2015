@@ -147,8 +147,14 @@ The parsing is done in a top-down way. The parse\_tree function parses each node
 \subsection{Internal format of Symbol Table}
 
 A sequence of Hash Tables was the chosen data structure to represent the internal format of the symbol table. \\
-We picked this structure because of it's efficiency and because it's the most common implementation in todays compilers. This critical structure has two main functions. The first one, store, is used to place a symbol in the hash table. The other function, fetch, is used to lookup the hash table for a symbol. This two functions use in common another function, hash\_fnv1a, that is responsible to produce a value from a string, value that is later used as a position in the table or not if there are colisions. \\
-By maintining a pointer that is updated always a store is called, and by pointing it to the new symbol, we guarantee order in the found sequence symbols. \\
+We picked this structure because of it's efficiency and because it's the most common implementation in todays compilers. This critical structure has two main functions. The first one, store, is used to place a symbol in the hash table. The other function, fetch, is used to lookup the hash table for a symbol. This two functions use in common another function, hash\_fnv1a, that is responsible to produce a value from a string, value that is later used as a position in the table or not if there are collisions. \\
+By maintaining an array of pointers that is updated when a store is called, and by pointing it to the new symbol, we guarantee order in the found sequence symbols. \\
+
+\subsection{Ids}
+
+We keep the outer symbol table, the program symbol table and a symbol table for each function. \\
+If a id is used inside an expression, we search the function scope (if we are inside a function), the program scope and the outer scope, until we find this id. If it's found, we get its type and store it in the node, to be used by the parent node.
+If the id is declared as a function argument or declared in the beginning of the program or in the beginning of a function, they are added to the symbol table in the correspondent scope. In the function arguments, we also store the specific flag (``varparam" or ``param").
 
 \subsection{Expressions}
 
@@ -195,12 +201,18 @@ In the next table, we show the type of the result of each expression, considerin
 
 \begin{tabularx} {\textwidth} {|X|X|X|} 
  \textbf{Operation Type} 	& \textbf{Operands} & \textbf{Expression type} \\ \hline
-	\multirow{2}{*}{Add, Mul, Sub} 	& Integer & Integer \\ 
+	\multirow{2}{*}{Add, Mul, Sub} 	& Integer & Integer \\ \cline{2-3}
 									& At least one of them is real & Real \\ \hline
-	\multirow{3}{*}{Lt, Gt, Leq, Geq, Eq, Neq} 	& Integer & Integer \\
-												& Boolean & Boolean \\
+	\multirow{3}{*}{Lt, Gt, Leq, Geq, Eq, Neq} 	& Integer & Integer \\ \cline{2-3}
+												& Boolean & Boolean \\ \cline{2-3}
 												& At least one of them is Real & Real \\ \hline
-
+	\multirow{2}{*}{Plus, Minus} 				& Integer & Integer \\ \cline{2-3}
+												& Real & Real \\ \hline
+	Not & Boolean & Boolean \\ \hline
+	Or, And & Boolean & Boolean \\ \hline
+	Div, Mod & Integer & Integer \\ \hline
+	RealDiv & Real & Real \\ \hline
+	
 
 \end{tabularx}
 
@@ -210,17 +222,32 @@ In the next table, we show the type of the result of each expression, considerin
 
 \subsection{Parsing}
 
+Code generation is done by traversing of the parse tree, using a recursive function, in a top-down way. 
+
 \subsection{Expressions}
 
+The parse tree can be easily translated to 3 address code or, in this, llvm-ir. \\
+Code for expressions is generated recursively, using the code\_gen function. That function proceeds in the following way:
+\begin{itemize}
+	\item calls the code\_gen function for the left operand;
+	\item calls the code\_gen function for the right operand;
+	\item obtains the register index in which the value of the two operands is stored;
+	\item performs any casting needed on those operands, updating the registers of the operands to use, calling the ``real\_cast" function;
+	\item generates the operation code, using those registers and a new one.
+\end{enumerate}
+
+To keep record of the next register index to use, a global counter is incremented. \\
+To generate the proper expression, we use the function op2llvm, that receives the expression name, as is stored in the parse tree, and returns the exact llvm code to be used.\\
+
 \subsection{Functions}
+
 
 \subsection{Statements}
 
 Generate code for statements is a bit more complex. Most statements, like if, while and repeat need to be generated using labels. This is important so we can later use an expression to jump to those labels, for example to simulate loops. \\ 
-Besides register count we also need a label count to keep track of the labels. This is also important because when we want to request a new label we just need to increment the counter and store it's value. For if statement we use 3 labels, a then label, a else label and a return label. For while we also use 3 labels. Those are compare, inside and return. For repeat until we only need two because the comparasion in until can be done in the inside label. \\ \\ 
-The statement valparam can be easily generated because it's static. We just need to request a new register and call a pre initialized valparam function to get the console argument. \\
-On the other hand writeln code generation is not so simple. The trick is in the intermediate code specification. Since LLVM IR allows later declaration of the strings and other expressions we just need to populate the parsed outputs of writeln to a list so we can later print the strings in the code without having the problem of strings not being declared. \\
-
+Besides register count we also need a label count to keep track of the labels. This is also important because when we want to request a new label we just need to increment the counter and store it's value. For if statement we use 3 labels, a then label, a else label and a return label. For while we also use 3 labels. Those are compare, inside and return. For repeat until we only need two because the comparison in the until part can be done in the inside label. \\
+The statement ``valparam str" can be easily generated because it's static. We just need to request a new register and call a llvm valparam function, implemented by us, to get the console argument. The same technique is done for ``paramcount". This function is inserted in the end of the generated code. If the user defines a paramcount function, we called that one. Otherwise, we call our one paramcount function.\\
+To generate code for the ``writeln" statement, we use the printf function. To print strings, we have to keep them in a list, and in the end, we defined them as global (because parsing order doesn't matter in llvm). To print integers and reals, we call printf with a specific argument string, and the register to print. To print booleans, we implemented our own function, that evaluates the boolean value and chooses which one of two strings will print. \\
 
 
 \end{document}
