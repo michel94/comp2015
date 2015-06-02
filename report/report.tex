@@ -266,14 +266,14 @@ If the id is declared as a function argument or declared in the beginning of the
 
 The expressions are parsed accordingly to its type. Some of them use the same parse function. Those groups of expressions are: Add, Sub and Mul (parse\_op function); Boolean operations (Lt, Gt, Eq, etc) (parse\_eq function); Or and And (parse\_bool function); Unary operations (parse\_unary function); RealDiv; Div and Mod.\\
 Another common thing to expressions parsing is that all of them store in the respective node the result type after parsing the two children (in the variable ``op\_type"). For example, Add and the similar group of operations set the result type to integer if both parameters returned are integers. If they are both real or one of them is integer and the other is integer, then the result is real. Otherwise, there is an error that will be reported. The parsing functions will return 1 until we reach the top node of the program.\\
-To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.\\
+To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.
 
 \subsection{Functions}
 There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to do some checks before creating a table. If it already exists in the PROGRAM symbol table we generate an error. After that we need to check its return type. If it's invalid, we generate an error too. \\
-FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error. \\
+FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error. 
 
 \subsection{Statements}
-The statements are parsed considering their operands. Statement operands are previously parsed so we can check their types to raise an error when an incompatibility is found.\\
+The statements are parsed considering their operands. Statement operands are previously parsed so we can check their types to raise an error when an incompatibility is found.
 
 \subsection{Errors}
 
