@@ -246,7 +246,7 @@ To generate the proper expression, we use the function ``op2llvm", that receives
 \subsection{Functions}
 
 Functions are generated for the nodes ``Funcdef" and ``Funcdef2" of the parse tree. ``Funcdecl" nodes can be ignored, as we explain later. \\
-For ``Funcdef"/``Funcdef2" we generate llvm functions with the same name plus ``_f" in the end, to avoid name conflicts. The arguments types are simple: integer is i32, real is double and boolean is i1. Varparams are passed as pointers, and can be used inside the function as variables. So, we simply add an ``\_" in the beginning in the argument name. Params are passed only with value. So we store them temporarily in a variable with ``\_\_" in the beginning and, after the function header, we allocate those variables locally and store these values in them. \\
+For ``Funcdef"/``Funcdef2" we generate llvm functions with the same name plus ``\_f" in the end, to avoid name conflicts. The arguments types are simple: integer is i32, real is double and boolean is i1. Varparams are passed as pointers, and can be used inside the function as variables. So, we simply add an ``\_" in the beginning in the argument name. Params are passed only with value. So we store them temporarily in a variable with ``\_\_" in the beginning and, after the function header, we allocate those variables locally and store these values in them. \\
 Also, we set the current scope to the one corresponding to the current function, such that in the recursive parsing, we know where to fetch the ids of the variables.
 
 \subsection{Calls}
