@@ -157,7 +157,7 @@ Another common thing to expressions parsing is that all of them store in the res
 To store variable types, we use a enum type\_t, with INTEGER\_T, REAL\_T, etc.\\
 
 \subsection{Functions}
-There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to do some checks before creating a table. If it already exists in the PROGRAM symbol table we generate the an error. After that we need to check its return type. If it's invalid, we generate an error too. \\
+There are three types of nodes that need to be parsed for semantic analysis. Those are FuncDef, FuncDef2 and FuncDecl. Inside FuncDef and FuncDecl we need to do some checks before creating a table. If it already exists in the PROGRAM symbol table we generate an error. After that we need to check its return type. If it's invalid, we generate an error too. \\
 FuncDef2 is used to define a function previously declared as forward. Within FuncDef2 there are two cases that need to be considered for error generation. We must detect if we are trying to define a function with FuncDef2 that hasn't been declared yet, or if we're trying to define a function with FuncDef2 that as already been defined. In both cases we generate the right error.
 
 \subsection{Statements}
@@ -206,6 +206,20 @@ In the next table, we show the type of the result of each expression, considerin
 \newpage
 
 \section{Code generation}
+
+\subsection{Parsing}
+
+\subsection{Expressions}
+
+\subsection{Functions}
+
+\subsection{Statements}
+
+Generate code for statements is a bit more complex. Most statements, like if, while and repeat need to be generated using labels. This is important so we can later use an expression to jump to those labels, for example to simulate loops. \\ 
+Besides register count we also need a label count to keep track of the labels. This is also important because when we want to request a new label we just need to increment the counter and store it's value. For if statement we use 3 labels, a then label, a else label and a return label. For while we also use 3 labels. Those are compare, inside and return. For repeat until we only need two because the comparasion in until can be done in the inside label. \\ \\ 
+The statement valparam can be easily generated because it's static. We just need to request a new register and call a pre initialized valparam function to get the console argument. \\
+On the other hand writeln code generation is not so simple. The trick is in the intermediate code specification. Since LLVM IR allows later declaration of the strings and other expressions we just need to populate the parsed outputs of writeln to a list so we can later print the strings in the code without having the problem of strings not being declared. \\
+
 
 
 \end{document}
